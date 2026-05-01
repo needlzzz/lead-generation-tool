@@ -1,0 +1,24 @@
+{
+  "name": "lead-generation-crm",
+  "version": "1.0.0",
+  "description": "Local lead generation CRM for business outreach in Zürich",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "jest --verbose",
+    "install-browsers": "npx playwright install chromium"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.16",
+    "playwright": "1.49.1",
+    "uuid": "^11.0.5"
+  },
+  "devDependencies": {
+    "jest": "29.7.0"
+  },
+  "keywords": [],
+  "license": "UNLICENSED",
+  "private": true
+}

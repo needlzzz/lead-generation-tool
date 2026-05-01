@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lead Generation CRM — Zürich</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Error Banner -->
+    <div id="errorBanner" class="error-banner hidden"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+      <div class="spinner"></div>
+      <p id="loadingText">Loading...</p>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-top">
+        <h1>Lead Generation CRM</h1>
+        <div class="header-actions">
+          <select id="categoryFilter" class="category-filter">
+            <option value="">All Categories</option>
+          </select>
+          <button id="btnSettings" class="btn-icon" title="Settings">⚙</button>
+        </div>
+      </div>
+      <div id="statusBadges" class="status-badges"></div>
+    </header>
+
+    <!-- Dashboard Alerts -->
+    <div id="dashboardAlerts" class="dashboard-alerts hidden">
+      <div id="followUpsDue" class="alert-section hidden">
+        <h3>📋 Follow-Ups Due</h3>
+        <div id="followUpsList"></div>
+      </div>
+      <div id="checkReplies" class="alert-section hidden">
+        <h3>📬 Check Replies</h3>
+        <div id="repliesList"></div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <nav class="tabs">
+      <button class="tab active" data-tab="discovery">Discovery</button>
+      <button class="tab" data-tab="outreach">Outreach Pipeline</button>
+      <button class="tab" data-tab="replies">Replies &amp; Meetings</button>
+      <button class="tab" data-tab="clients">Client Tracker</button>
+    </nav>
+
+    <!-- Tab Panels -->
+    <section class="tab-panel active" id="panel-discovery">
+      <div class="panel-toolbar">
+        <button class="btn btn-primary" id="btnAddLead" style="font-size:1rem;padding:8px 20px">➕ New Lead</button>
+        <button class="btn btn-primary" id="btnImportCSV" style="font-size:1rem;padding:8px 20px">📥 CSV Import</button>
+        <input type="file" id="csvFileInput" accept=".csv" class="hidden">
+        <button class="btn" id="btnDiscoverLeads" title="Requires Playwright/Chromium">🔍 Auto-Discover (Scraper)</button>
+        <button class="btn" id="btnExportDiscovery">📤 CSV Export</button>
+      </div>
+      <div class="table-wrap">
+        <table id="tableDiscovery">
+          <thead>
+            <tr>
+              <th>Business Name</th>
+              <th>Category</th>
+              <th>Address</th>
+              <th>Phone</th>
+              <th>Email</th>
+              <th>Website</th>
+              <th>Quality</th>
+              <th>Status</th>
+              <th>Discovered</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div id="emptyDiscovery" class="empty-state hidden">
+          No leads discovered yet. Use "New Lead", "CSV Import", or "Auto-Discover" to get started.
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="panel-outreach">
+      <div class="panel-toolbar">
+        <button class="btn" id="btnExportOutreach">📤 CSV Export</button>
+      </div>
+      <div class="table-wrap">
+        <table id="tableOutreach">
+          <thead>
+            <tr>
+              <th>Business Name</th>
+              <th>Category</th>
+              <th>Email</th>
+              <th>Status</th>
+              <th>Email 1</th>
+              <th>Follow-Up 1</th>
+              <th>Follow-Up 2</th>
+              <th>Last Activity</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div id="emptyOutreach" class="empty-state hidden">
+          No leads in the outreach pipeline. Send Email 1 to discovered leads first.
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="panel-replies">
+      <div class="panel-toolbar">
+        <button class="btn" id="btnExportReplies">📤 CSV Export</button>
+      </div>
+      <div class="table-wrap">
+        <table id="tableReplies">
+          <thead>
+            <tr>
+              <th>Business Name</th>
+              <th>Reply Date</th>
+              <th>Sentiment</th>
+              <th>Calendly</th>
+              <th>Meeting Date</th>
+              <th>Notes</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div id="emptyReplies" class="empty-state hidden">
+          No replies or meetings yet. Leads appear here once a reply is logged.
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="panel-clients">
+      <div class="panel-toolbar">
+        <button class="btn" id="btnExportClients">📤 CSV Export</button>
+      </div>
+      <div class="table-wrap">
+        <table id="tableClients">
+          <thead>
+            <tr>
+              <th>Business Name</th>
+              <th>Meeting Date</th>
+              <th>Decision</th>
+              <th>Start Date</th>
+              <th>Notes</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div id="emptyClients" class="empty-state hidden">
+          No clients yet. Leads appear here after a meeting is scheduled.
+        </div>
+      </div>
+    </section>
+
+    <!-- Modals -->
+    <!-- Add/Edit Lead Modal -->
+    <div class="modal-overlay hidden" id="modalLead">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 id="modalLeadTitle">New Lead</h2>
+          <button class="modal-close" onclick="closeModal('modalLead')">&times;</button>
+        </div>
+        <form id="formLead">
+          <input type="hidden" id="leadEditId">
+          <div class="form-row">
+            <label for="leadName">Business Name *</label>
+            <input type="text" id="leadName" required>
+          </div>
+          <div class="form-row">
+            <label for="leadCategory">Category *</label>
+            <select id="leadCategory" required></select>
+          </div>
+          <div class="form-row">
+            <label for="leadAddress">Address</label>
+            <input type="text" id="leadAddress">
+          </div>
+          <div class="form-row">
+            <label for="leadPhone">Phone</label>
+            <input type="text" id="leadPhone">
+          </div>
+          <div class="form-row">
+            <label for="leadEmail">Email</label>
+            <input type="email" id="leadEmail">
+          </div>
+          <div class="form-row">
+            <label for="leadWebsite">Website URL</label>
+            <input type="url" id="leadWebsite" placeholder="https://">
+          </div>
+          <div class="form-row">
+            <label for="leadContact">Contact Person</label>
+            <input type="text" id="leadContact">
+          </div>
+          <div class="form-row">
+            <label for="leadQuality">Website Quality</label>
+            <select id="leadQuality">
+              <option value="None">No Website</option>
+              <option value="Poor">Poor</option>
+              <option value="Outdated">Outdated</option>
+              <option value="Not a Fit">Not a Fit (modern)</option>
+            </select>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn" onclick="closeModal('modalLead')">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Email Preview Modal -->
+    <div class="modal-overlay hidden" id="modalEmail">
+      <div class="modal modal-wide">
+        <div class="modal-header">
+          <h2 id="emailPreviewTitle">Email Preview</h2>
+          <button class="modal-close" onclick="closeModal('modalEmail')">&times;</button>
+        </div>
+        <div class="email-preview">
+          <div class="email-field"><strong>To:</strong> <span id="emailTo"></span></div>
+          <div class="email-field"><strong>Subject:</strong> <span id="emailSubject"></span></div>
+          <pre id="emailBody" class="email-body"></pre>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn" onclick="closeModal('modalEmail')">Close</button>
+          <button type="button" class="btn btn-primary" id="btnSendEmail">📧 Send</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reply Modal -->
+    <div class="modal-overlay hidden" id="modalReply">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Log Reply</h2>
+          <button class="modal-close" onclick="closeModal('modalReply')">&times;</button>
+        </div>
+        <form id="formReply">
+          <input type="hidden" id="replyLeadId">
+          <div class="form-row">
+            <label for="replyDate">Reply Date *</label>
+            <input type="date" id="replyDate" required>
+          </div>
+          <div class="form-row">
+            <label for="replySentiment">Sentiment *</label>
+            <select id="replySentiment" required>
+              <option value="Positive">Positive</option>
+              <option value="Neutral">Neutral</option>
+              <option value="Negative">Negative</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label for="replyNotes">Notes</label>
+            <textarea id="replyNotes" rows="3"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn" onclick="closeModal('modalReply')">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Meeting Modal -->
+    <div class="modal-overlay hidden" id="modalMeeting">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Schedule Meeting</h2>
+          <button class="modal-close" onclick="closeModal('modalMeeting')">&times;</button>
+        </div>
+        <form id="formMeeting">
+          <input type="hidden" id="meetingLeadId">
+          <div class="form-row">
+            <label for="meetingDate">Meeting Date *</label>
+            <input type="date" id="meetingDate" required>
+          </div>
+          <div class="form-row">
+            <label for="meetingNotes">Notes</label>
+            <textarea id="meetingNotes" rows="3"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn" onclick="closeModal('modalMeeting')">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Decision Modal -->
+    <div class="modal-overlay hidden" id="modalDecision">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>Decision</h2>
+          <button class="modal-close" onclick="closeModal('modalDecision')">&times;</button>
+        </div>
+        <form id="formDecision">
+          <input type="hidden" id="decisionLeadId">
+          <input type="hidden" id="decisionAction">
+          <div class="form-row">
+            <label for="decisionStartDate">Start Date (if won)</label>
+            <input type="date" id="decisionStartDate">
+          </div>
+          <div class="form-row">
+            <label for="decisionNotes">Notes</label>
+            <textarea id="decisionNotes" rows="3"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn" onclick="closeModal('modalDecision')">Cancel</button>
+            <button type="submit" class="btn btn-primary">Confirm</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay hidden" id="modalSettings">
+      <div class="modal modal-wide">
+        <div class="modal-header">
+          <h2>Settings</h2>
+          <button class="modal-close" onclick="closeModal('modalSettings')">&times;</button>
+        </div>
+        <div class="settings-tabs">
+          <button class="settings-tab active" data-settings-tab="personal">Personal</button>
+          <button class="settings-tab" data-settings-tab="smtp">SMTP</button>
+          <button class="settings-tab" data-settings-tab="categories">Categories & Templates</button>
+        </div>
+        <div class="settings-panel active" id="settings-personal">
+          <form id="formSettingsPersonal">
+            <div class="form-row">
+              <label for="settingsName">Your Name *</label>
+              <input type="text" id="settingsName" required>
+            </div>
+            <div class="form-row">
+              <label for="settingsCalendly">Calendly Link *</label>
+              <input type="url" id="settingsCalendly" required placeholder="https://calendly.com/...">
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+          </form>
+        </div>
+        <div class="settings-panel" id="settings-smtp">
+          <form id="formSettingsSMTP">
+            <div class="form-row">
+              <label for="smtpHost">SMTP Host</label>
+              <input type="text" id="smtpHost" placeholder="smtp.gmail.com">
+            </div>
+            <div class="form-row">
+              <label for="smtpPort">SMTP Port</label>
+              <input type="number" id="smtpPort" value="587">
+            </div>
+            <div class="form-row">
+              <label for="smtpUsername">Username</label>
+              <input type="text" id="smtpUsername">
+            </div>
+            <div class="form-row">
+              <label for="smtpPassword">Password</label>
+              <input type="password" id="smtpPassword">
+            </div>
+            <div class="form-row">
+              <label for="smtpFrom">From Address</label>
+              <input type="email" id="smtpFrom">
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn" id="btnTestSMTP">🔌 Test Connection</button>
+              <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+          </form>
+        </div>
+        <div class="settings-panel" id="settings-categories">
+          <div class="panel-toolbar">
+            <button class="btn btn-primary" id="btnAddCategory">+ New Category</button>
+          </div>
+          <div id="categoriesList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Editor Modal -->
+    <div class="modal-overlay hidden" id="modalCategory">
+      <div class="modal modal-wide">
+        <div class="modal-header">
+          <h2 id="modalCategoryTitle">New Category</h2>
+          <button class="modal-close" onclick="closeModal('modalCategory')">&times;</button>
+        </div>
+        <form id="formCategory">
+          <input type="hidden" id="catEditId">
+          <div class="form-row">
+            <label for="catName">Name *</label>
+            <input type="text" id="catName" required>
+          </div>
+          <div class="form-row">
+            <label for="catSearchTerm">Google Maps Search Term *</label>
+            <input type="text" id="catSearchTerm" required placeholder="e.g. Fitnessstudio Zürich">
+          </div>
+          <div class="form-row">
+            <label for="catTone">Tone</label>
+            <select id="catTone">
+              <option value="casual">Casual (Du)</option>
+              <option value="formal">Formal (Sie)</option>
+            </select>
+          </div>
+          <p class="hint">Placeholders: [Name], [Business Name], [CALENDLY-LINK], [Dein Name]</p>
+          <h3>Email 1 — Cold Outreach</h3>
+          <div class="form-row">
+            <label for="catE1Subject">Subject</label>
+            <input type="text" id="catE1Subject">
+          </div>
+          <div class="form-row">
+            <label for="catE1Body">Body</label>
+            <textarea id="catE1Body" rows="8"></textarea>
+          </div>
+          <h3>Email 2 — Follow-Up 1 (Day 3)</h3>
+          <div class="form-row">
+            <label for="catE2Subject">Subject</label>
+            <input type="text" id="catE2Subject">
+          </div>
+          <div class="form-row">
+            <label for="catE2Body">Body</label>
+            <textarea id="catE2Body" rows="6"></textarea>
+          </div>
+          <h3>Email 3 — Follow-Up 2 (Day 6)</h3>
+          <div class="form-row">
+            <label for="catE3Subject">Subject</label>
+            <input type="text" id="catE3Subject">
+          </div>
+          <div class="form-row">
+            <label for="catE3Body">Body</label>
+            <textarea id="catE3Body" rows="6"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn" onclick="closeModal('modalCategory')">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Activity Log Modal -->
+    <div class="modal-overlay hidden" id="modalActivity">
+      <div class="modal modal-wide">
+        <div class="modal-header">
+          <h2 id="activityTitle">Activity Log</h2>
+          <button class="modal-close" onclick="closeModal('modalActivity')">&times;</button>
+        </div>
+        <div id="activityLogContent" class="activity-log"></div>
+        <div class="form-actions">
+          <button type="button" class="btn" onclick="closeModal('modalActivity')">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
