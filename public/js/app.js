@@ -683,16 +683,57 @@ async function enrichEmails() {
     return;
   }
 
-  showLoading(`Enriching emails for ${leadsWithoutEmail.length} leads via local.ch...`);
+  showLoading(`Starting email enrichment (0/${leadsWithoutEmail.length})...`);
+
   try {
-    const result = await API.post('/api/scraper/enrich-emails', { city });
-    const found = result.results.filter(r => r.email);
-    alert(`Done! Found ${result.enriched} emails out of ${result.total} leads searched.${found.length > 0 ? '\n\n' + found.map(r => `${r.businessName}: ${r.email}`).join('\n') : ''}`);
+    const response = await fetch('/api/scraper/enrich-emails', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ city })
+    });
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let finalResult = null;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop(); // keep incomplete line in buffer
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          try {
+            const event = JSON.parse(line.slice(6));
+            if (event.type === 'progress') {
+              document.getElementById('loadingText').textContent = 
+                `Enriching ${event.current}/${event.total}: ${event.businessName}...`;
+            } else if (event.type === 'done') {
+              finalResult = event;
+            } else if (event.type === 'error') {
+              throw new Error(event.error);
+            }
+          } catch (parseErr) {
+            if (parseErr.message !== event?.error) { /* ignore JSON parse errors from partial data */ }
+          }
+        }
+      }
+    }
+
+    hideLoading();
+
+    if (finalResult) {
+      const found = finalResult.results.filter(r => r.email);
+      alert(`Done! Found ${finalResult.enriched} emails out of ${finalResult.total} leads searched.${found.length > 0 ? '\n\n' + found.map(r => `${r.businessName}: ${r.email}`).join('\n') : ''}`);
+    }
     await loadData();
   } catch (err) {
-    showError(`Enrichment error: ${err.message}`);
-  } finally {
     hideLoading();
+    showError(`Enrichment error: ${err.message}`);
   }
 }
 

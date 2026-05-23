@@ -89,9 +89,19 @@ router.post('/discover', async (req, res) => {
   }
 });
 
-// POST /api/scraper/enrich-emails
+// POST /api/scraper/enrich-emails (SSE — streams progress)
 router.post('/enrich-emails', async (req, res) => {
   const { leadIds, city } = req.body;
+
+  // Set up SSE headers
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+
+  function sendEvent(data) {
+    res.write(`data: ${JSON.stringify(data)}\n\n`);
+  }
 
   // Get leads to enrich — either specific IDs or all discovered leads without email
   let leads;
@@ -104,23 +114,28 @@ router.post('/enrich-emails', async (req, res) => {
   }
 
   if (leads.length === 0) {
-    return res.json({ enriched: 0, results: [], message: 'No leads to enrich' });
+    sendEvent({ type: 'done', enriched: 0, total: 0, results: [], message: 'No leads to enrich' });
+    res.end();
+    return;
   }
 
   const enrichCity = city || 'Zürich';
 
+  sendEvent({ type: 'start', total: leads.length, city: enrichCity });
+
   try {
     let results;
     try {
-      results = await enrichEmails(leads, enrichCity);
+      results = await enrichEmails(leads, enrichCity, (current, total, name) => {
+        sendEvent({ type: 'progress', current, total, businessName: name });
+      });
     } catch (enrichErr) {
       if (enrichErr.message.includes('Playwright') || 
           enrichErr.message.includes('chromium') ||
           enrichErr.message.includes('Cannot find module')) {
-        return res.status(503).json({ 
-          error: 'Playwright/Chromium is not installed. Run "npx playwright install chromium" first.',
-          code: 'SCRAPER_NOT_INSTALLED'
-        });
+        sendEvent({ type: 'error', error: 'Playwright/Chromium is not installed. Run "npx playwright install chromium" first.' });
+        res.end();
+        return;
       }
       throw enrichErr;
     }
@@ -146,7 +161,8 @@ router.post('/enrich-emails', async (req, res) => {
       }
     }
 
-    res.json({ 
+    sendEvent({ 
+      type: 'done', 
       enriched: enrichedCount, 
       total: leads.length,
       results: results.map(r => ({ 
@@ -156,8 +172,10 @@ router.post('/enrich-emails', async (req, res) => {
       }))
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    sendEvent({ type: 'error', error: err.message });
   }
+
+  res.end();
 });
 
 module.exports = router;
