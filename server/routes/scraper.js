@@ -124,11 +124,36 @@ router.post('/enrich-emails', async (req, res) => {
   sendEvent({ type: 'start', total: leads.length, city: enrichCity });
 
   try {
-    let results;
+    const now = new Date().toISOString();
+    let enrichedCount = 0;
+    const allResults = [];
+
     try {
-      results = await enrichEmails(leads, enrichCity, (current, total, name) => {
-        sendEvent({ type: 'progress', current, total, businessName: name });
-      });
+      await enrichEmails(leads, enrichCity, 
+        // onProgress
+        (current, total, name) => {
+          sendEvent({ type: 'progress', current, total, businessName: name });
+        },
+        // onResult — save immediately so data is available even if enrichment is interrupted
+        (result) => {
+          allResults.push(result);
+          if (result.email) {
+            const lead = dataStore.get('leads', result.leadId);
+            if (lead) {
+              lead.email = result.email;
+              lead.activityLog = lead.activityLog || [];
+              lead.activityLog.push({
+                date: now,
+                action: 'Email enriched',
+                details: `Found ${result.email} via ${result.source}`
+              });
+              dataStore.save('leads', lead);
+              enrichedCount++;
+              sendEvent({ type: 'found', businessName: result.businessName, email: result.email });
+            }
+          }
+        }
+      );
     } catch (enrichErr) {
       if (enrichErr.message.includes('Playwright') || 
           enrichErr.message.includes('chromium') ||
@@ -140,32 +165,11 @@ router.post('/enrich-emails', async (req, res) => {
       throw enrichErr;
     }
 
-    // Update leads with found emails
-    const now = new Date().toISOString();
-    let enrichedCount = 0;
-
-    for (const result of results) {
-      if (result.email) {
-        const lead = dataStore.get('leads', result.leadId);
-        if (lead) {
-          lead.email = result.email;
-          lead.activityLog = lead.activityLog || [];
-          lead.activityLog.push({
-            date: now,
-            action: 'Email enriched',
-            details: `Found ${result.email} via ${result.source}`
-          });
-          dataStore.save('leads', lead);
-          enrichedCount++;
-        }
-      }
-    }
-
     sendEvent({ 
       type: 'done', 
       enriched: enrichedCount, 
       total: leads.length,
-      results: results.map(r => ({ 
+      results: allResults.map(r => ({ 
         businessName: r.businessName, 
         email: r.email, 
         source: r.source 

@@ -141,9 +141,10 @@ async function enrichEmail(lead, city, page) {
  * @param {Array} leads - Array of lead objects to enrich
  * @param {string} city - City context for searches
  * @param {function} onProgress - Callback(current, total, leadName) for progress updates
+ * @param {function} onResult - Callback({ leadId, businessName, email, source }) called after each lead
  * @returns {Promise<Array<{ leadId, email, source }>>}
  */
-async function enrichEmails(leads, city, onProgress) {
+async function enrichEmails(leads, city, onProgress, onResult) {
   let chromium;
   try {
     chromium = require('playwright').chromium;
@@ -172,7 +173,10 @@ async function enrichEmails(leads, city, onProgress) {
       if (onProgress) onProgress(i + 1, leads.length, lead.businessName);
 
       const { email, source } = await enrichEmail(lead, city, page);
-      results.push({ leadId: lead.id, businessName: lead.businessName, email, source });
+      const result = { leadId: lead.id, businessName: lead.businessName, email, source };
+      results.push(result);
+
+      if (onResult) onResult(result);
 
       // Small delay between requests to be polite
       if (i < leads.length - 1) {

@@ -679,11 +679,24 @@ async function enrichEmails() {
     return;
   }
 
-  if (!confirm(`Enrich emails for ${leadsWithoutEmail.length} leads without email (searching local.ch in ${city})? This may take a few minutes.`)) {
+  if (!confirm(`Enrich emails for ${leadsWithoutEmail.length} leads without email (searching local.ch in ${city})? This runs in the background.`)) {
     return;
   }
 
-  showLoading(`Starting email enrichment (0/${leadsWithoutEmail.length})...`);
+  // Show non-blocking progress bar
+  const bar = document.getElementById('enrichmentBar');
+  const text = document.getElementById('enrichmentText');
+  const fill = document.getElementById('enrichmentFill');
+  const count = document.getElementById('enrichmentCount');
+  bar.classList.remove('hidden');
+  text.textContent = 'Starting enrichment...';
+  fill.style.width = '0%';
+  count.textContent = `0/${leadsWithoutEmail.length}`;
+
+  // Disable the button while running
+  const btn = document.getElementById('btnEnrichEmails');
+  btn.disabled = true;
+  btn.textContent = '⏳ Enriching...';
 
   try {
     const response = await fetch('/api/scraper/enrich-emails', {
@@ -696,6 +709,7 @@ async function enrichEmails() {
     const decoder = new TextDecoder();
     let buffer = '';
     let finalResult = null;
+    let foundEmails = 0;
 
     while (true) {
       const { done, value } = await reader.read();
@@ -703,37 +717,49 @@ async function enrichEmails() {
 
       buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split('\n');
-      buffer = lines.pop(); // keep incomplete line in buffer
+      buffer = lines.pop();
 
       for (const line of lines) {
         if (line.startsWith('data: ')) {
           try {
             const event = JSON.parse(line.slice(6));
             if (event.type === 'progress') {
-              document.getElementById('loadingText').textContent = 
-                `Enriching ${event.current}/${event.total}: ${event.businessName}...`;
+              const pct = Math.round((event.current / event.total) * 100);
+              fill.style.width = `${pct}%`;
+              text.textContent = `${event.businessName}`;
+              count.textContent = `${event.current}/${event.total} (${foundEmails} found)`;
             } else if (event.type === 'done') {
               finalResult = event;
+              foundEmails = event.enriched;
             } else if (event.type === 'error') {
               throw new Error(event.error);
+            } else if (event.type === 'found') {
+              // Increment found counter on each find (sent from backend)
+              foundEmails++;
+              count.textContent = count.textContent.replace(/\(\d+ found\)/, `(${foundEmails} found)`);
             }
           } catch (parseErr) {
-            if (parseErr.message !== event?.error) { /* ignore JSON parse errors from partial data */ }
+            if (parseErr.message && parseErr.message !== 'Unexpected end of JSON input') {
+              throw parseErr;
+            }
           }
         }
       }
     }
 
-    hideLoading();
-
+    // Done — hide bar, refresh data
+    bar.classList.add('hidden');
     if (finalResult) {
       const found = finalResult.results.filter(r => r.email);
-      alert(`Done! Found ${finalResult.enriched} emails out of ${finalResult.total} leads searched.${found.length > 0 ? '\n\n' + found.map(r => `${r.businessName}: ${r.email}`).join('\n') : ''}`);
+      alert(`Done! Found ${finalResult.enriched} emails out of ${finalResult.total} leads.${found.length > 0 ? '\n\n' + found.map(r => `${r.businessName}: ${r.email}`).join('\n') : ''}`);
     }
     await loadData();
   } catch (err) {
-    hideLoading();
+    bar.classList.add('hidden');
     showError(`Enrichment error: ${err.message}`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '📧 Enrich Emails';
   }
 }
 

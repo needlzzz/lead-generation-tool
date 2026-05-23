@@ -363,3 +363,52 @@ form { padding: 16px 20px; }
 
 /* Utility */
 .hidden { display: none !important; }
+
+/* Enrichment Progress Bar (non-blocking) */
+.enrichment-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid #ddd;
+  padding: 8px 20px;
+  z-index: 200;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+}
+.enrichment-bar.hidden { display: none; }
+.enrichment-bar-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+#enrichmentText {
+  font-size: 0.82rem;
+  color: #333;
+  white-space: nowrap;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+.enrichment-progress {
+  flex: 2;
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.enrichment-fill {
+  height: 100%;
+  background: #1565c0;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+.enrichment-count {
+  font-size: 0.78rem;
+  color: #888;
+  white-space: nowrap;
+}
