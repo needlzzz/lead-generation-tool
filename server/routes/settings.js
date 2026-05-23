@@ -36,11 +36,7 @@ router.get('/', (req, res) => {
 router.put('/', (req, res) => {
   const { userName, calendlyLink, smtp } = req.body;
 
-  if (!userName && userName !== '') {
-    return res.status(400).json({ error: 'userName is required' });
-  }
-
-  const existing = dataStore.readSingleton('settings') || DEFAULT_SETTINGS;
+  const existing = dataStore.readSingleton('settings') || { ...DEFAULT_SETTINGS };
 
   const settings = {
     userName: userName !== undefined ? userName : existing.userName,

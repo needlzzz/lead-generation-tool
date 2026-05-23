@@ -57,7 +57,30 @@
         <button class="btn btn-primary" id="btnAddLead" style="font-size:1rem;padding:8px 20px">➕ New Lead</button>
         <button class="btn btn-primary" id="btnImportCSV" style="font-size:1rem;padding:8px 20px">📥 CSV Import</button>
         <input type="file" id="csvFileInput" accept=".csv" class="hidden">
+        <select id="scraperCityFilter" class="category-filter" title="Scraper geolocation">
+          <option value="Zürich">Zürich</option>
+          <option value="Bern">Bern</option>
+          <option value="Basel">Basel</option>
+          <option value="Luzern">Luzern</option>
+          <option value="St. Gallen">St. Gallen</option>
+          <option value="Lausanne">Lausanne</option>
+          <option value="Genf">Genf</option>
+          <option value="Winterthur">Winterthur</option>
+          <option value="Biel/Bienne">Biel/Bienne</option>
+          <option value="Thun">Thun</option>
+          <option value="Aarau">Aarau</option>
+          <option value="Schaffhausen">Schaffhausen</option>
+          <option value="Chur">Chur</option>
+          <option value="Zug">Zug</option>
+          <option value="Solothurn">Solothurn</option>
+          <option value="Baden">Baden</option>
+          <option value="Olten">Olten</option>
+          <option value="Rapperswil">Rapperswil</option>
+          <option value="Frauenfeld">Frauenfeld</option>
+          <option value="Lugano">Lugano</option>
+        </select>
         <button class="btn" id="btnDiscoverLeads" title="Requires Playwright/Chromium">🔍 Auto-Discover (Scraper)</button>
+        <label style="display:flex;align-items:center;gap:4px;font-size:0.85rem;cursor:pointer"><input type="checkbox" id="filterNoWebsite"> No website only</label>
         <button class="btn" id="btnExportDiscovery">📤 CSV Export</button>
       </div>
       <div class="table-wrap">

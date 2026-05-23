@@ -193,7 +193,11 @@ function renderDashboardAlerts(dueData, repliesData) {
 function renderDiscoveryTab() {
   const tbody = document.querySelector('#tableDiscovery tbody');
   const empty = document.getElementById('emptyDiscovery');
-  const leads = allLeads.filter(l => l.status === 'Discovered' || l.status === 'Lost');
+  const noWebsiteOnly = document.getElementById('filterNoWebsite').checked;
+  let leads = allLeads.filter(l => l.status === 'Discovered' || l.status === 'Lost');
+  if (noWebsiteOnly) {
+    leads = leads.filter(l => !l.websiteUrl || l.websiteQuality === 'None');
+  }
 
   if (leads.length === 0) {
     tbody.innerHTML = '';
@@ -348,6 +352,11 @@ function setupEventListeners() {
   document.getElementById('categoryFilter').addEventListener('change', (e) => {
     currentCategoryFilter = e.target.value;
     loadData();
+  });
+
+  // No-website filter
+  document.getElementById('filterNoWebsite').addEventListener('change', () => {
+    renderDiscoveryTab();
   });
 
   // Settings button
@@ -641,9 +650,10 @@ async function discoverLeads() {
     return;
   }
 
-  showLoading('Searching Google Maps...');
+  const city = document.getElementById('scraperCityFilter').value;
+  showLoading(`Searching Google Maps in ${city}...`);
   try {
-    const result = await API.post('/api/scraper/discover', { categoryId: category.id });
+    const result = await API.post('/api/scraper/discover', { categoryId: category.id, city });
     if (result.duplicates && result.duplicates.length > 0) {
       alert(`${result.leads.length} leads discovered. ${result.duplicates.length} possible duplicates found.`);
     }

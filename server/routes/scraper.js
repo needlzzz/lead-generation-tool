@@ -1,23 +1,31 @@
 const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 const dataStore = require('../lib/dataStore');
-const { scrapeGoogleMaps } = require('../lib/scraper');
+const { scrapeGoogleMaps, SWISS_CITIES } = require('../lib/scraper');
 const { checkDuplicate } = require('../lib/pipeline');
 
 const router = express.Router();
 
+// GET /api/scraper/cities — list available cities
+router.get('/cities', (req, res) => {
+  res.json({ cities: Object.keys(SWISS_CITIES) });
+});
+
 // POST /api/scraper/discover
 router.post('/discover', async (req, res) => {
-  const { categoryId } = req.body;
+  const { categoryId, city } = req.body;
   if (!categoryId) return res.status(400).json({ error: 'categoryId is required' });
 
   const category = dataStore.get('categories', categoryId);
   if (!category) return res.status(400).json({ error: 'Category not found' });
 
+  // Use city from request body (defaults to Zürich in scraper if not provided)
+  const scraperCity = city || 'Zürich';
+
   try {
     let businesses;
     try {
-      businesses = await scrapeGoogleMaps(category.searchTerm);
+      businesses = await scrapeGoogleMaps(category.searchTerm, { city: scraperCity });
     } catch (scraperErr) {
       if (scraperErr.message.includes('browserType.launch') || 
           scraperErr.message.includes('Executable doesn') ||
