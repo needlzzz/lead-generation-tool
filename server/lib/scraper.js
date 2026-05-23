@@ -29,7 +29,11 @@ function getCityCoordinates(cityName) {
 
 async function scrapeGoogleMaps(searchTerm, options = {}) {
   const maxResults = options.maxResults || 30;
-  const geolocation = getCityCoordinates(options.city);
+  const city = options.city || 'Zürich';
+  const geolocation = getCityCoordinates(city);
+
+  // Append city to search term so Google Maps actually searches in that location
+  const fullSearchTerm = `${searchTerm} ${city}`;
 
   let chromium;
   try {
@@ -55,8 +59,8 @@ async function scrapeGoogleMaps(searchTerm, options = {}) {
     const page = await context.newPage();
     page.setDefaultTimeout(30000);
 
-    // Navigate to Google Maps
-    const searchUrl = `https://www.google.com/maps/search/${encodeURIComponent(searchTerm)}`;
+    // Navigate to Google Maps with city included in search
+    const searchUrl = `https://www.google.com/maps/search/${encodeURIComponent(fullSearchTerm)}`;
     await page.goto(searchUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
     // Accept cookies — try multiple selectors for different Google consent screens

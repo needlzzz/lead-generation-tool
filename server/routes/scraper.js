@@ -66,7 +66,7 @@ router.post('/discover', async (req, res) => {
         decision: null,
         startDate: null,
         notes: '',
-        activityLog: [{ date: now, action: 'Lead discovered', details: `Scraped from Google Maps: ${category.searchTerm}` }]
+        activityLog: [{ date: now, action: 'Lead discovered', details: `Scraped from Google Maps: ${category.searchTerm} in ${scraperCity}` }]
       };
 
       const dupeWarnings = checkDuplicate(lead, existingLeads);
