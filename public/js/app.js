@@ -194,9 +194,13 @@ function renderDiscoveryTab() {
   const tbody = document.querySelector('#tableDiscovery tbody');
   const empty = document.getElementById('emptyDiscovery');
   const noWebsiteOnly = document.getElementById('filterNoWebsite').checked;
+  const hasEmailOnly = document.getElementById('filterHasEmail').checked;
   let leads = allLeads.filter(l => l.status === 'Discovered' || l.status === 'Lost');
   if (noWebsiteOnly) {
     leads = leads.filter(l => !l.websiteUrl || l.websiteQuality === 'None');
+  }
+  if (hasEmailOnly) {
+    leads = leads.filter(l => l.email);
   }
 
   if (leads.length === 0) {
@@ -356,6 +360,11 @@ function setupEventListeners() {
 
   // No-website filter
   document.getElementById('filterNoWebsite').addEventListener('change', () => {
+    renderDiscoveryTab();
+  });
+
+  // Has-email filter
+  document.getElementById('filterHasEmail').addEventListener('change', () => {
     renderDiscoveryTab();
   });
 
