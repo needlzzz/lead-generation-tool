@@ -22,9 +22,6 @@
       <div class="header-top">
         <h1>Lead Generation CRM</h1>
         <div class="header-actions">
-          <select id="categoryFilter" class="category-filter">
-            <option value="">All Categories</option>
-          </select>
           <button id="btnSettings" class="btn-icon" title="Settings">⚙</button>
         </div>
       </div>
@@ -57,6 +54,9 @@
         <button class="btn btn-primary" id="btnAddLead" style="font-size:1rem;padding:8px 20px">➕ New Lead</button>
         <button class="btn btn-primary" id="btnImportCSV" style="font-size:1rem;padding:8px 20px">📥 CSV Import</button>
         <input type="file" id="csvFileInput" accept=".csv" class="hidden">
+        <select id="categoryFilter" class="category-filter">
+          <option value="">All Categories</option>
+        </select>
         <select id="scraperCityFilter" class="category-filter" title="Scraper geolocation">
           <option value="Zürich">Zürich</option>
           <option value="Bern">Bern</option>
