@@ -382,6 +382,9 @@ function setupEventListeners() {
   // Discover Leads
   document.getElementById('btnDiscoverLeads').addEventListener('click', discoverLeads);
 
+  // Enrich Emails
+  document.getElementById('btnEnrichEmails').addEventListener('click', enrichEmails);
+
   // CSV Import
   document.getElementById('btnImportCSV').addEventListener('click', () => {
     document.getElementById('csvFileInput').click();
@@ -660,6 +663,34 @@ async function discoverLeads() {
     await loadData();
   } catch (err) {
     showError(`Scraper error: ${err.message}`);
+  } finally {
+    hideLoading();
+  }
+}
+
+async function enrichEmails() {
+  const city = document.getElementById('scraperCityFilter').value;
+  const leadsWithoutEmail = allLeads.filter(l => 
+    !l.email && (l.status === 'Discovered' || l.status === 'Lost')
+  );
+
+  if (leadsWithoutEmail.length === 0) {
+    showError('No leads without email to enrich.');
+    return;
+  }
+
+  if (!confirm(`Enrich emails for ${leadsWithoutEmail.length} leads without email (searching local.ch in ${city})? This may take a few minutes.`)) {
+    return;
+  }
+
+  showLoading(`Enriching emails for ${leadsWithoutEmail.length} leads via local.ch...`);
+  try {
+    const result = await API.post('/api/scraper/enrich-emails', { city });
+    const found = result.results.filter(r => r.email);
+    alert(`Done! Found ${result.enriched} emails out of ${result.total} leads searched.${found.length > 0 ? '\n\n' + found.map(r => `${r.businessName}: ${r.email}`).join('\n') : ''}`);
+    await loadData();
+  } catch (err) {
+    showError(`Enrichment error: ${err.message}`);
   } finally {
     hideLoading();
   }

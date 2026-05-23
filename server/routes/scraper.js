@@ -2,6 +2,7 @@ const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 const dataStore = require('../lib/dataStore');
 const { scrapeGoogleMaps, SWISS_CITIES } = require('../lib/scraper');
+const { enrichEmails } = require('../lib/enrichment');
 const { checkDuplicate } = require('../lib/pipeline');
 
 const router = express.Router();
@@ -83,6 +84,77 @@ router.post('/discover', async (req, res) => {
     }
 
     res.json({ leads: createdLeads, duplicates });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/scraper/enrich-emails
+router.post('/enrich-emails', async (req, res) => {
+  const { leadIds, city } = req.body;
+
+  // Get leads to enrich — either specific IDs or all discovered leads without email
+  let leads;
+  if (leadIds && leadIds.length > 0) {
+    leads = leadIds.map(id => dataStore.get('leads', id)).filter(Boolean);
+  } else {
+    leads = dataStore.getAll('leads').filter(l => 
+      !l.email && (l.status === 'Discovered' || l.status === 'Lost')
+    );
+  }
+
+  if (leads.length === 0) {
+    return res.json({ enriched: 0, results: [], message: 'No leads to enrich' });
+  }
+
+  const enrichCity = city || 'Zürich';
+
+  try {
+    let results;
+    try {
+      results = await enrichEmails(leads, enrichCity);
+    } catch (enrichErr) {
+      if (enrichErr.message.includes('Playwright') || 
+          enrichErr.message.includes('chromium') ||
+          enrichErr.message.includes('Cannot find module')) {
+        return res.status(503).json({ 
+          error: 'Playwright/Chromium is not installed. Run "npx playwright install chromium" first.',
+          code: 'SCRAPER_NOT_INSTALLED'
+        });
+      }
+      throw enrichErr;
+    }
+
+    // Update leads with found emails
+    const now = new Date().toISOString();
+    let enrichedCount = 0;
+
+    for (const result of results) {
+      if (result.email) {
+        const lead = dataStore.get('leads', result.leadId);
+        if (lead) {
+          lead.email = result.email;
+          lead.activityLog = lead.activityLog || [];
+          lead.activityLog.push({
+            date: now,
+            action: 'Email enriched',
+            details: `Found ${result.email} via ${result.source}`
+          });
+          dataStore.save('leads', lead);
+          enrichedCount++;
+        }
+      }
+    }
+
+    res.json({ 
+      enriched: enrichedCount, 
+      total: leads.length,
+      results: results.map(r => ({ 
+        businessName: r.businessName, 
+        email: r.email, 
+        source: r.source 
+      }))
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
