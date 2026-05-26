@@ -62,7 +62,7 @@ router.get('/:id', (req, res) => {
 
 // POST /api/leads — create a new lead
 router.post('/', (req, res) => {
-  const { businessName, category, address, phone, email, websiteUrl, websiteQuality, contactPerson } = req.body;
+  const { businessName, category, city, address, phone, email, websiteUrl, websiteQuality, contactPerson } = req.body;
 
   if (!businessName) return res.status(400).json({ error: 'businessName is required' });
   if (!category) return res.status(400).json({ error: 'category is required' });
@@ -72,6 +72,7 @@ router.post('/', (req, res) => {
     id: uuidv4(),
     businessName,
     category,
+    city: city || '',
     address: address || '',
     phone: phone || '',
     email: email || '',
@@ -113,7 +114,7 @@ router.patch('/:id', (req, res) => {
 
   const updatableFields = ['businessName', 'address', 'phone', 'email', 'websiteUrl',
     'websiteQuality', 'websiteScore', 'websiteIssues', 'websiteLoadTime', 'websiteAnalyzedAt',
-    'contactPerson', 'notes', 'category'];
+    'contactPerson', 'notes', 'category', 'city'];
 
   for (const [key, value] of Object.entries(req.body)) {
     if (updatableFields.includes(key)) {

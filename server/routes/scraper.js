@@ -50,6 +50,7 @@ router.post('/discover', async (req, res) => {
         id: uuidv4(),
         businessName: biz.businessName,
         category: category.name,
+        city: scraperCity,
         address: biz.address || '',
         phone: biz.phone || '',
         email: biz.email || '',

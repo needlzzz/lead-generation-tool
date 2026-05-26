@@ -6,6 +6,7 @@ let allLeads = [];
 let allCategories = [];
 let currentTab = 'discovery';
 let currentCategoryFilter = '';
+let currentCityFilter = '';
 let currentEmailContext = null; // { leadId, emailType }
 
 // ============================================================
@@ -196,6 +197,9 @@ function renderDiscoveryTab() {
   const noWebsiteOnly = document.getElementById('filterNoWebsite').checked;
   const hasEmailOnly = document.getElementById('filterHasEmail').checked;
   let leads = allLeads.filter(l => l.status === 'Discovered' || l.status === 'Lost');
+  if (currentCityFilter) {
+    leads = leads.filter(l => l.city === currentCityFilter);
+  }
   if (noWebsiteOnly) {
     leads = leads.filter(l => !l.websiteUrl || l.websiteQuality === 'None');
   }
@@ -365,6 +369,12 @@ function setupEventListeners() {
 
   // Has-email filter
   document.getElementById('filterHasEmail').addEventListener('change', () => {
+    renderDiscoveryTab();
+  });
+
+  // City filter
+  document.getElementById('scraperCityFilter').addEventListener('change', (e) => {
+    currentCityFilter = e.target.value === 'all' ? '' : e.target.value;
     renderDiscoveryTab();
   });
 
@@ -694,7 +704,12 @@ async function discoverLeads() {
     return;
   }
 
-  const city = document.getElementById('scraperCityFilter').value;
+  const citySelect = document.getElementById('scraperCityFilter').value;
+  const city = citySelect === 'all' ? 'Zürich' : citySelect;
+  if (citySelect === 'all') {
+    showError('Please select a specific city for scraping.');
+    return;
+  }
   showLoading(`Searching Google Maps in ${city}...`);
   try {
     const result = await API.post('/api/scraper/discover', { categoryId: category.id, city });
@@ -710,7 +725,8 @@ async function discoverLeads() {
 }
 
 async function enrichEmails() {
-  const city = document.getElementById('scraperCityFilter').value;
+  const citySelect = document.getElementById('scraperCityFilter').value;
+  const city = citySelect === 'all' ? 'Zürich' : citySelect;
   const leadsWithoutEmail = allLeads.filter(l => 
     !l.email && (l.status === 'Discovered' || l.status === 'Lost')
   );
