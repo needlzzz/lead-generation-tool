@@ -1,6 +1,6 @@
 const express = require('express');
 const dataStore = require('../lib/dataStore');
-const { testConnection } = require('../lib/emailService');
+const { testConnection, sendEmail } = require('../lib/emailService');
 
 const router = express.Router();
 
@@ -92,6 +92,39 @@ router.post('/test-smtp', async (req, res) => {
     } else {
       res.status(500).json({ success: false, error: `SMTP test failed: ${detail}` });
     }
+  }
+});
+
+// POST /api/settings/send-test-email
+router.post('/send-test-email', async (req, res) => {
+  const { to } = req.body;
+  if (!to) {
+    return res.status(400).json({ error: 'Recipient address is required' });
+  }
+
+  const settings = dataStore.readSingleton('settings');
+  if (!settings || !settings.smtp || !settings.smtp.host) {
+    return res.status(400).json({ error: 'SMTP not configured. Save your settings first.' });
+  }
+
+  const fromAddress = settings.smtp.fromAddress || settings.smtp.username;
+  const subject = `Test Email from Lead Generation CRM`;
+  const body = [
+    `This is a test email sent from your Lead Generation CRM.`,
+    ``,
+    `SMTP Host: ${settings.smtp.host}:${settings.smtp.port}`,
+    `From: ${fromAddress}`,
+    `Proxy: ${settings.smtp.useProxy ? 'yes (corporate)' : 'no (direct)'}`,
+    `Sent at: ${new Date().toLocaleString('de-CH')}`,
+    ``,
+    `If you received this, your email setup is working correctly.`
+  ].join('\n');
+
+  try {
+    await sendEmail(settings.smtp, fromAddress, to, subject, body);
+    res.json({ success: true, message: `Test email sent to ${to}` });
+  } catch (err) {
+    res.status(500).json({ success: false, error: `Send failed: ${err.message}` });
   }
 });
 

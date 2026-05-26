@@ -112,7 +112,8 @@ router.patch('/:id', (req, res) => {
   if (!lead) return res.status(404).json({ error: 'Lead not found' });
 
   const updatableFields = ['businessName', 'address', 'phone', 'email', 'websiteUrl',
-    'websiteQuality', 'contactPerson', 'notes', 'category'];
+    'websiteQuality', 'websiteScore', 'websiteIssues', 'websiteLoadTime', 'websiteAnalyzedAt',
+    'contactPerson', 'notes', 'category'];
 
   for (const [key, value] of Object.entries(req.body)) {
     if (updatableFields.includes(key)) {

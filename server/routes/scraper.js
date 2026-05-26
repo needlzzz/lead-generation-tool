@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require('uuid');
 const dataStore = require('../lib/dataStore');
 const { scrapeGoogleMaps, SWISS_CITIES } = require('../lib/scraper');
 const { enrichEmails } = require('../lib/enrichment');
+const { analyzeWebsite } = require('../lib/websiteAnalyzer');
 const { checkDuplicate } = require('../lib/pipeline');
 
 const router = express.Router();
@@ -177,6 +178,118 @@ router.post('/enrich-emails', async (req, res) => {
     });
   } catch (err) {
     sendEvent({ type: 'error', error: err.message });
+  }
+
+  res.end();
+});
+
+// POST /api/scraper/analyze-websites (SSE — streams progress)
+router.post('/analyze-websites', async (req, res) => {
+  const { leadIds } = req.body;
+
+  // Set up SSE headers
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+
+  function sendEvent(data) {
+    res.write(`data: ${JSON.stringify(data)}\n\n`);
+  }
+
+  // Get leads to analyze — either specific IDs or all discovered leads with a website
+  let leads;
+  if (leadIds && leadIds.length > 0) {
+    leads = leadIds.map(id => dataStore.get('leads', id)).filter(l => l && l.websiteUrl);
+  } else {
+    leads = dataStore.getAll('leads').filter(l =>
+      l.websiteUrl && (l.status === 'Discovered' || l.status === 'Reached Out')
+    );
+  }
+
+  if (leads.length === 0) {
+    sendEvent({ type: 'done', analyzed: 0, total: 0, message: 'No leads with websites to analyze' });
+    res.end();
+    return;
+  }
+
+  sendEvent({ type: 'start', total: leads.length });
+
+  let chromium;
+  try {
+    chromium = require('playwright').chromium;
+  } catch (e) {
+    sendEvent({ type: 'error', error: 'Playwright/Chromium is not installed. Run "npx playwright install chromium" first.' });
+    res.end();
+    return;
+  }
+
+  let browser;
+  try {
+    browser = await chromium.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+
+    const context = await browser.newContext({
+      locale: 'de-CH',
+      viewport: { width: 1280, height: 800 },
+      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    });
+
+    const page = await context.newPage();
+    page.setDefaultTimeout(20000);
+
+    const now = new Date().toISOString();
+    let analyzedCount = 0;
+
+    for (let i = 0; i < leads.length; i++) {
+      const lead = leads[i];
+      sendEvent({ type: 'progress', current: i + 1, total: leads.length, businessName: lead.businessName });
+
+      try {
+        const result = await analyzeWebsite(lead.websiteUrl, page);
+
+        // Update lead with analysis results
+        lead.websiteQuality = result.quality;
+        lead.websiteScore = result.score;
+        lead.websiteIssues = result.issues;
+        lead.websiteLoadTime = result.loadTimeMs;
+        lead.websiteAnalyzedAt = now;
+        lead.activityLog = lead.activityLog || [];
+        lead.activityLog.push({
+          date: now,
+          action: 'Website analyzed',
+          details: `Score: ${result.score}/100 (${result.quality}), ${result.issues.length} issues found`
+        });
+
+        dataStore.save('leads', lead);
+        analyzedCount++;
+
+        sendEvent({
+          type: 'result',
+          leadId: lead.id,
+          businessName: lead.businessName,
+          quality: result.quality,
+          score: result.score,
+          issues: result.issues,
+          loadTimeMs: result.loadTimeMs
+        });
+      } catch (err) {
+        sendEvent({ type: 'error-single', leadId: lead.id, businessName: lead.businessName, error: err.message });
+      }
+
+      // Polite delay between requests
+      if (i < leads.length - 1) {
+        await page.waitForTimeout(1500 + Math.random() * 1000);
+      }
+    }
+
+    sendEvent({ type: 'done', analyzed: analyzedCount, total: leads.length });
+  } catch (err) {
+    sendEvent({ type: 'error', error: err.message });
+  } finally {
+    if (browser) await browser.close();
   }
 
   res.end();

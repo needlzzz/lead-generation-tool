@@ -5,6 +5,16 @@ function renderTemplate(template, lead, settings) {
     ? lead.contactPerson
     : `Team von ${lead.businessName}`;
 
+  // Format website issues as a bullet list for email templates
+  const websiteIssuesList = (lead.websiteIssues && lead.websiteIssues.length > 0)
+    ? lead.websiteIssues.map(i => `• ${i.label}: ${i.detail}`).join('\n')
+    : '';
+
+  // Short summary (first 2-3 issues, one-liner)
+  const websiteIssuesSummary = (lead.websiteIssues && lead.websiteIssues.length > 0)
+    ? lead.websiteIssues.slice(0, 3).map(i => i.label).join(', ')
+    : '';
+
   let subject = template.subject || '';
   let body = template.body || '';
 
@@ -13,7 +23,10 @@ function renderTemplate(template, lead, settings) {
     '[Name / Team von Business Name]': contactName,
     '[Business Name]': lead.businessName || '',
     '[CALENDLY-LINK]': settings.calendlyLink || '',
-    '[Dein Name]': settings.userName || ''
+    '[Dein Name]': settings.userName || '',
+    '[Website-Probleme]': websiteIssuesList,
+    '[Website-Probleme-Kurz]': websiteIssuesSummary,
+    '[Website-Score]': lead.websiteScore != null ? `${lead.websiteScore}/100` : ''
   };
 
   for (const [placeholder, value] of Object.entries(replacements)) {

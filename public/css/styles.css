@@ -183,6 +183,22 @@ td .actions { display: flex; gap: 4px; flex-wrap: wrap; }
   white-space: nowrap;
 }
 
+/* Website Quality Badges */
+.quality-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: default;
+}
+.quality-none { background: #e0e0e0; color: #616161; }
+.quality-poor { background: #ffcdd2; color: #b71c1c; }
+.quality-outdated { background: #fff9c4; color: #f57f17; }
+.quality-good { background: #c8e6c9; color: #1b5e20; }
+.quality-notafit { background: #e1bee7; color: #4a148c; }
+
 /* Empty State */
 .empty-state {
   text-align: center;

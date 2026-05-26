@@ -218,7 +218,7 @@ function renderDiscoveryTab() {
       <td>${esc(l.phone)}</td>
       <td>${esc(l.email)}</td>
       <td>${l.websiteUrl ? `<a href="${esc(l.websiteUrl)}" target="_blank" onclick="event.stopPropagation()">🔗</a>` : '—'}</td>
-      <td>${esc(l.websiteQuality)}</td>
+      <td>${renderQualityBadge(l)}</td>
       <td><span class="status-pill ${statusClass(l.status)}">${statusLabel(l.status)}</span></td>
       <td>${l.dateDiscovered || ''}</td>
       <td onclick="event.stopPropagation()">
@@ -393,6 +393,7 @@ function setupEventListeners() {
 
   // Enrich Emails
   document.getElementById('btnEnrichEmails').addEventListener('click', enrichEmails);
+  document.getElementById('btnAnalyzeWebsites').addEventListener('click', analyzeWebsites);
 
   // CSV Import
   document.getElementById('btnImportCSV').addEventListener('click', () => {
@@ -437,6 +438,7 @@ function setupEventListeners() {
     await saveSettingsSMTP();
   });
   document.getElementById('btnTestSMTP').addEventListener('click', testSMTP);
+  document.getElementById('btnSendTestEmail').addEventListener('click', sendTestEmail);
 
   // Category management
   document.getElementById('btnAddCategory').addEventListener('click', () => {
@@ -773,6 +775,115 @@ async function enrichEmails() {
 }
 
 // ============================================================
+// WEBSITE ANALYSIS
+// ============================================================
+
+function renderQualityBadge(lead) {
+  const q = lead.websiteQuality || 'None';
+  const score = lead.websiteScore != null ? ` (${lead.websiteScore}/100)` : '';
+  const issues = lead.websiteIssues || [];
+  const tooltip = issues.length > 0
+    ? issues.map(i => `• ${i.label}`).join('&#10;')
+    : '';
+  const badgeClass = {
+    'None': 'quality-none',
+    'Poor': 'quality-poor',
+    'Outdated': 'quality-outdated',
+    'Good': 'quality-good',
+    'Not a Fit': 'quality-notafit'
+  }[q] || 'quality-none';
+
+  return `<span class="quality-badge ${badgeClass}" ${tooltip ? `title="${tooltip}"` : ''}>${esc(q)}${score}</span>`;
+}
+
+async function analyzeWebsites() {
+  const leadsWithWebsite = allLeads.filter(l =>
+    l.websiteUrl && (l.status === 'Discovered' || l.status === 'Reached Out')
+  );
+
+  if (leadsWithWebsite.length === 0) {
+    showError('No leads with websites to analyze.');
+    return;
+  }
+
+  if (!confirm(`Analyze ${leadsWithWebsite.length} websites for quality issues? This runs in the background.`)) {
+    return;
+  }
+
+  // Reuse the enrichment progress bar
+  const bar = document.getElementById('enrichmentBar');
+  const text = document.getElementById('enrichmentText');
+  const fill = document.getElementById('enrichmentFill');
+  const count = document.getElementById('enrichmentCount');
+  bar.classList.remove('hidden');
+  text.textContent = 'Starting website analysis...';
+  fill.style.width = '0%';
+  count.textContent = `0/${leadsWithWebsite.length}`;
+
+  const btn = document.getElementById('btnAnalyzeWebsites');
+  btn.disabled = true;
+  btn.textContent = '⏳ Analyzing...';
+
+  try {
+    const response = await fetch('/api/scraper/analyze-websites', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let analyzedCount = 0;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          try {
+            const event = JSON.parse(line.slice(6));
+            if (event.type === 'progress') {
+              const pct = Math.round((event.current / event.total) * 100);
+              fill.style.width = `${pct}%`;
+              text.textContent = `Analyzing: ${event.businessName}`;
+              count.textContent = `${event.current}/${event.total}`;
+            } else if (event.type === 'result') {
+              analyzedCount++;
+              count.textContent = `${event.current || analyzedCount}/${leadsWithWebsite.length} (${event.quality}: ${event.score}/100)`;
+            } else if (event.type === 'done') {
+              bar.classList.add('hidden');
+              alert(`Done! Analyzed ${event.analyzed} websites.`);
+              await loadData();
+            } else if (event.type === 'error') {
+              throw new Error(event.error);
+            }
+          } catch (parseErr) {
+            if (parseErr.message && !parseErr.message.includes('Unexpected end of JSON input')) {
+              throw parseErr;
+            }
+          }
+        }
+      }
+    }
+
+    bar.classList.add('hidden');
+    await loadData();
+  } catch (err) {
+    bar.classList.add('hidden');
+    showError(`Analysis error: ${err.message}`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔬 Analyze Websites';
+  }
+}
+
+// ============================================================
 // CSV IMPORT / EXPORT
 // ============================================================
 
@@ -868,6 +979,41 @@ async function testSMTP() {
       }
     });
     const result = await API.post('/api/settings/test-smtp', {});
+    resultEl.classList.remove('smtp-pending');
+    resultEl.classList.add('smtp-success');
+    resultEl.textContent = `✅ ${result.message}`;
+  } catch (err) {
+    resultEl.classList.remove('smtp-pending');
+    resultEl.classList.add('smtp-error');
+    resultEl.textContent = `❌ ${err.message}`;
+  }
+}
+
+async function sendTestEmail() {
+  const recipient = document.getElementById('smtpTestRecipient').value.trim();
+  if (!recipient) {
+    showError('Enter a recipient email address.');
+    return;
+  }
+
+  const resultEl = document.getElementById('smtpSendTestResult');
+  resultEl.classList.remove('hidden', 'smtp-success', 'smtp-error');
+  resultEl.textContent = '⏳ Sending test email...';
+  resultEl.classList.add('smtp-pending');
+
+  try {
+    // Save settings first to ensure current form values are used
+    await API.put('/api/settings', {
+      smtp: {
+        host: document.getElementById('smtpHost').value,
+        port: parseInt(document.getElementById('smtpPort').value) || 587,
+        username: document.getElementById('smtpUsername').value,
+        password: document.getElementById('smtpPassword').value,
+        fromAddress: document.getElementById('smtpFrom').value,
+        useProxy: document.getElementById('smtpUseProxy').checked
+      }
+    });
+    const result = await API.post('/api/settings/send-test-email', { to: recipient });
     resultEl.classList.remove('smtp-pending');
     resultEl.classList.add('smtp-success');
     resultEl.textContent = `✅ ${result.message}`;
