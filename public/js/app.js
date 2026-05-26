@@ -198,7 +198,18 @@ function renderDiscoveryTab() {
   const hasEmailOnly = document.getElementById('filterHasEmail').checked;
   let leads = allLeads.filter(l => l.status === 'Discovered' || l.status === 'Lost');
   if (currentCityFilter) {
-    leads = leads.filter(l => l.city === currentCityFilter);
+    leads = leads.filter(l => {
+      // Match explicit city field
+      if (l.city === currentCityFilter) return true;
+      // Fallback: check if city name appears in address (for older leads without city field)
+      if (!l.city && l.address && l.address.toLowerCase().includes(currentCityFilter.toLowerCase())) return true;
+      // Fallback: check activity log for scraper city
+      if (!l.city && l.activityLog && l.activityLog.length > 0) {
+        const firstEntry = l.activityLog[0];
+        if (firstEntry.details && firstEntry.details.includes(`in ${currentCityFilter}`)) return true;
+      }
+      return false;
+    });
   }
   if (noWebsiteOnly) {
     leads = leads.filter(l => !l.websiteUrl || l.websiteQuality === 'None');
