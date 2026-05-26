@@ -818,17 +818,40 @@ async function discoverLeads() {
 
 async function enrichEmails() {
   const citySelect = document.getElementById('scraperCityFilter').value;
-  const city = citySelect === 'all' ? 'Zürich' : citySelect;
-  const leadsWithoutEmail = allLeads.filter(l => 
+  const catFilter = document.getElementById('categoryFilter').value;
+
+  // Filter leads that need enrichment based on current category/city selection
+  let leadsToEnrich = allLeads.filter(l =>
     !l.email && (l.status === 'Discovered' || l.status === 'Lost')
   );
 
-  if (leadsWithoutEmail.length === 0) {
-    showError('No leads without email to enrich.');
+  // Apply category filter if set
+  if (catFilter) {
+    leadsToEnrich = leadsToEnrich.filter(l => l.category === catFilter);
+  }
+
+  // Apply city filter if set
+  if (citySelect !== 'all') {
+    leadsToEnrich = leadsToEnrich.filter(l => {
+      if (l.city) return l.city === citySelect;
+      if (l.activityLog && l.activityLog[0]?.details) {
+        return l.activityLog[0].details.includes(`in ${citySelect}`);
+      }
+      return false;
+    });
+  }
+
+  if (leadsToEnrich.length === 0) {
+    showError('No leads without email to enrich (for current filter).');
     return;
   }
 
-  if (!confirm(`Enrich emails for ${leadsWithoutEmail.length} leads without email (searching local.ch in ${city})? This runs in the background.`)) {
+  const scope = [
+    catFilter || 'all categories',
+    citySelect === 'all' ? 'all cities' : citySelect
+  ].join(', ');
+
+  if (!confirm(`Enrich emails for ${leadsToEnrich.length} leads (${scope})? This runs in the background.`)) {
     return;
   }
 
@@ -840,7 +863,7 @@ async function enrichEmails() {
   bar.classList.remove('hidden');
   text.textContent = 'Starting enrichment...';
   fill.style.width = '0%';
-  count.textContent = `0/${leadsWithoutEmail.length}`;
+  count.textContent = `0/${leadsToEnrich.length}`;
 
   // Disable the button while running
   const btn = document.getElementById('btnEnrichEmails');
@@ -851,7 +874,10 @@ async function enrichEmails() {
     const response = await fetch('/api/scraper/enrich-emails', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ city })
+      body: JSON.stringify({
+        leadIds: leadsToEnrich.map(l => l.id),
+        city: citySelect === 'all' ? 'Zürich' : citySelect
+      })
     });
 
     const reader = response.body.getReader();
@@ -935,16 +961,41 @@ function renderQualityBadge(lead) {
 }
 
 async function analyzeWebsites() {
-  const leadsWithWebsite = allLeads.filter(l =>
-    l.websiteUrl && (l.status === 'Discovered' || l.status === 'Reached Out')
+  const citySelect = document.getElementById('scraperCityFilter').value;
+  const catFilter = document.getElementById('categoryFilter').value;
+
+  // Filter leads that have a website and haven't been analyzed yet
+  let leadsToAnalyze = allLeads.filter(l =>
+    l.websiteUrl && !l.websiteAnalyzedAt && (l.status === 'Discovered' || l.status === 'Reached Out')
   );
 
-  if (leadsWithWebsite.length === 0) {
-    showError('No leads with websites to analyze.');
+  // Apply category filter if set
+  if (catFilter) {
+    leadsToAnalyze = leadsToAnalyze.filter(l => l.category === catFilter);
+  }
+
+  // Apply city filter if set
+  if (citySelect !== 'all') {
+    leadsToAnalyze = leadsToAnalyze.filter(l => {
+      if (l.city) return l.city === citySelect;
+      if (l.activityLog && l.activityLog[0]?.details) {
+        return l.activityLog[0].details.includes(`in ${citySelect}`);
+      }
+      return false;
+    });
+  }
+
+  if (leadsToAnalyze.length === 0) {
+    showError('No unanalyzed leads with websites (for current filter).');
     return;
   }
 
-  if (!confirm(`Analyze ${leadsWithWebsite.length} websites for quality issues? This runs in the background.`)) {
+  const scope = [
+    catFilter || 'all categories',
+    citySelect === 'all' ? 'all cities' : citySelect
+  ].join(', ');
+
+  if (!confirm(`Analyze ${leadsToAnalyze.length} websites (${scope})? This runs in the background.`)) {
     return;
   }
 
@@ -956,7 +1007,7 @@ async function analyzeWebsites() {
   bar.classList.remove('hidden');
   text.textContent = 'Starting website analysis...';
   fill.style.width = '0%';
-  count.textContent = `0/${leadsWithWebsite.length}`;
+  count.textContent = `0/${leadsToAnalyze.length}`;
 
   const btn = document.getElementById('btnAnalyzeWebsites');
   btn.disabled = true;
@@ -966,7 +1017,7 @@ async function analyzeWebsites() {
     const response = await fetch('/api/scraper/analyze-websites', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({})
+      body: JSON.stringify({ leadIds: leadsToAnalyze.map(l => l.id) })
     });
 
     const reader = response.body.getReader();
