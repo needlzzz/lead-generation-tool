@@ -199,15 +199,17 @@ function renderDiscoveryTab() {
   let leads = allLeads.filter(l => l.status === 'Discovered' || l.status === 'Lost');
   if (currentCityFilter) {
     leads = leads.filter(l => {
-      // Match explicit city field
-      if (l.city === currentCityFilter) return true;
-      // Fallback: check if city name appears in address (for older leads without city field)
-      if (!l.city && l.address && l.address.toLowerCase().includes(currentCityFilter.toLowerCase())) return true;
-      // Fallback: check activity log for scraper city
-      if (!l.city && l.activityLog && l.activityLog.length > 0) {
+      // Match explicit city field (new leads)
+      if (l.city) return l.city === currentCityFilter;
+      // Fallback for older leads: check activity log for scraper city
+      if (l.activityLog && l.activityLog.length > 0) {
         const firstEntry = l.activityLog[0];
-        if (firstEntry.details && firstEntry.details.includes(`in ${currentCityFilter}`)) return true;
+        if (firstEntry.details && firstEntry.details.includes(' in ')) {
+          return firstEntry.details.includes(`in ${currentCityFilter}`);
+        }
       }
+      // Last resort: check address
+      if (l.address) return l.address.toLowerCase().includes(currentCityFilter.toLowerCase());
       return false;
     });
   }
