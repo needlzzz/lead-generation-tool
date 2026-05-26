@@ -199,6 +199,48 @@ td .actions { display: flex; gap: 4px; flex-wrap: wrap; }
 .quality-good { background: #c8e6c9; color: #1b5e20; }
 .quality-notafit { background: #e1bee7; color: #4a148c; }
 
+/* Website Findings Panel */
+.website-findings {
+  margin: 0 20px 16px;
+  padding: 14px 16px;
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+}
+.findings-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.findings-meta {
+  font-size: 0.75rem;
+  color: #888;
+}
+.findings-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.finding-item {
+  padding: 6px 0;
+  border-bottom: 1px solid #eee;
+}
+.finding-item:last-child { border-bottom: none; }
+.finding-label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: block;
+  color: #d32f2f;
+}
+.finding-detail {
+  font-size: 0.8rem;
+  color: #555;
+  margin-top: 2px;
+  display: block;
+}
+
 /* Empty State */
 .empty-state {
   text-align: center;

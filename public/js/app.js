@@ -635,6 +635,36 @@ function showActivityLog(leadId) {
   const lead = allLeads.find(l => l.id === leadId);
   if (!lead) return;
   document.getElementById('activityTitle').textContent = `${lead.businessName} — Activity Log`;
+
+  // Website findings section
+  const findingsEl = document.getElementById('websiteFindings');
+  if (lead.websiteIssues && lead.websiteIssues.length > 0) {
+    findingsEl.classList.remove('hidden');
+    findingsEl.innerHTML = `
+      <div class="findings-header">
+        <strong>🔬 Website Analysis</strong>
+        <span class="quality-badge ${({
+          'Poor': 'quality-poor', 'Outdated': 'quality-outdated',
+          'Good': 'quality-good', 'None': 'quality-none', 'Not a Fit': 'quality-notafit'
+        })[lead.websiteQuality] || 'quality-none'}">${esc(lead.websiteQuality)} — ${lead.websiteScore}/100</span>
+        ${lead.websiteLoadTime ? `<span class="findings-meta">Load: ${(lead.websiteLoadTime / 1000).toFixed(1)}s</span>` : ''}
+        ${lead.websiteAnalyzedAt ? `<span class="findings-meta">Analyzed: ${lead.websiteAnalyzedAt.split('T')[0]}</span>` : ''}
+      </div>
+      <ul class="findings-list">
+        ${lead.websiteIssues.map(i => `
+          <li class="finding-item">
+            <span class="finding-label">${esc(i.label)}</span>
+            <span class="finding-detail">${esc(i.detail)}</span>
+          </li>
+        `).join('')}
+      </ul>
+    `;
+  } else {
+    findingsEl.classList.add('hidden');
+    findingsEl.innerHTML = '';
+  }
+
+  // Activity log
   const log = (lead.activityLog || []).slice().reverse();
   document.getElementById('activityLogContent').innerHTML = log.length
     ? log.map(e => `
