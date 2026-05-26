@@ -707,33 +707,101 @@ function showActivityLog(leadId) {
 
 async function discoverLeads() {
   const catFilter = document.getElementById('categoryFilter').value;
-  if (!catFilter) {
-    showError('Please select a category first.');
-    return;
-  }
-  const category = allCategories.find(c => c.name === catFilter);
-  if (!category) {
-    showError('Category not found.');
-    return;
-  }
-
   const citySelect = document.getElementById('scraperCityFilter').value;
-  const city = citySelect === 'all' ? 'Zürich' : citySelect;
+
   if (citySelect === 'all') {
     showError('Please select a specific city for scraping.');
     return;
   }
-  showLoading(`Searching Google Maps in ${city}...`);
-  try {
-    const result = await API.post('/api/scraper/discover', { categoryId: category.id, city });
-    if (result.duplicates && result.duplicates.length > 0) {
-      alert(`${result.leads.length} leads discovered. ${result.duplicates.length} possible duplicates found.`);
+  const city = citySelect;
+
+  // Determine which categories to scrape
+  let categoriesToScrape;
+  if (catFilter) {
+    const category = allCategories.find(c => c.name === catFilter);
+    if (!category) { showError('Category not found.'); return; }
+    categoriesToScrape = [category];
+  } else {
+    categoriesToScrape = [...allCategories];
+  }
+
+  // Filter out categories already scraped for this city
+  const existingLeads = allLeads.filter(l => l.status === 'Discovered' || l.status === 'Lost');
+  const alreadyScraped = new Set();
+  for (const lead of existingLeads) {
+    // Determine lead's city from explicit field or activity log
+    let leadCity = lead.city;
+    if (!leadCity && lead.activityLog && lead.activityLog[0]?.details) {
+      const match = lead.activityLog[0].details.match(/in (.+)$/);
+      if (match) leadCity = match[1];
     }
+    if (leadCity && lead.category) {
+      alreadyScraped.add(`${lead.category}::${leadCity}`);
+    }
+  }
+
+  const remaining = categoriesToScrape.filter(c => !alreadyScraped.has(`${c.name}::${city}`));
+
+  if (remaining.length === 0) {
+    showError(`All ${categoriesToScrape.length === 1 ? 'selected category has' : 'categories have'} already been scraped for ${city}. Add new categories or pick a different city.`);
+    return;
+  }
+
+  const skipped = categoriesToScrape.length - remaining.length;
+  const msg = remaining.length === 1
+    ? `Scrape "${remaining[0].name}" in ${city}?`
+    : `Scrape ${remaining.length} categories in ${city}?${skipped > 0 ? ` (${skipped} already scraped, skipping)` : ''}`;
+
+  if (!confirm(msg)) return;
+
+  // Show progress bar
+  const bar = document.getElementById('enrichmentBar');
+  const text = document.getElementById('enrichmentText');
+  const fill = document.getElementById('enrichmentFill');
+  const count = document.getElementById('enrichmentCount');
+  bar.classList.remove('hidden');
+  fill.style.width = '0%';
+
+  const btn = document.getElementById('btnDiscoverLeads');
+  btn.disabled = true;
+  btn.textContent = '⏳ Scraping...';
+
+  let totalCreated = 0;
+  let totalDuplicates = 0;
+
+  try {
+    for (let i = 0; i < remaining.length; i++) {
+      const cat = remaining[i];
+      const pct = Math.round(((i) / remaining.length) * 100);
+      fill.style.width = `${pct}%`;
+      text.textContent = `Scraping: ${cat.name} in ${city}`;
+      count.textContent = `${i + 1}/${remaining.length}`;
+
+      try {
+        const result = await API.post('/api/scraper/discover', { categoryId: cat.id, city });
+        totalCreated += result.leads.length;
+        totalDuplicates += (result.duplicates || []).length;
+      } catch (err) {
+        // Log error but continue with next category
+        console.error(`Scraper error for ${cat.name}:`, err.message);
+      }
+
+      // Polite delay between categories
+      if (i < remaining.length - 1) {
+        await new Promise(r => setTimeout(r, 2000));
+      }
+    }
+
+    fill.style.width = '100%';
+    bar.classList.add('hidden');
+    alert(`Done! ${totalCreated} leads discovered across ${remaining.length} categories.${totalDuplicates > 0 ? ` ${totalDuplicates} duplicates.` : ''}`);
     await loadData();
   } catch (err) {
+    bar.classList.add('hidden');
     showError(`Scraper error: ${err.message}`);
   } finally {
-    hideLoading();
+    btn.disabled = false;
+    btn.textContent = '🔍 Auto-Discover (Scraper)';
   }
 }
 
