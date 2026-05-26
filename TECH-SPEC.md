@@ -34,7 +34,9 @@ lead-generation-tool/
 │   │   ├── pipeline.js           # Status transitions, follow-up logic, duplicates
 │   │   ├── scraper.js            # Playwright Google Maps scraper
 │   │   ├── emailService.js       # Nodemailer wrapper + template rendering
-│   │   └── csvService.js         # CSV parse/generate
+│   │   ├── csvService.js         # CSV parse/generate
+│   │   ├── enrichment.js         # Email enrichment (local.ch + website scraping)
+│   │   └── websiteAnalyzer.js    # Automated website quality analysis
 │   └── data/
 │       ├── leads.json            # Lead records (created at runtime)
 │       ├── categories.json       # Category + template definitions
@@ -76,7 +78,7 @@ lead-generation-tool/
 | phone             | string   | no       | Phone number                                             |
 | email             | string   | no       | Business email for outreach                              |
 | websiteUrl        | string   | no       | Website URL, may be empty if none exists                 |
-| websiteQuality    | enum     | yes      | One of: "None", "Poor", "Outdated", "Not a Fit"         |
+| websiteQuality    | enum     | yes      | One of: "None", "Poor", "Outdated", "Good", "Not a Fit"  |
 | contactPerson     | string   | no       | Name of contact. If empty, templates use "Team von [businessName]" |
 | status            | enum     | yes      | One of: "Discovered", "Reached Out", "Replied", "No Response", "Meeting Scheduled", "Client Won", "Lost" |
 | dateDiscovered    | ISO date | yes      | Set on creation                                          |
@@ -91,6 +93,10 @@ lead-generation-tool/
 | startDate         | ISO date | no       | Set when client is won and work begins                   |
 | notes             | string   | no       | Free-text notes                                          |
 | activityLog       | array    | yes      | Array of `{ date: ISO, action: string, details: string }` |
+| websiteScore      | number   | no       | Quality score 0-100 from automated analysis              |
+| websiteIssues     | array    | no       | Array of `{ id: string, label: string, detail: string }` (German) |
+| websiteLoadTime   | number   | no       | Page load time in milliseconds                           |
+| websiteAnalyzedAt | ISO date | no       | When the website was last analyzed                       |
 
 ### Category
 
@@ -113,6 +119,7 @@ lead-generation-tool/
 | smtp.username | string | yes      | SMTP login                               |
 | smtp.password | string | yes      | SMTP password / app password             |
 | smtp.fromAddress | string | yes   | "From" address on outgoing emails        |
+| smtp.useProxy   | boolean | no   | Route SMTP through corporate HTTP proxy   |
 
 ## API / Routes
 
@@ -213,10 +220,24 @@ lead-generation-tool/
 ### `PUT /api/settings`
 
 - **Purpose:** Save settings
-- **Request body:** `{ userName, calendlyLink, smtp: { host, port, username, password, fromAddress } }`
-- **Behavior:** If smtp.password is `"********"`, keep the existing password (don't overwrite with mask)
+- **Request body:** `{ userName, calendlyLink, smtp: { host, port, username, password, fromAddress, useProxy } }`
+- **Behavior:** If smtp.password is `"********"`, keep the existing password (don't overwrite with mask). If useProxy is true, SMTP connections route through `http://aproxy.corproot.net:8080`.
 - **Response:** `{ settings: Settings }` (masked)
 - **Errors:** 400 if userName or calendlyLink missing
+
+### `POST /api/settings/test-smtp`
+
+- **Purpose:** Test SMTP connection with verbose error reporting
+- **Request body:** `{}` (uses saved settings)
+- **Response:** `{ success: true, message: "SMTP connection to host:port successful (user: x)" }` or `{ success: false, error: "SMTP test failed [ECONNREFUSED]: Host: ... | Port: ... | Error: ..." }`
+- **Behavior:** Saves current form values first, then calls `transport.verify()`. Reports error code, host, port, user, secure mode, and proxy status.
+
+### `POST /api/settings/send-test-email`
+
+- **Purpose:** Send a real test email to verify delivery
+- **Request body:** `{ to: "recipient@example.com" }`
+- **Response:** `{ success: true, message: "Test email sent to ..." }`
+- **Behavior:** Sends a test email with SMTP config details in the body. Uses saved settings.
 
 ### `POST /api/scraper/discover`
 
@@ -225,6 +246,15 @@ lead-generation-tool/
 - **Behavior:** Looks up category's searchTerm, launches Playwright, scrapes results, creates leads with status "Discovered". Returns created leads with duplicate warnings.
 - **Response:** `{ leads: Lead[], duplicates: Array<{ businessName, existingLeadId }> }`
 - **Errors:** 400 if category not found, 500 if scraper fails (timeout, blocked, etc.)
+
+### `POST /api/scraper/analyze-websites`
+
+- **Purpose:** Analyze website quality for leads (SSE stream)
+- **Request body:** `{ leadIds?: string[] }` — if empty, analyzes all discovered/reached-out leads with websites
+- **Behavior:** Launches Playwright, visits each lead's website, checks SSL, mobile-friendliness, speed, SEO, accessibility, outdated tech, copyright year, mixed content. Scores 0-100, assigns quality label (Poor/Outdated/Good). Saves results immediately per-lead.
+- **SSE events:** `start`, `progress`, `result` (per lead with quality/score/issues), `error-single`, `done`
+- **Stored fields:** `websiteQuality`, `websiteScore`, `websiteIssues[]`, `websiteLoadTime`, `websiteAnalyzedAt`
+- **Issue format:** `{ id: "no-ssl", label: "Kein SSL-Zertifikat", detail: "Die Website verwendet kein HTTPS..." }`
 
 ### `POST /api/email/preview`
 
@@ -301,7 +331,7 @@ lead-generation-tool/
 
 **Acceptance criteria:**
 - [ ] Clicking "Send Email" on a lead opens a preview modal showing the rendered subject and body
-- [ ] All placeholders are replaced: `[Name]` with contactPerson or "Team von [businessName]", `[Business Name]` with businessName, `[CALENDLY-LINK]` with settings.calendlyLink, `[Dein Name]` with settings.userName
+- [ ] All placeholders are replaced: `[Name]` with contactPerson or "Team von [businessName]", `[Business Name]` with businessName, `[CALENDLY-LINK]` with settings.calendlyLink, `[Dein Name]` with settings.userName, `[Website-Probleme]` with issue list, `[Website-Probleme-Kurz]` with short labels, `[Website-Score]` with score
 - [ ] No raw placeholder text (brackets) remains in the preview
 - [ ] "Send" button sends the email via configured SMTP and updates lead status
 - [ ] If SMTP is not configured, a message directs the user to Settings
@@ -356,7 +386,7 @@ lead-generation-tool/
 - [ ] User can add a new category with all fields
 - [ ] User can edit any field of an existing category
 - [ ] User can delete a category only if no leads reference it; otherwise show error
-- [ ] Template editor shows available placeholders: `[Name]`, `[Business Name]`, `[CALENDLY-LINK]`, `[Dein Name]`
+- [ ] Template editor shows available placeholders: `[Name]`, `[Business Name]`, `[CALENDLY-LINK]`, `[Dein Name]`, `[Website-Probleme]`, `[Website-Probleme-Kurz]`, `[Website-Score]`
 - [ ] Four default categories are pre-loaded on first run: Gyms, Physiotherapeuten, Barbershops, Solo-Unternehmer with the German email templates from the project plan
 
 ### Feature 9: Settings Panel

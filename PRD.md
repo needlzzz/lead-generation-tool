@@ -41,13 +41,13 @@ Key user flows:
 ### Data Model
 
 **Lead:**
-- id, businessName, category, address, phone, email, websiteUrl, websiteQuality (None/Poor/Outdated/Not a Fit), contactPerson (optional), status, dateDiscovered, dateEmail1Sent, dateFollowUp1Sent, dateFollowUp2Sent, replyDate, replySentiment, calendlySent, meetingDate, decision, startDate, notes, activityLog[]
+- id, businessName, category, address, phone, email, websiteUrl, websiteQuality (None/Poor/Outdated/Good/Not a Fit), websiteScore (0-100), websiteIssues[] (array of {id, label, detail}), websiteLoadTime (ms), websiteAnalyzedAt (ISO date), contactPerson (optional), status, dateDiscovered, dateEmail1Sent, dateFollowUp1Sent, dateFollowUp2Sent, replyDate, replySentiment, calendlySent, meetingDate, decision, startDate, notes, activityLog[]
 
 **Category:**
 - id, name, searchTerm, tone (formal/casual), templates: { email1: {subject, body}, email2: {subject, body}, email3: {subject, body} }
 
 **Settings:**
-- userName, calendlyLink, smtp: { host, port, username, password, fromAddress }
+- userName, calendlyLink, smtp: { host, port, username, password, fromAddress, useProxy }
 
 ### Status Pipeline (enforced transitions)
 - **Discovered** → Reached Out (send Email 1) | Not a Fit (→ Lost)
@@ -70,8 +70,9 @@ Key user flows:
 ### Email Templates
 - German language, tone varies by category (formal Sie-Form for Physiotherapeuten, casual for others)
 - All templates are editable per category through the UI
-- Placeholders: `[Name]`, `[Business Name]`, `[CALENDLY-LINK]`, `[Dein Name]`
+- Placeholders: `[Name]`, `[Business Name]`, `[CALENDLY-LINK]`, `[Dein Name]`, `[Website-Probleme]`, `[Website-Probleme-Kurz]`, `[Website-Score]`
 - Contact person field used for `[Name]`; falls back to "Team von [Business Name]" if empty
+- Website issue placeholders populated from automated analysis results (German descriptions)
 
 ### Visual Design
 - Clean light theme, no dark mode
@@ -114,7 +115,6 @@ Good tests for this project test external behavior through module interfaces, no
 - Dark mode
 - Multi-user support or authentication
 - Cloud deployment or hosted version
-- Automated website quality assessment (Lighthouse, screenshots)
 - Business-day calculations for follow-up scheduling
 - Email open/click tracking
 - Integration with external CRMs (HubSpot, Salesforce, etc.)
