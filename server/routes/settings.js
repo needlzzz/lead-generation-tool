@@ -12,7 +12,8 @@ const DEFAULT_SETTINGS = {
     port: 587,
     username: '',
     password: '',
-    fromAddress: ''
+    fromAddress: '',
+    useProxy: false
   }
 };
 
@@ -48,7 +49,8 @@ router.put('/', (req, res) => {
       password: smtp && smtp.password !== undefined && smtp.password !== '********'
         ? smtp.password
         : existing.smtp.password,
-      fromAddress: smtp && smtp.fromAddress !== undefined ? smtp.fromAddress : existing.smtp.fromAddress
+      fromAddress: smtp && smtp.fromAddress !== undefined ? smtp.fromAddress : existing.smtp.fromAddress,
+      useProxy: smtp && smtp.useProxy !== undefined ? smtp.useProxy : (existing.smtp.useProxy || false)
     }
   };
 
@@ -70,11 +72,26 @@ router.post('/test-smtp', async (req, res) => {
     return res.status(400).json({ error: 'SMTP not configured' });
   }
 
+  const { host, port, username, useProxy } = settings.smtp;
+
   try {
     await testConnection(settings.smtp);
-    res.json({ success: true, message: 'SMTP connection successful' });
+    res.json({ success: true, message: `SMTP connection to ${host}:${port} successful (user: ${username})${useProxy ? ' via corporate proxy' : ''}` });
   } catch (err) {
-    res.status(500).json({ success: false, error: `SMTP test failed: ${err.message}` });
+    const detail = [
+      `Host: ${host}`,
+      `Port: ${port}`,
+      `User: ${username || '(none)'}`,
+      `Secure: ${port === 465 ? 'yes' : 'no (STARTTLS)'}`,
+      useProxy ? `Proxy: http://aproxy.corproot.net:8080` : null,
+      `Error: ${err.message}`
+    ].filter(Boolean).join(' | ');
+
+    if (err.code) {
+      res.status(500).json({ success: false, error: `SMTP test failed [${err.code}]: ${detail}` });
+    } else {
+      res.status(500).json({ success: false, error: `SMTP test failed: ${detail}` });
+    }
   }
 });
 

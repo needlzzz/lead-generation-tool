@@ -401,10 +401,17 @@
               <label for="smtpFrom">From Address</label>
               <input type="email" id="smtpFrom">
             </div>
+            <div class="form-row">
+              <label for="smtpProxy">
+                <input type="checkbox" id="smtpUseProxy" style="margin-right: 6px;">
+                Use corporate proxy (http://aproxy.corproot.net:8080)
+              </label>
+            </div>
             <div class="form-actions">
               <button type="button" class="btn" id="btnTestSMTP">🔌 Test Connection</button>
               <button type="submit" class="btn btn-primary">Save</button>
             </div>
+            <div id="smtpTestResult" class="smtp-test-result hidden"></div>
           </form>
         </div>
         <div class="settings-panel" id="settings-categories">

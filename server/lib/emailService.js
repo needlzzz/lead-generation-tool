@@ -27,8 +27,10 @@ function renderTemplate(template, lead, settings) {
   return { subject, body };
 }
 
+const CORPORATE_PROXY = 'http://aproxy.corproot.net:8080';
+
 function createTransport(smtpConfig) {
-  return nodemailer.createTransport({
+  const opts = {
     host: smtpConfig.host,
     port: smtpConfig.port,
     secure: smtpConfig.port === 465,
@@ -36,7 +38,13 @@ function createTransport(smtpConfig) {
       user: smtpConfig.username,
       pass: smtpConfig.password
     }
-  });
+  };
+
+  if (smtpConfig.useProxy) {
+    opts.proxy = CORPORATE_PROXY;
+  }
+
+  return nodemailer.createTransport(opts);
 }
 
 async function sendEmail(smtpConfig, fromAddress, to, subject, body) {

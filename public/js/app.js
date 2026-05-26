@@ -813,6 +813,7 @@ async function loadSettingsForm() {
     document.getElementById('smtpUsername').value = settings.smtp?.username || '';
     document.getElementById('smtpPassword').value = settings.smtp?.password || '';
     document.getElementById('smtpFrom').value = settings.smtp?.fromAddress || '';
+    document.getElementById('smtpUseProxy').checked = !!settings.smtp?.useProxy;
   } catch (err) {
     showError(err.message);
   }
@@ -838,7 +839,8 @@ async function saveSettingsSMTP() {
         port: parseInt(document.getElementById('smtpPort').value) || 587,
         username: document.getElementById('smtpUsername').value,
         password: document.getElementById('smtpPassword').value,
-        fromAddress: document.getElementById('smtpFrom').value
+        fromAddress: document.getElementById('smtpFrom').value,
+        useProxy: document.getElementById('smtpUseProxy').checked
       }
     });
     alert('SMTP settings saved.');
@@ -848,14 +850,31 @@ async function saveSettingsSMTP() {
 }
 
 async function testSMTP() {
-  showLoading('Testing SMTP connection...');
+  const resultEl = document.getElementById('smtpTestResult');
+  resultEl.classList.remove('hidden', 'smtp-success', 'smtp-error');
+  resultEl.textContent = '⏳ Saving & testing SMTP connection...';
+  resultEl.classList.add('smtp-pending');
+
   try {
+    // Save current form values first so the test uses them
+    await API.put('/api/settings', {
+      smtp: {
+        host: document.getElementById('smtpHost').value,
+        port: parseInt(document.getElementById('smtpPort').value) || 587,
+        username: document.getElementById('smtpUsername').value,
+        password: document.getElementById('smtpPassword').value,
+        fromAddress: document.getElementById('smtpFrom').value,
+        useProxy: document.getElementById('smtpUseProxy').checked
+      }
+    });
     const result = await API.post('/api/settings/test-smtp', {});
-    alert(result.success ? '✅ SMTP connection successful!' : '❌ Connection failed.');
+    resultEl.classList.remove('smtp-pending');
+    resultEl.classList.add('smtp-success');
+    resultEl.textContent = `✅ ${result.message}`;
   } catch (err) {
-    showError(`SMTP test failed: ${err.message}`);
-  } finally {
-    hideLoading();
+    resultEl.classList.remove('smtp-pending');
+    resultEl.classList.add('smtp-error');
+    resultEl.textContent = `❌ ${err.message}`;
   }
 }
 

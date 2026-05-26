@@ -255,6 +255,33 @@ form { padding: 16px 20px; }
   padding: 12px 20px;
   border-top: 1px solid #eee;
 }
+
+/* SMTP Test Result */
+.smtp-test-result {
+  margin: 12px 20px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-family: monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.smtp-test-result.smtp-success {
+  background: #e8f5e9;
+  border: 1px solid #4caf50;
+  color: #2e7d32;
+}
+.smtp-test-result.smtp-error {
+  background: #fbe9e7;
+  border: 1px solid #e53935;
+  color: #b71c1c;
+}
+.smtp-test-result.smtp-pending {
+  background: #fff3e0;
+  border: 1px solid #ff9800;
+  color: #e65100;
+}
+
 .hint {
   font-size: 0.78rem;
   color: #888;
