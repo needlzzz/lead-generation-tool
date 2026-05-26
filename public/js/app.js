@@ -709,12 +709,6 @@ async function discoverLeads() {
   const catFilter = document.getElementById('categoryFilter').value;
   const citySelect = document.getElementById('scraperCityFilter').value;
 
-  if (citySelect === 'all') {
-    showError('Please select a specific city for scraping.');
-    return;
-  }
-  const city = citySelect;
-
   // Determine which categories to scrape
   let categoriesToScrape;
   if (catFilter) {
@@ -725,11 +719,19 @@ async function discoverLeads() {
     categoriesToScrape = [...allCategories];
   }
 
-  // Filter out categories already scraped for this city
+  // Determine which cities to scrape
+  let citiesToScrape;
+  if (citySelect === 'all') {
+    const cityOptions = document.getElementById('scraperCityFilter').options;
+    citiesToScrape = [...cityOptions].filter(o => o.value !== 'all').map(o => o.value);
+  } else {
+    citiesToScrape = [citySelect];
+  }
+
+  // Build list of all category+city combos and filter out already scraped
   const existingLeads = allLeads.filter(l => l.status === 'Discovered' || l.status === 'Lost');
   const alreadyScraped = new Set();
   for (const lead of existingLeads) {
-    // Determine lead's city from explicit field or activity log
     let leadCity = lead.city;
     if (!leadCity && lead.activityLog && lead.activityLog[0]?.details) {
       const match = lead.activityLog[0].details.match(/in (.+)$/);
@@ -740,17 +742,25 @@ async function discoverLeads() {
     }
   }
 
-  const remaining = categoriesToScrape.filter(c => !alreadyScraped.has(`${c.name}::${city}`));
+  const jobs = [];
+  for (const city of citiesToScrape) {
+    for (const cat of categoriesToScrape) {
+      if (!alreadyScraped.has(`${cat.name}::${city}`)) {
+        jobs.push({ category: cat, city });
+      }
+    }
+  }
 
-  if (remaining.length === 0) {
-    showError(`All ${categoriesToScrape.length === 1 ? 'selected category has' : 'categories have'} already been scraped for ${city}. Add new categories or pick a different city.`);
+  if (jobs.length === 0) {
+    showError('All category+city combinations have already been scraped. Add new categories or cities.');
     return;
   }
 
-  const skipped = categoriesToScrape.length - remaining.length;
-  const msg = remaining.length === 1
-    ? `Scrape "${remaining[0].name}" in ${city}?`
-    : `Scrape ${remaining.length} categories in ${city}?${skipped > 0 ? ` (${skipped} already scraped, skipping)` : ''}`;
+  const totalCombos = categoriesToScrape.length * citiesToScrape.length;
+  const skipped = totalCombos - jobs.length;
+  const msg = jobs.length === 1
+    ? `Scrape "${jobs[0].category.name}" in ${jobs[0].city}?`
+    : `Scrape ${jobs.length} category+city combinations?${skipped > 0 ? ` (${skipped} already scraped, skipping)` : ''}`;
 
   if (!confirm(msg)) return;
 
@@ -768,33 +778,34 @@ async function discoverLeads() {
 
   let totalCreated = 0;
   let totalDuplicates = 0;
+  let errors = 0;
 
   try {
-    for (let i = 0; i < remaining.length; i++) {
-      const cat = remaining[i];
-      const pct = Math.round(((i) / remaining.length) * 100);
+    for (let i = 0; i < jobs.length; i++) {
+      const { category: cat, city } = jobs[i];
+      const pct = Math.round((i / jobs.length) * 100);
       fill.style.width = `${pct}%`;
       text.textContent = `Scraping: ${cat.name} in ${city}`;
-      count.textContent = `${i + 1}/${remaining.length}`;
+      count.textContent = `${i + 1}/${jobs.length}`;
 
       try {
         const result = await API.post('/api/scraper/discover', { categoryId: cat.id, city });
         totalCreated += result.leads.length;
         totalDuplicates += (result.duplicates || []).length;
       } catch (err) {
-        // Log error but continue with next category
-        console.error(`Scraper error for ${cat.name}:`, err.message);
+        errors++;
+        console.error(`Scraper error for ${cat.name} in ${city}:`, err.message);
       }
 
-      // Polite delay between categories
-      if (i < remaining.length - 1) {
+      // Polite delay between requests
+      if (i < jobs.length - 1) {
         await new Promise(r => setTimeout(r, 2000));
       }
     }
 
     fill.style.width = '100%';
     bar.classList.add('hidden');
-    alert(`Done! ${totalCreated} leads discovered across ${remaining.length} categories.${totalDuplicates > 0 ? ` ${totalDuplicates} duplicates.` : ''}`);
+    alert(`Done! ${totalCreated} leads discovered across ${jobs.length} searches.${totalDuplicates > 0 ? ` ${totalDuplicates} duplicates.` : ''}${errors > 0 ? ` ${errors} errors.` : ''}`);
     await loadData();
   } catch (err) {
     bar.classList.add('hidden');
