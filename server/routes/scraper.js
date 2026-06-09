@@ -56,6 +56,7 @@ router.post('/discover', async (req, res) => {
         email: biz.email || '',
         websiteUrl: biz.websiteUrl || '',
         websiteQuality: biz.websiteUrl ? 'Poor' : 'None',
+        googleRating: biz.googleRating || null,
         contactPerson: '',
         status: 'Discovered',
         dateDiscovered: now.split('T')[0],
@@ -249,7 +250,11 @@ router.post('/analyze-websites', async (req, res) => {
       sendEvent({ type: 'progress', current: i + 1, total: leads.length, businessName: lead.businessName });
 
       try {
-        const result = await analyzeWebsite(lead.websiteUrl, page);
+        const analysisOptions = {};
+        // Pass Google rating if available on the lead (from scraper)
+        if (lead.googleRating) analysisOptions.googleRating = lead.googleRating;
+
+        const result = await analyzeWebsite(lead.websiteUrl, page, analysisOptions);
 
         // Update lead with analysis results
         lead.websiteQuality = result.quality;
@@ -257,11 +262,22 @@ router.post('/analyze-websites', async (req, res) => {
         lead.websiteIssues = result.issues;
         lead.websiteLoadTime = result.loadTimeMs;
         lead.websiteAnalyzedAt = now;
+        lead.websiteTechStack = result.techStack;
+        lead.websiteSecurityGrade = result.securityHeaders ? result.securityHeaders.grade : null;
+        lead.websiteOpportunityScore = result.opportunityScore;
         lead.activityLog = lead.activityLog || [];
+
+        // Build detailed activity log entry
+        const techInfo = result.techStack && result.techStack.cms
+          ? `, CMS: ${result.techStack.cms}${result.techStack.cmsVersion ? ' ' + result.techStack.cmsVersion : ''}`
+          : '';
+        const secInfo = result.securityHeaders
+          ? `, Sicherheit: ${result.securityHeaders.grade}`
+          : '';
         lead.activityLog.push({
           date: now,
           action: 'Website analyzed',
-          details: `Score: ${result.score}/100 (${result.quality}), ${result.issues.length} issues found`
+          details: `Score: ${result.score}/100 (${result.quality}), ${result.issues.length} issues${techInfo}${secInfo}, Opportunity: ${result.opportunityScore}/100`
         });
 
         dataStore.save('leads', lead);
@@ -274,7 +290,10 @@ router.post('/analyze-websites', async (req, res) => {
           quality: result.quality,
           score: result.score,
           issues: result.issues,
-          loadTimeMs: result.loadTimeMs
+          loadTimeMs: result.loadTimeMs,
+          techStack: result.techStack,
+          securityGrade: result.securityHeaders ? result.securityHeaders.grade : null,
+          opportunityScore: result.opportunityScore
         });
       } catch (err) {
         sendEvent({ type: 'error-single', leadId: lead.id, businessName: lead.businessName, error: err.message });

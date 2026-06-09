@@ -169,7 +169,28 @@ async function scrapeGoogleMaps(searchTerm, options = {}) {
                            document.querySelector('a[data-item-id="authority"]');
           const website = websiteEl ? websiteEl.href : '';
 
-          return { address, phone, website };
+          // Try to find Google rating (e.g. "4.5" from the star rating display)
+          let googleRating = null;
+          const ratingEl = document.querySelector('[role="img"][aria-label*="Stern"]') ||
+                          document.querySelector('[role="img"][aria-label*="star"]') ||
+                          document.querySelector('.fontDisplayLarge');
+          if (ratingEl) {
+            const ratingText = ratingEl.getAttribute('aria-label') || ratingEl.textContent || '';
+            const ratingMatch = ratingText.match(/([\d,]+)\s/);
+            if (ratingMatch) {
+              googleRating = parseFloat(ratingMatch[1].replace(',', '.'));
+            }
+          }
+          // Fallback: try to find it in the header area
+          if (!googleRating) {
+            const headerRating = document.querySelector('.F7nice span[aria-hidden="true"]');
+            if (headerRating) {
+              const val = parseFloat(headerRating.textContent.replace(',', '.'));
+              if (val >= 1 && val <= 5) googleRating = val;
+            }
+          }
+
+          return { address, phone, website, googleRating };
         });
 
         businesses.push({
@@ -177,6 +198,7 @@ async function scrapeGoogleMaps(searchTerm, options = {}) {
           address: details.address,
           phone: details.phone,
           websiteUrl: details.website,
+          googleRating: details.googleRating,
           email: ''
         });
       } catch (err) {

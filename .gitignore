@@ -1,6 +1,5 @@
 node_modules/
 server/data/
-.kiro/
 .kiro_tmp/
 .vscode/
 *.log

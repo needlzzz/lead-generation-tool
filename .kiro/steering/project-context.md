@@ -104,7 +104,7 @@ tests/
   - **Copyright year** — flags if >2 years old (site appears unmaintained)
   - **Mixed content** — HTTP resources on HTTPS pages
   - **Security headers** — HSTS, CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy. Graded A+ to F.
-  - **CMS/Tech stack detection** — WordPress (version + plugins + theme), Wix, Jimdo, Squarespace, Shopify, Joomla, Webflow, TYPO3, Drupal. Also detects React/Next.js/Vue/Angular, analytics (GA, Matomo, Hotjar, Plausible), e-commerce (WooCommerce, Shopify).
+  - **CMS/Tech stack detection** — WordPress (version + plugins + theme), Wix, Jimdo, Squarespace, Shopify, Joomla, Webflow, TYPO3, Drupal, Webflow. Also detects React/Next.js/Vue/Angular, analytics (GA, Matomo, Hotjar, Plausible), e-commerce (WooCommerce, Shopify).
   - **Opportunity scoring** — composite 0-100 score factoring in: website quality (inverted), issue count, CMS type (WordPress users more open to redesign), copyright staleness, Google rating (higher-rated = more budget)
 - Scoring: 0-100 points, deductions per issue
 - Quality labels: Good (80+), Outdated (50-79), Poor (<50)
@@ -207,8 +207,7 @@ Calendar days, no weekend logic.
 
 ## Testing Approach
 
-- Jest for unit tests on backend modules (pipeline, dataStore, emailService, csvService, websiteAnalyzer)
+- Jest for unit tests on backend modules (pipeline, dataStore, emailService, csvService)
 - No frontend tests — manual testing only
 - No integration/E2E tests for the scraper (depends on live Google Maps / local.ch DOM)
 - Run `npm test` to validate logic modules
-- websiteAnalyzer tests cover: security header analysis, opportunity score calculation, score deductions, quality grading
