@@ -7,6 +7,7 @@ const router = express.Router();
 const DEFAULT_SETTINGS = {
   userName: '',
   calendlyLink: '',
+  previewSiteRepoPath: '/Users/tabkamac/private/dev/git/kaelint-website-business',
   smtp: {
     host: '',
     port: 587,
@@ -22,6 +23,9 @@ router.get('/', (req, res) => {
   let settings = dataStore.readSingleton('settings');
   if (!settings) {
     settings = { ...DEFAULT_SETTINGS };
+  } else {
+    // Merge with defaults so new fields are always present
+    settings = { ...DEFAULT_SETTINGS, ...settings, smtp: { ...DEFAULT_SETTINGS.smtp, ...(settings.smtp || {}) } };
   }
 
   // Mask password in response
@@ -35,13 +39,14 @@ router.get('/', (req, res) => {
 
 // PUT /api/settings
 router.put('/', (req, res) => {
-  const { userName, calendlyLink, smtp } = req.body;
+  const { userName, calendlyLink, previewSiteRepoPath, smtp } = req.body;
 
   const existing = dataStore.readSingleton('settings') || { ...DEFAULT_SETTINGS };
 
   const settings = {
     userName: userName !== undefined ? userName : existing.userName,
     calendlyLink: calendlyLink !== undefined ? calendlyLink : existing.calendlyLink,
+    previewSiteRepoPath: previewSiteRepoPath !== undefined ? previewSiteRepoPath : (existing.previewSiteRepoPath || DEFAULT_SETTINGS.previewSiteRepoPath),
     smtp: {
       host: smtp && smtp.host !== undefined ? smtp.host : existing.smtp.host,
       port: smtp && smtp.port !== undefined ? smtp.port : existing.smtp.port,

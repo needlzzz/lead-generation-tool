@@ -39,6 +39,11 @@ server/
     enrichment.js        Email enrichment (pluggable: local.ch + website scraping)
     websiteAnalyzer.js   Automated website quality analysis (SSL, mobile, speed, SEO, tech stack, security headers, opportunity scoring)
     defaultCategories.js Pre-loaded German email template sets
+    configGenerator.js     Config generation for preview sites (niche presets)
+    previewGenerator.js    Preview site generation orchestrator (build + deploy pipeline)
+    previewRegistry.js     JSON persistence for preview lifecycle state
+    screenshotCapturer.js  Playwright-based hero screenshot capture
+    slugGenerator.js       URL-safe slug generation with uniqueness retry
   routes/
     leads.js             Lead CRUD + pipeline transitions
     categories.js        Category CRUD
@@ -46,10 +51,13 @@ server/
     scraper.js           Scraper + enrichment + website analysis endpoints (SSE)
     email.js             Email preview + send
     csv.js               CSV import/export
+    previews.js            Preview generation SSE endpoint + state API
   data/                  Runtime data (JSON files, gitignored)
     leads.json
     categories.json
     settings.json
+    previews.json          Preview registry (generated, gitignored)
+    previews/{slug}/       Screenshot storage per preview
 public/
   index.html             SPA shell
   css/styles.css         Styles with status colors
@@ -128,9 +136,9 @@ Calendar days, no weekend logic.
 
 ## Data Model (Key Entities)
 
-- **Lead**: id, businessName, category, address, phone, email, websiteUrl, websiteQuality, websiteScore, websiteIssues[], websiteLoadTime, websiteAnalyzedAt, websiteTechStack, websiteSecurityGrade, websiteOpportunityScore, googleRating, contactPerson, status, dates (discovered, email1, followup1, followup2, reply, meeting), replySentiment, decision, startDate, notes, activityLog[]
+- **Lead**: id, businessName, category, address, phone, email, websiteUrl, websiteQuality, websiteScore, websiteIssues[], websiteLoadTime, websiteAnalyzedAt, websiteTechStack, websiteSecurityGrade, websiteOpportunityScore, googleRating, contactPerson, status, dates (discovered, email1, followup1, followup2, reply, meeting), replySentiment, decision, startDate, notes, activityLog[], previewUrl, previewScreenshotPath, previewGeneratedAt, previewExpiresAt
 - **Category**: id, name, searchTerm, tone (formal/casual), templates (email1/2/3 with subject + body)
-- **Settings**: userName, calendlyLink, smtp config (host, port, username, password, fromAddress, useProxy)
+- **Settings**: userName, calendlyLink, previewSiteRepoPath, smtp config (host, port, username, password, fromAddress, useProxy)
 
 ## Email Template Placeholders
 
@@ -141,6 +149,9 @@ Calendar days, no weekend logic.
 - `[Website-Probleme]` → full bullet list of website issues (German)
 - `[Website-Probleme-Kurz]` → short comma-separated issue labels (first 3)
 - `[Website-Score]` → website score as "X/100"
+- `[Preview-Link]` → previewUrl or empty string if not generated
+- `[Preview-Screenshot]` → screenshot URL at preview.kaelint.ch/{slug}/screenshot.png
+- `[Preview-Ablauf]` → formatted expiry date in German (e.g., "15. Juli 2026")
 
 ## SMTP Configuration
 
@@ -190,6 +201,8 @@ Calendar days, no weekend logic.
 | GET/POST | /api/categories | List/create categories |
 | POST | /api/csv/import | Import CSV |
 | GET | /api/csv/export/:type | Export CSV |
+| POST | /api/previews/generate | Generate preview site (SSE stream) |
+| GET | /api/previews/:leadId | Get preview state for a lead |
 
 ## Important Conventions
 
@@ -207,8 +220,19 @@ Calendar days, no weekend logic.
 
 ## Testing Approach
 
-- Jest for unit tests on backend modules (pipeline, dataStore, emailService, csvService, websiteAnalyzer)
+- Jest for unit tests on backend modules (pipeline, dataStore, emailService, csvService, websiteAnalyzer, slugGenerator, previewRegistry, configGenerator, previewGenerator, screenshotCapturer)
+- Property-based tests with fast-check (slug format, config validity, color derivation, email placeholders)
 - No frontend tests — manual testing only
 - No integration/E2E tests for the scraper (depends on live Google Maps / local.ch DOM)
 - Run `npm test` to validate logic modules
 - websiteAnalyzer tests cover: security header analysis, opportunity score calculation, score deductions, quality grading
+
+## Preview Site Generation
+
+- Generates personalized demo websites for cold outreach leads
+- Uses kaelint-website-business as the build system (invoked via child_process)
+- Deployed atomically to Cloudflare Pages at `preview.kaelint.ch/{slug}/de/`
+- Previews expire after 30 days (removed on next deploy)
+- Settings: `previewSiteRepoPath` points to local kaelint-website-business checkout
+- Screenshot captured via Playwright (non-blocking on failure)
+- SSE streaming for real-time progress in the UI

@@ -687,6 +687,9 @@ function showActivityLog(leadId) {
     findingsEl.innerHTML = '';
   }
 
+  // Preview section
+  renderPreviewSection(lead);
+
   // Activity log
   const log = (lead.activityLog || []).slice().reverse();
   document.getElementById('activityLogContent').innerHTML = log.length
@@ -699,6 +702,207 @@ function showActivityLog(leadId) {
     `).join('')
     : '<p style="color:#999">No entries.</p>';
   openModal('modalActivity');
+}
+
+// ============================================================
+// PREVIEW SITE GENERATION
+// ============================================================
+
+let previewGenerationInProgress = false;
+
+function renderPreviewSection(lead) {
+  const container = document.getElementById('previewSection');
+  const canGenerate = lead.websiteAnalyzedAt && ['Discovered', 'Reached Out'].includes(lead.status);
+
+  // If lead doesn't qualify for preview, hide the section
+  if (!canGenerate && !lead.previewUrl) {
+    container.classList.add('hidden');
+    container.innerHTML = '';
+    return;
+  }
+
+  container.classList.remove('hidden');
+
+  // Check for existing non-expired preview
+  if (lead.previewUrl && lead.previewExpiresAt) {
+    const expiresAt = new Date(lead.previewExpiresAt);
+    if (expiresAt > new Date()) {
+      // Show existing valid preview
+      renderPreviewResult(container, lead);
+      return;
+    }
+  }
+
+  // Also try fetching preview state from API (async, non-blocking)
+  if (canGenerate) {
+    container.innerHTML = `
+      <div class="preview-section-inner">
+        <button class="btn btn-primary" id="btnGeneratePreview" onclick="startPreviewGeneration('${lead.id}')">🎨 Generate Preview</button>
+        <div id="previewProgress" class="preview-progress hidden"></div>
+        <div id="previewResult" class="preview-result hidden"></div>
+        <div id="previewError" class="preview-error hidden"></div>
+      </div>
+    `;
+    // Check if there's an existing preview via API
+    fetchExistingPreview(lead.id, container);
+  } else {
+    container.innerHTML = '';
+    container.classList.add('hidden');
+  }
+}
+
+async function fetchExistingPreview(leadId, container) {
+  try {
+    const res = await fetch(`/api/previews/${leadId}`);
+    if (!res.ok) return; // 404 = no preview
+    const preview = await res.json();
+    if (preview && preview.status === 'deployed' && preview.expiresAt) {
+      const expiresAt = new Date(preview.expiresAt);
+      if (expiresAt > new Date()) {
+        renderPreviewResult(container, {
+          previewUrl: preview.previewUrl,
+          previewScreenshotPath: preview.screenshotPath
+        });
+      }
+    }
+  } catch (err) {
+    // Silently ignore — preview check is non-blocking
+  }
+}
+
+function renderPreviewResult(container, lead) {
+  const slug = lead.previewUrl ? lead.previewUrl.replace('https://preview.kaelint.ch/', '').replace(/\/de\/?$/, '') : '';
+  const screenshotUrl = slug ? `https://preview.kaelint.ch/${slug}/screenshot.png` : '';
+
+  container.innerHTML = `
+    <div class="preview-section-inner">
+      <div class="preview-result">
+        <strong>🎨 Preview Site</strong>
+        <a href="${esc(lead.previewUrl)}" target="_blank" class="preview-link">${esc(lead.previewUrl)}</a>
+        ${screenshotUrl ? `<img src="${esc(screenshotUrl)}" alt="Preview Screenshot" class="preview-thumbnail" onerror="this.style.display='none'">` : ''}
+      </div>
+    </div>
+  `;
+}
+
+async function startPreviewGeneration(leadId) {
+  if (previewGenerationInProgress) return;
+  previewGenerationInProgress = true;
+
+  const btn = document.getElementById('btnGeneratePreview');
+  const progressEl = document.getElementById('previewProgress');
+  const resultEl = document.getElementById('previewResult');
+  const errorEl = document.getElementById('previewError');
+
+  // Disable button
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '⏳ Generating...';
+  }
+
+  // Show progress, hide others
+  progressEl.classList.remove('hidden');
+  progressEl.innerHTML = '<div class="preview-progress-step">Starting...</div>';
+  resultEl.classList.add('hidden');
+  errorEl.classList.add('hidden');
+
+  try {
+    const response = await fetch('/api/previews/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ leadId })
+    });
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({ error: response.statusText }));
+      throw new Error(err.error || 'Generation failed');
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop(); // Keep incomplete line in buffer
+
+      let currentEventType = 'progress';
+      for (const line of lines) {
+        if (line.startsWith('event: ')) {
+          currentEventType = line.slice(7).trim();
+        } else if (line.startsWith('data: ')) {
+          try {
+            const data = JSON.parse(line.slice(6));
+            handlePreviewSSEEvent(currentEventType, data, progressEl, resultEl, errorEl, btn, leadId);
+          } catch (e) {
+            // Skip malformed JSON
+          }
+        }
+      }
+    }
+  } catch (err) {
+    errorEl.classList.remove('hidden');
+    errorEl.innerHTML = `
+      <div class="preview-error-message">❌ ${esc(err.message)}</div>
+      <button class="btn btn-sm" onclick="retryPreviewGeneration('${leadId}')">🔄 Retry</button>
+    `;
+    progressEl.classList.add('hidden');
+  } finally {
+    previewGenerationInProgress = false;
+    if (btn && !btn.classList.contains('hidden')) {
+      btn.disabled = false;
+      btn.textContent = '🎨 Generate Preview';
+    }
+  }
+}
+
+function handlePreviewSSEEvent(eventType, data, progressEl, resultEl, errorEl, btn, leadId) {
+  if (eventType === 'complete' || data.step === 'deploy_complete') {
+    // Success state
+    progressEl.classList.add('hidden');
+    resultEl.classList.remove('hidden');
+    if (btn) btn.classList.add('hidden');
+
+    const previewUrl = data.previewUrl || '';
+    const slug = previewUrl.replace('https://preview.kaelint.ch/', '').replace(/\/de\/?$/, '');
+    const screenshotUrl = slug ? `https://preview.kaelint.ch/${slug}/screenshot.png` : '';
+
+    resultEl.innerHTML = `
+      <strong>✅ Preview erfolgreich deployed</strong>
+      <a href="${esc(previewUrl)}" target="_blank" class="preview-link">${esc(previewUrl)}</a>
+      ${screenshotUrl ? `<img src="${esc(screenshotUrl)}" alt="Preview Screenshot" class="preview-thumbnail" onerror="this.style.display='none'">` : ''}
+    `;
+
+    // Reload lead data so the preview info is reflected
+    loadData();
+  } else if (eventType === 'error' || (data.step && data.step.includes('fail'))) {
+    // Error from SSE
+    progressEl.classList.add('hidden');
+    errorEl.classList.remove('hidden');
+    errorEl.innerHTML = `
+      <div class="preview-error-message">❌ ${esc(data.message)}</div>
+      <button class="btn btn-sm" onclick="retryPreviewGeneration('${leadId}')">🔄 Retry</button>
+    `;
+  } else if (data.message) {
+    // Progress update
+    progressEl.innerHTML = `<div class="preview-progress-step">⏳ ${esc(data.message)}</div>`;
+  }
+}
+
+function retryPreviewGeneration(leadId) {
+  const errorEl = document.getElementById('previewError');
+  if (errorEl) errorEl.classList.add('hidden');
+  const btn = document.getElementById('btnGeneratePreview');
+  if (btn) {
+    btn.classList.remove('hidden');
+    btn.disabled = false;
+    btn.textContent = '🎨 Generate Preview';
+  }
+  startPreviewGeneration(leadId);
 }
 
 // ============================================================

@@ -13,10 +13,18 @@
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.16",
     "playwright": "1.49.1",
-    "uuid": "^11.0.5"
+    "uuid": "^11.0.5",
+    "yaml": "^2.9.0"
   },
   "devDependencies": {
+    "fast-check": "^4.8.0",
     "jest": "29.7.0"
+  },
+  "jest": {
+    "testMatch": [
+      "**/__tests__/**/*.[jt]s?(x)",
+      "**/?(*.)+(spec|test|property).[jt]s?(x)"
+    ]
   },
   "keywords": [],
   "license": "UNLICENSED",

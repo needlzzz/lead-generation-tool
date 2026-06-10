@@ -1,5 +1,26 @@
 const nodemailer = require('nodemailer');
 
+/**
+ * Format an ISO date string as a German date (e.g., "15. Juli 2026").
+ * Returns empty string for invalid/null dates.
+ */
+function formatGermanDate(isoDateString) {
+  if (!isoDateString) return '';
+  const date = new Date(isoDateString);
+  if (isNaN(date.getTime())) return '';
+
+  const MONTHS_DE = [
+    'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
+    'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'
+  ];
+
+  const day = date.getUTCDate();
+  const month = MONTHS_DE[date.getUTCMonth()];
+  const year = date.getUTCFullYear();
+
+  return `${day}. ${month} ${year}`;
+}
+
 function renderTemplate(template, lead, settings) {
   const contactName = lead.contactPerson
     ? lead.contactPerson
@@ -15,6 +36,14 @@ function renderTemplate(template, lead, settings) {
     ? lead.websiteIssues.slice(0, 3).map(i => i.label).join(', ')
     : '';
 
+  // Preview screenshot URL: derive from previewUrl by replacing the language path with screenshot.png
+  const previewScreenshotUrl = lead.previewUrl
+    ? lead.previewUrl.replace(/[a-z]{2}\/$/, 'screenshot.png')
+    : '';
+
+  // Preview expiry date in German format
+  const previewExpiryFormatted = formatGermanDate(lead.previewExpiresAt);
+
   let subject = template.subject || '';
   let body = template.body || '';
 
@@ -26,7 +55,10 @@ function renderTemplate(template, lead, settings) {
     '[Dein Name]': settings.userName || '',
     '[Website-Probleme]': websiteIssuesList,
     '[Website-Probleme-Kurz]': websiteIssuesSummary,
-    '[Website-Score]': lead.websiteScore != null ? `${lead.websiteScore}/100` : ''
+    '[Website-Score]': lead.websiteScore != null ? `${lead.websiteScore}/100` : '',
+    '[Preview-Link]': lead.previewUrl || '',
+    '[Preview-Screenshot]': previewScreenshotUrl,
+    '[Preview-Ablauf]': previewExpiryFormatted
   };
 
   for (const [placeholder, value] of Object.entries(replacements)) {
@@ -77,4 +109,4 @@ async function testConnection(smtpConfig) {
   return true;
 }
 
-module.exports = { renderTemplate, sendEmail, testConnection, createTransport };
+module.exports = { renderTemplate, sendEmail, testConnection, createTransport, formatGermanDate };
