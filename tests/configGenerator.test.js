@@ -520,7 +520,7 @@ describe('generateConfig — conditional feature data', () => {
     expect(config.gallery).toBeDefined();
     expect(config.gallery.images).toHaveLength(3);
     for (const img of config.gallery.images) {
-      expect(img.path).toContain('gallery/coiffeur-');
+      expect(img.path).toMatch(/^image-\d\.jpg$/);
       expect(img.alt).toHaveProperty('de');
     }
   });
@@ -529,7 +529,7 @@ describe('generateConfig — conditional feature data', () => {
     const lead = makeLead({ category: 'restaurant' });
     const { config } = generateConfig(lead, 'slug-1');
 
-    expect(config.gallery.images[0].path).toContain('restaurant-');
+    expect(config.gallery.images[0].path).toBe('image-1.jpg');
   });
 
   test('does not include gallery when feature is not in preset', () => {
@@ -596,13 +596,13 @@ describe('buildGallery', () => {
   test('returns 3 images with niche paths', () => {
     const result = buildGallery('coiffeur', 'Salon Impression');
     expect(result.images).toHaveLength(3);
-    expect(result.images[0].path).toBe('gallery/coiffeur-1.jpg');
+    expect(result.images[0].path).toBe('image-1.jpg');
     expect(result.images[0].alt.de).toBe('Salon Impression');
   });
 
   test('uses generic prefix when niche is null', () => {
     const result = buildGallery(null, 'Impression');
-    expect(result.images[0].path).toBe('gallery/generic-1.jpg');
+    expect(result.images[0].path).toBe('image-1.jpg');
   });
 });
 

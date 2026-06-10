@@ -208,12 +208,11 @@ function buildFeatureFlags(enabledFeatures) {
  * Uses 3 images from the niche's assets directory.
  */
 function buildGallery(niche, galleryAlt) {
-  const nicheDir = niche || 'generic';
   return {
     images: [
-      { path: `gallery/${nicheDir}-1.jpg`, alt: { de: galleryAlt } },
-      { path: `gallery/${nicheDir}-2.jpg`, alt: { de: galleryAlt } },
-      { path: `gallery/${nicheDir}-3.jpg`, alt: { de: galleryAlt } }
+      { path: `image-1.jpg`, alt: { de: galleryAlt } },
+      { path: `image-2.jpg`, alt: { de: galleryAlt } },
+      { path: `image-3.jpg`, alt: { de: galleryAlt } }
     ]
   };
 }
