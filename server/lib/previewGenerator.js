@@ -90,7 +90,7 @@ async function generatePreview(lead, settings, sendEvent) {
 
   // Determine niche (for build script and assets)
   const niche = resolveNiche(lead.category);
-  const previewUrl = `https://preview.kaelint.ch/${slug}/de/`;
+  const previewUrl = `https://preview.kaelint.ch/${slug}/`;
 
   // --- Step 4: Create registry entry ---
   const leadDataHash = computeLeadDataHash(lead);

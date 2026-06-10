@@ -167,7 +167,7 @@ describe('Preview Generator Orchestrator', () => {
         status: 'deployed',
         expiresAt: futureDate,
         leadDataHash: 'hash123',
-        previewUrl: 'https://preview.kaelint.ch/existing-slug/de/',
+        previewUrl: 'https://preview.kaelint.ch/existing-slug/',
         screenshotPath: '/path/to/screenshot.png'
       });
       computeLeadDataHash.mockReturnValue('hash123');
@@ -176,7 +176,7 @@ describe('Preview Generator Orchestrator', () => {
 
       expect(result.success).toBe(true);
       expect(result.existing).toBe(true);
-      expect(result.previewUrl).toBe('https://preview.kaelint.ch/existing-slug/de/');
+      expect(result.previewUrl).toBe('https://preview.kaelint.ch/existing-slug/');
       expect(sendEvent).toHaveBeenCalledWith('complete', expect.objectContaining({
         step: 'deploy_complete',
         message: 'Preview bereits vorhanden (keine Änderungen)'
@@ -190,7 +190,7 @@ describe('Preview Generator Orchestrator', () => {
         status: 'deployed',
         expiresAt: futureDate,
         leadDataHash: 'old-hash',
-        previewUrl: 'https://preview.kaelint.ch/existing-slug/de/'
+        previewUrl: 'https://preview.kaelint.ch/existing-slug/'
       });
       computeLeadDataHash.mockReturnValue('new-hash');
 
@@ -240,7 +240,7 @@ describe('Preview Generator Orchestrator', () => {
       const result = await generatePreview(validLead, settings, sendEvent);
 
       expect(result.success).toBe(true);
-      expect(result.previewUrl).toBe(`https://preview.kaelint.ch/${testSlug}/de/`);
+      expect(result.previewUrl).toBe(`https://preview.kaelint.ch/${testSlug}/`);
 
       // Verify SSE event sequence
       const eventSteps = events.map(e => `${e.type}:${e.data.step}`);
@@ -261,7 +261,7 @@ describe('Preview Generator Orchestrator', () => {
         slug: testSlug,
         leadId: 'lead-123',
         niche: 'coiffeur',
-        previewUrl: `https://preview.kaelint.ch/${testSlug}/de/`,
+        previewUrl: `https://preview.kaelint.ch/${testSlug}/`,
         leadDataHash: 'hash123'
       });
     });
@@ -315,7 +315,7 @@ describe('Preview Generator Orchestrator', () => {
       // Should be called with 'built' first, then 'deployed'
       expect(registry.updateStatus).toHaveBeenCalledWith(testSlug, 'built');
       expect(registry.updateStatus).toHaveBeenCalledWith(testSlug, 'deployed', expect.objectContaining({
-        previewUrl: `https://preview.kaelint.ch/${testSlug}/de/`
+        previewUrl: `https://preview.kaelint.ch/${testSlug}/`
       }));
     });
 
@@ -324,7 +324,7 @@ describe('Preview Generator Orchestrator', () => {
 
       expect(dataStore.get).toHaveBeenCalledWith('leads', 'lead-123');
       expect(dataStore.save).toHaveBeenCalledWith('leads', expect.objectContaining({
-        previewUrl: `https://preview.kaelint.ch/${testSlug}/de/`,
+        previewUrl: `https://preview.kaelint.ch/${testSlug}/`,
         previewScreenshotPath: '/tmp/screenshots/test.png',
         previewGeneratedAt: expect.any(String)
       }));
