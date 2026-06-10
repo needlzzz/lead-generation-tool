@@ -1543,13 +1543,16 @@ function populateCategoryDropdowns() {
   const filterSelect = document.getElementById('categoryFilter');
   const leadSelect = document.getElementById('leadCategory');
 
+  // Sort categories alphabetically
+  const sorted = [...allCategories].sort((a, b) => a.name.localeCompare(b.name, 'de'));
+
   // Preserve current filter value
   const currentFilter = filterSelect.value;
   filterSelect.innerHTML = '<option value="">All Categories</option>' +
-    allCategories.map(c => `<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('');
+    sorted.map(c => `<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('');
   filterSelect.value = currentFilter;
 
-  leadSelect.innerHTML = allCategories.map(c =>
+  leadSelect.innerHTML = sorted.map(c =>
     `<option value="${esc(c.name)}">${esc(c.name)}</option>`
   ).join('');
 }
