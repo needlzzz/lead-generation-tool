@@ -55,8 +55,8 @@ describe('analyzeSecurityHeaders', () => {
 
     const secIssue = issues.find(i => i.id === 'missing-security-headers');
     expect(secIssue).toBeDefined();
-    expect(secIssue.label).toBe('Fehlender Schutz vor Angriffen');
-    expect(secIssue.detail).toContain('Sicherheitseinstellungen');
+    expect(secIssue.label).toBe('Kein Schutz vor Datenklau und Manipulation');
+    expect(secIssue.detail).toContain('HSTS');
   });
 
   test('does not push HSTS issue for non-SSL sites', () => {

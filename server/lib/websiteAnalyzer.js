@@ -645,8 +645,8 @@ function analyzeSecurityHeaders(headers, hasSSL, issues) {
     if (missingCritical.length > 0) {
       issues.push({
         id: 'missing-security-headers',
-        label: 'Fehlender Schutz vor Angriffen',
-        detail: 'Ihrer Website fehlen wichtige Sicherheitseinstellungen — das macht sie anfälliger für Hackerangriffe und kann das Vertrauen Ihrer Kunden gefährden.'
+        label: 'Kein Schutz vor Datenklau und Manipulation',
+        detail: 'Ihrer Website fehlen Sicherheitseinstellungen (HSTS, CSP), die verhindern, dass Kundendaten abgefangen oder Ihre Inhalte manipuliert werden — moderne Browser warnen Besucher zunehmend vor solchen Seiten.'
       });
     }
   }
