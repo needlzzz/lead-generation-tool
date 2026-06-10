@@ -283,7 +283,7 @@ function generateConfig(lead, slug) {
     address: {
       street: lead.address || '',
       city: lead.city || '',
-      postalCode: ''
+      postalCode: lead.postalCode || '0000'
     },
     siteUrl: `https://preview.kaelint.ch/${slug}/`,
     languages: ['de'],

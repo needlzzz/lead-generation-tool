@@ -440,7 +440,7 @@ describe('generateConfig — field mapping', () => {
 
     expect(config.address.street).toBe('Bahnhofstrasse 1');
     expect(config.address.city).toBe('Zürich');
-    expect(config.address.postalCode).toBe('');
+    expect(config.address.postalCode).toBe('0000');
   });
 
   test('sets siteUrl with slug', () => {
