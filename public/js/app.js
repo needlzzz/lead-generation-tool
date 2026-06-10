@@ -974,7 +974,7 @@ async function discoverLeads() {
     citiesToScrape = [citySelect];
   }
 
-  // Build list of all category+city combos and filter out already scraped
+  // Build list of all category+city combos (allow re-scraping)
   const existingLeads = allLeads.filter(l => l.status === 'Discovered' || l.status === 'Lost');
   const alreadyScraped = new Set();
   for (const lead of existingLeads) {
@@ -989,24 +989,24 @@ async function discoverLeads() {
   }
 
   const jobs = [];
+  let rescrapeCount = 0;
   for (const city of citiesToScrape) {
     for (const cat of categoriesToScrape) {
-      if (!alreadyScraped.has(`${cat.name}::${city}`)) {
-        jobs.push({ category: cat, city });
+      jobs.push({ category: cat, city });
+      if (alreadyScraped.has(`${cat.name}::${city}`)) {
+        rescrapeCount++;
       }
     }
   }
 
   if (jobs.length === 0) {
-    showError('All category+city combinations have already been scraped. Add new categories or cities.');
+    showError('No category+city combinations to scrape.');
     return;
   }
 
-  const totalCombos = categoriesToScrape.length * citiesToScrape.length;
-  const skipped = totalCombos - jobs.length;
   const msg = jobs.length === 1
-    ? `Scrape "${jobs[0].category.name}" in ${jobs[0].city}?`
-    : `Scrape ${jobs.length} category+city combinations?${skipped > 0 ? ` (${skipped} already scraped, skipping)` : ''}`;
+    ? `Scrape "${jobs[0].category.name}" in ${jobs[0].city}?${rescrapeCount > 0 ? ' (already scraped before — duplicates will be skipped)' : ''}`
+    : `Scrape ${jobs.length} category+city combinations?${rescrapeCount > 0 ? ` (${rescrapeCount} previously scraped — duplicates will be skipped)` : ''}`;
 
   if (!confirm(msg)) return;
 
