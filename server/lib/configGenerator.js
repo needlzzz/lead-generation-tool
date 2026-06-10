@@ -230,6 +230,20 @@ function buildOpeningHours() {
   }));
 }
 
+/**
+ * Build a default price list from preset services.
+ * Uses the preset's service names as price list items.
+ */
+function buildPriceList(preset) {
+  return [{
+    category: { de: 'Unsere Leistungen' },
+    items: preset.services.map(s => ({
+      name: { de: s.name },
+      price: { de: 'Auf Anfrage' }
+    }))
+  }];
+}
+
 // --- Main Config Generator ---
 
 /**
@@ -312,6 +326,10 @@ function generateConfig(lead, slug) {
     config.gallery = buildGallery(nicheKey, preset.galleryAlt || 'Impression');
   }
 
+  if (enabledFeatures.includes('priceList')) {
+    config.priceList = buildPriceList(preset);
+  }
+
   return { success: true, config };
 }
 
@@ -326,5 +344,6 @@ module.exports = {
   buildFeatureFlags,
   buildGallery,
   buildOpeningHours,
+  buildPriceList,
   resolveTemplate
 };

@@ -5,7 +5,8 @@
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
-    "test": "jest --verbose",
+    "test": "jest --verbose --testPathIgnorePatterns=e2e",
+    "test:e2e:preview": "jest tests/previewBuild.e2e.test.js --testTimeout=120000 --runInBand",
     "install-browsers": "npx playwright install chromium"
   },
   "dependencies": {
