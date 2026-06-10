@@ -28,6 +28,10 @@ router.post('/generate', async (req, res) => {
   // Get settings
   const settings = dataStore.readSingleton('settings') || {};
 
+  if (!settings.previewSiteRepoPath) {
+    return res.status(400).json({ error: 'previewSiteRepoPath not configured in settings' });
+  }
+
   // Set up SSE
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');

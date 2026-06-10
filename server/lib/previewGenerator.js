@@ -38,6 +38,11 @@ const dataStore = require('./dataStore');
 async function generatePreview(lead, settings, sendEvent) {
   const previewSiteRepoPath = settings.previewSiteRepoPath;
 
+  if (!previewSiteRepoPath) {
+    sendEvent('error', { step: 'validation_failed', message: 'Preview-Site-Repo-Pfad nicht konfiguriert (Settings → previewSiteRepoPath)' });
+    return { success: false, error: 'previewSiteRepoPath not configured' };
+  }
+
   // --- Step 1: Validate lead ---
   if (!lead || !lead.businessName) {
     sendEvent('error', { step: 'validation_failed', message: 'Firmenname fehlt' });

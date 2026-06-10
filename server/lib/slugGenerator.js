@@ -19,6 +19,7 @@ function replaceUmlauts(str) {
  * (except hyphens), collapse consecutive hyphens, trim leading/trailing hyphens.
  */
 function slugify(str) {
+  if (!str) return '';
   let slug = str.toLowerCase();
   slug = replaceUmlauts(slug);
   // Remove non-alphanumeric except hyphens
