@@ -385,6 +385,40 @@ async function analyzeWebsite(url, page, options = {}) {
     const httpResources = [...document.querySelectorAll('img[src^="http:"], script[src^="http:"], link[href^="http:"]')];
     results.mixedContentCount = httpResources.length;
 
+    // --- Email extraction ---
+    const foundEmails = new Set();
+
+    // 1. Extract from mailto: links
+    document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
+      const email = link.getAttribute('href').replace('mailto:', '').split('?')[0].trim().toLowerCase();
+      if (email && email.includes('@') && email.includes('.')) {
+        foundEmails.add(email);
+      }
+    });
+
+    // 2. Extract from visible text using regex
+    const bodyText = document.body?.innerText || '';
+    const emailRegex = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g;
+    const textMatches = bodyText.match(emailRegex) || [];
+    textMatches.forEach(email => {
+      const cleaned = email.toLowerCase().trim();
+      // Filter out common false positives
+      if (!cleaned.endsWith('.png') && !cleaned.endsWith('.jpg') && !cleaned.endsWith('.svg') &&
+          !cleaned.includes('example.com') && !cleaned.includes('domain.com') &&
+          !cleaned.includes('wixpress.com') && !cleaned.includes('sentry.io')) {
+        foundEmails.add(cleaned);
+      }
+    });
+
+    // 3. Extract from href attributes that might contain obfuscated emails
+    document.querySelectorAll('a[href*="@"]').forEach(link => {
+      const href = link.getAttribute('href') || '';
+      const match = href.match(/([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/);
+      if (match) foundEmails.add(match[1].toLowerCase());
+    });
+
+    results.emails = [...foundEmails];
+
     return results;
   });
 
@@ -511,7 +545,8 @@ async function analyzeWebsite(url, page, options = {}) {
     loadTimeMs,
     techStack,
     securityHeaders,
-    opportunityScore
+    opportunityScore,
+    emails: analysis.emails || []
   };
 }
 

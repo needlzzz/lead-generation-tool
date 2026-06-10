@@ -265,6 +265,12 @@ router.post('/analyze-websites', async (req, res) => {
         lead.websiteTechStack = result.techStack;
         lead.websiteSecurityGrade = result.securityHeaders ? result.securityHeaders.grade : null;
         lead.websiteOpportunityScore = result.opportunityScore;
+
+        // Save email if found during analysis and lead doesn't already have one
+        if (result.emails && result.emails.length > 0 && !lead.email) {
+          lead.email = result.emails[0];
+        }
+
         lead.activityLog = lead.activityLog || [];
 
         // Build detailed activity log entry
@@ -274,10 +280,13 @@ router.post('/analyze-websites', async (req, res) => {
         const secInfo = result.securityHeaders
           ? `, Sicherheit: ${result.securityHeaders.grade}`
           : '';
+        const emailInfo = result.emails && result.emails.length > 0
+          ? `, Email gefunden: ${result.emails[0]}`
+          : '';
         lead.activityLog.push({
           date: now,
           action: 'Website analyzed',
-          details: `Score: ${result.score}/100 (${result.quality}), ${result.issues.length} issues${techInfo}${secInfo}, Opportunity: ${result.opportunityScore}/100`
+          details: `Score: ${result.score}/100 (${result.quality}), ${result.issues.length} issues${techInfo}${secInfo}${emailInfo}, Opportunity: ${result.opportunityScore}/100`
         });
 
         dataStore.save('leads', lead);
