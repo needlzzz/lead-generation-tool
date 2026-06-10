@@ -279,9 +279,35 @@ function generateConfig(lead, slug) {
   const fontFamily = THEME_FONT_MAP[preset.theme] || THEME_FONT_MAP['slate-professional'];
 
   // --- Determine enabled features (Req 1.8, 1.9) ---
+  // Start with preset features for this category
   let enabledFeatures = preset.features.filter(f =>
     ALLOWED_FEATURES.includes(f) && !FORBIDDEN_FEATURES.includes(f)
   );
+
+  // Enhance with features detected on the client's current website
+  // This ensures the preview mirrors what they already have (plus improvements)
+  if (lead.websiteComplexity) {
+    const complexity = lead.websiteComplexity;
+    if (complexity.hasContactForm && !enabledFeatures.includes('contactForm')) {
+      enabledFeatures.push('contactForm');
+    }
+    if (complexity.hasOpeningHours && !enabledFeatures.includes('openingHours')) {
+      enabledFeatures.push('openingHours');
+    }
+    if (complexity.hasGoogleMaps && !enabledFeatures.includes('googleMaps')) {
+      enabledFeatures.push('googleMaps');
+    }
+    if (complexity.hasTeamSection && !enabledFeatures.includes('gallery')) {
+      enabledFeatures.push('gallery'); // Show gallery as visual upgrade
+    }
+    if (complexity.socialMediaCount > 0 && !enabledFeatures.includes('socialMedia')) {
+      // socialMedia is not in ALLOWED_FEATURES for config, but we can note it
+    }
+    // Always add contactForm if they don't have one (our key differentiator)
+    if (!complexity.hasContactForm && !enabledFeatures.includes('contactForm')) {
+      enabledFeatures.push('contactForm');
+    }
+  }
 
   // Disable clickToCall if no phone (Req 1.4)
   if (!lead.phone) {
