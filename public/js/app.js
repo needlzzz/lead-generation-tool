@@ -8,6 +8,7 @@ let currentTab = 'discovery';
 let currentCategoryFilter = '';
 let currentCityFilter = '';
 let currentEmailContext = null; // { leadId, emailType }
+let qualitySortOrder = null; // null = no sort, 'asc' = best first, 'desc' = worst first
 
 // ============================================================
 // TOAST NOTIFICATIONS
@@ -218,6 +219,13 @@ function renderDashboardAlerts(dueData, repliesData) {
 // DISCOVERY TAB
 // ============================================================
 
+function toggleQualitySort() {
+  if (qualitySortOrder === null) qualitySortOrder = 'desc'; // worst first (best prospects)
+  else if (qualitySortOrder === 'desc') qualitySortOrder = 'asc';
+  else qualitySortOrder = null;
+  renderDiscoveryTab();
+}
+
 function renderDiscoveryTab() {
   const tbody = document.querySelector('#tableDiscovery tbody');
   const empty = document.getElementById('emptyDiscovery');
@@ -245,6 +253,16 @@ function renderDiscoveryTab() {
   }
   if (hasEmailOnly) {
     leads = leads.filter(l => l.email);
+  }
+
+  // Sort by quality if active
+  if (qualitySortOrder) {
+    const qualityRank = { 'Poor': 1, 'Outdated': 2, 'Good': 3, 'None': 4 };
+    leads.sort((a, b) => {
+      const aRank = qualityRank[a.websiteQuality] || 5;
+      const bRank = qualityRank[b.websiteQuality] || 5;
+      return qualitySortOrder === 'desc' ? aRank - bRank : bRank - aRank;
+    });
   }
 
   if (leads.length === 0) {
