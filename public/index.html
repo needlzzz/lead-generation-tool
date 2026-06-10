@@ -50,11 +50,13 @@
     </div>
 
     <!-- Tabs -->
-    <nav class="tabs">
-      <button class="tab active" data-tab="discovery">Discovery</button>
-      <button class="tab" data-tab="outreach">Outreach Pipeline</button>
-      <button class="tab" data-tab="replies">Replies &amp; Meetings</button>
-      <button class="tab" data-tab="clients">Client Tracker</button>
+    <nav class="tabs" aria-label="Main navigation">
+      <div role="tablist">
+        <button class="tab active" role="tab" aria-selected="true" data-tab="discovery">Discovery</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="outreach">Outreach Pipeline</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="replies">Replies &amp; Meetings</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="clients">Client Tracker</button>
+      </div>
     </nav>
 
     <!-- Tab Panels -->
@@ -510,6 +512,7 @@
         </div>
       </div>
     </div>
+    <div id="toast-container"></div>
   </div>
 
   <script src="js/api.js"></script>

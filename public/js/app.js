@@ -10,6 +10,30 @@ let currentCityFilter = '';
 let currentEmailContext = null; // { leadId, emailType }
 
 // ============================================================
+// TOAST NOTIFICATIONS
+// ============================================================
+
+function showToast(type, message) {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+  const toast = document.createElement('div');
+  toast.className = `toast toast--${type}`;
+  toast.innerHTML = `
+    <span class="toast__message">${esc(message)}</span>
+    <button class="toast__close" onclick="this.parentElement.remove()">&times;</button>
+  `;
+  container.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('toast--visible'));
+
+  if (type !== 'error') {
+    setTimeout(() => {
+      toast.classList.remove('toast--visible');
+      setTimeout(() => toast.remove(), 200);
+    }, 4000);
+  }
+}
+
+// ============================================================
 // INITIALIZATION
 // ============================================================
 
@@ -72,6 +96,9 @@ function setupTabs() {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
       tab.classList.add('active');
+      // Toggle aria-selected
+      document.querySelectorAll('.tab[role="tab"]').forEach(t => t.setAttribute('aria-selected', 'false'));
+      tab.setAttribute('aria-selected', 'true');
       const tabName = tab.dataset.tab;
       document.getElementById(`panel-${tabName}`).classList.add('active');
       currentTab = tabName;
@@ -241,6 +268,10 @@ function renderDiscoveryTab() {
       <td>${l.dateDiscovered || ''}</td>
       <td onclick="event.stopPropagation()">
         <div class="actions">
+          ${l.websiteAnalyzedAt && !l.previewUrl && (l.status === 'Discovered' || l.status === 'Reached Out')
+            ? `<button class="btn btn-sm" onclick="startPreviewGeneration('${l.id}')" title="Generate Preview">🎨</button>` : ''}
+          ${l.previewUrl
+            ? `<button class="btn btn-sm" onclick="window.open('${esc(l.previewUrl)}', '_blank')" title="View Preview">👁</button>` : ''}
           ${l.status === 'Discovered' && l.email && l.websiteQuality !== 'Not a Fit'
             ? `<button class="btn btn-sm btn-primary" onclick="previewEmail('${l.id}','email1')">📧 Email 1</button>` : ''}
           ${l.status === 'Discovered'
