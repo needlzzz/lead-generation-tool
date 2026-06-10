@@ -28,7 +28,7 @@ function renderTemplate(template, lead, settings) {
 
   // Format website issues as a bullet list for email templates
   const websiteIssuesList = (lead.websiteIssues && lead.websiteIssues.length > 0)
-    ? lead.websiteIssues.map(i => `• ${i.label}: ${i.detail}`).join('\n')
+    ? lead.websiteIssues.map(i => `• ${i.label}: ${i.detail}`).join('\n\n')
     : '';
 
   // Short summary (first 2-3 issues, one-liner)
