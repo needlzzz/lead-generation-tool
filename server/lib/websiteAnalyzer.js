@@ -390,6 +390,85 @@ async function analyzeWebsite(url, page, options = {}) {
     // Font awesome or icon library
     results.hasIconLibrary = !!document.querySelector('link[href*="font-awesome"], link[href*="fontawesome"], svg.icon, [class*="fa-"]');
 
+    // --- Site Complexity Metrics ---
+
+    // Page count (internal links)
+    const currentHost = window.location.hostname;
+    const internalLinks = new Set();
+    document.querySelectorAll('a[href]').forEach(a => {
+      try {
+        const url = new URL(a.href, window.location.origin);
+        if (url.hostname === currentHost && !url.hash && url.pathname !== window.location.pathname) {
+          internalLinks.add(url.pathname);
+        }
+      } catch (e) {}
+    });
+    results.pageCount = internalLinks.size + 1; // +1 for current page
+
+    // Navigation depth
+    const navElement = document.querySelector('nav, [role="navigation"], .nav, .menu, .navbar');
+    results.navDepth = 1;
+    if (navElement) {
+      const nestedLists = navElement.querySelectorAll('ul ul, ol ol');
+      results.navDepth = nestedLists.length > 0 ? 2 + (navElement.querySelectorAll('ul ul ul').length > 0 ? 1 : 0) : 1;
+    }
+
+    // Word count on homepage
+    const bodyTextContent = document.body?.innerText || '';
+    results.wordCount = bodyTextContent.split(/\s+/).filter(w => w.length > 0).length;
+
+    // --- Sales Leverage Metrics ---
+
+    // No CTA above the fold
+    const viewportHeight = window.innerHeight;
+    const ctaSelectors = 'a.btn, a.button, button.btn, button.cta, [class*="cta"], a[class*="button"], .hero a, .hero button';
+    const ctaElements = document.querySelectorAll(ctaSelectors);
+    results.hasCtaAboveFold = [...ctaElements].some(el => {
+      const rect = el.getBoundingClientRect();
+      return rect.top < viewportHeight && rect.bottom > 0;
+    });
+
+    // No contact form on homepage
+    results.hasContactForm = !!document.querySelector('form:not([role="search"]):not(.search), [id*="contact"], [class*="contact-form"], [id*="kontakt"]');
+
+    // No Google Maps / address visible
+    results.hasGoogleMaps = !!document.querySelector('iframe[src*="google.com/maps"], iframe[src*="maps.google"], [class*="map"], #map');
+    results.hasVisibleAddress = !!(document.querySelector('[class*="address"], [class*="adresse"], address') ||
+      bodyTextContent.match(/\d{4}\s+[A-ZÄÖÜa-zäöü]+/)); // Swiss postal code pattern
+
+    // No opening hours visible
+    results.hasOpeningHours = !!(document.querySelector('[class*="opening"], [class*="öffnungszeit"], [class*="hours"]') ||
+      bodyTextContent.match(/montag|dienstag|mittwoch|donnerstag|freitag|mo\s*[-–]\s*fr|mo\s*-\s*so/i));
+
+    // Social media links
+    const socialLinks = document.querySelectorAll('a[href*="facebook.com"], a[href*="instagram.com"], a[href*="linkedin.com"], a[href*="twitter.com"], a[href*="x.com"], a[href*="tiktok.com"], a[href*="youtube.com"]');
+    results.socialMediaCount = socialLinks.length;
+
+    // No favicon
+    results.hasFavicon = !!document.querySelector('link[rel="icon"], link[rel="shortcut icon"], link[rel="apple-touch-icon"]');
+
+    // --- Trust Signals ---
+
+    // No team photos
+    results.hasTeamSection = !!(document.querySelector('[class*="team"], [id*="team"], [class*="mitarbeiter"], [class*="über-uns"]') ||
+      bodyTextContent.match(/unser team|unsere mitarbeiter|über uns/i));
+
+    // No testimonials/reviews
+    results.hasTestimonials = !!(document.querySelector('[class*="testimonial"], [class*="bewertung"], [class*="review"], [class*="referenz"]') ||
+      bodyTextContent.match(/kundenstimmen|bewertungen|referenzen|was unsere kunden/i));
+
+    // No Google reviews link
+    results.hasGoogleReviewLink = !!document.querySelector('a[href*="google.com/maps/place"], a[href*="g.page"], a[href*="search.google.com/local"]');
+
+    // --- Free/cheap CMS indicators ---
+    results.isFreePlan = !!(
+      document.querySelector('[class*="wix-ads"], .wixAds, [id*="WIX_ADS"]') ||
+      document.querySelector('.jimdo-free-footer, [class*="jimdo-footer"]') ||
+      bodyTextContent.includes('erstellt mit jimdo') ||
+      bodyTextContent.includes('created with wix') ||
+      bodyTextContent.includes('powered by squarespace')
+    );
+
     // Mixed content — only flag resources that actually load visible content
     const httpResources = [...document.querySelectorAll('img[src^="http:"], script[src^="http:"], link[rel="stylesheet"][href^="http:"], video[src^="http:"], audio[src^="http:"], iframe[src^="http:"]')];
     results.mixedContentCount = httpResources.length;
@@ -549,6 +628,88 @@ async function analyzeWebsite(url, page, options = {}) {
     });
   }
 
+  // --- Site Complexity Issues ---
+
+  if (analysis.pageCount <= 5) {
+    // This is actually good for us — easy to recreate. Store as info, not issue.
+  }
+
+  // --- Sales Leverage Issues ---
+
+  if (!analysis.hasCtaAboveFold) {
+    issues.push({
+      id: 'no-cta',
+      label: 'Kein Handlungsaufruf sichtbar',
+      detail: 'Besucher sehen auf Ihrer Startseite keinen klaren "Jetzt anfragen" oder "Termin buchen" Button — sie wissen nicht, was der nächste Schritt ist.'
+    });
+  }
+
+  if (!analysis.hasContactForm) {
+    issues.push({
+      id: 'no-contact-form',
+      label: 'Kein Kontaktformular',
+      detail: 'Ohne Kontaktformular müssen Besucher selbst eine E-Mail schreiben — viele tun das nicht und gehen stattdessen zur Konkurrenz.'
+    });
+  }
+
+  if (!analysis.hasOpeningHours) {
+    issues.push({
+      id: 'no-opening-hours',
+      label: 'Keine Öffnungszeiten sichtbar',
+      detail: 'Kunden wollen sofort sehen, wann Sie geöffnet haben — fehlende Öffnungszeiten führen zu unnötigen Anrufen oder verlorenen Kunden.'
+    });
+  }
+
+  if (analysis.socialMediaCount === 0) {
+    issues.push({
+      id: 'no-social-media',
+      label: 'Keine Social-Media-Verlinkung',
+      detail: 'Ihre Website verlinkt nicht auf Social-Media-Profile — eine verpasste Chance, Vertrauen aufzubauen und Reichweite zu gewinnen.'
+    });
+  }
+
+  if (!analysis.hasFavicon) {
+    issues.push({
+      id: 'no-favicon',
+      label: 'Kein Favicon (Browser-Icon)',
+      detail: 'Ihre Website zeigt kein eigenes Icon im Browser-Tab — das wirkt unprofessionell und macht es Besuchern schwerer, Ihren Tab wiederzufinden.'
+    });
+  }
+
+  // --- Trust Signal Issues ---
+
+  if (!analysis.hasTeamSection && !analysis.hasTestimonials) {
+    issues.push({
+      id: 'no-trust-signals',
+      label: 'Keine Vertrauenssignale',
+      detail: 'Ihre Website zeigt weder Team-Fotos noch Kundenstimmen — Besucher können nicht einschätzen, mit wem sie es zu tun haben.'
+    });
+  }
+
+  if (analysis.isFreePlan) {
+    issues.push({
+      id: 'free-plan-cms',
+      label: 'Kostenlose Website-Version erkannt',
+      detail: 'Ihre Website läuft auf einer kostenlosen Version eines Baukastens — mit Werbung des Anbieters und eingeschränkten Funktionen.'
+    });
+  }
+
+  // --- Store site complexity data for display (not issues, but metadata) ---
+  const siteComplexity = {
+    pageCount: analysis.pageCount,
+    navDepth: analysis.navDepth,
+    wordCount: analysis.wordCount,
+    hasContactForm: analysis.hasContactForm,
+    hasOpeningHours: analysis.hasOpeningHours,
+    hasGoogleMaps: analysis.hasGoogleMaps,
+    socialMediaCount: analysis.socialMediaCount,
+    hasFavicon: analysis.hasFavicon,
+    hasTeamSection: analysis.hasTeamSection,
+    hasTestimonials: analysis.hasTestimonials,
+    hasGoogleReviewLink: analysis.hasGoogleReviewLink,
+    hasCtaAboveFold: analysis.hasCtaAboveFold
+  };
+
   // --- Calculate score and quality ---
   const score = calculateScore(issues, loadTimeMs);
   const quality = scoreToQuality(score);
@@ -564,6 +725,7 @@ async function analyzeWebsite(url, page, options = {}) {
     techStack,
     securityHeaders,
     opportunityScore,
+    siteComplexity,
     emails: analysis.emails || []
   };
 }
@@ -777,7 +939,14 @@ function calculateScore(issues, loadTimeMs) {
     'outdated-copyright': 10,
     'mixed-content': 10,
     'missing-security-headers': 12,
-    'weak-security-headers': 8
+    'weak-security-headers': 8,
+    'no-cta': 8,
+    'no-contact-form': 10,
+    'no-opening-hours': 5,
+    'no-social-media': 3,
+    'no-favicon': 3,
+    'no-trust-signals': 5,
+    'free-plan-cms': 8
   };
 
   for (const issue of issues) {

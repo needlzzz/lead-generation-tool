@@ -265,6 +265,7 @@ router.post('/analyze-websites', async (req, res) => {
         lead.websiteTechStack = result.techStack;
         lead.websiteSecurityGrade = result.securityHeaders ? result.securityHeaders.grade : null;
         lead.websiteOpportunityScore = result.opportunityScore;
+        lead.websiteComplexity = result.siteComplexity || null;
 
         // Save email if found during analysis and lead doesn't already have one
         if (result.emails && result.emails.length > 0 && !lead.email) {
