@@ -55,9 +55,8 @@ describe('analyzeSecurityHeaders', () => {
 
     const secIssue = issues.find(i => i.id === 'missing-security-headers');
     expect(secIssue).toBeDefined();
-    expect(secIssue.label).toBe('Fehlende Sicherheits-Header');
-    expect(secIssue.detail).toContain('HSTS');
-    expect(secIssue.detail).toContain('CSP');
+    expect(secIssue.label).toBe('Fehlender Schutz vor Angriffen');
+    expect(secIssue.detail).toContain('Sicherheitseinstellungen');
   });
 
   test('does not push HSTS issue for non-SSL sites', () => {
@@ -97,7 +96,7 @@ describe('analyzeSecurityHeaders', () => {
     expect(['D', 'F']).toContain(result.grade);
     const weakIssue = issues.find(i => i.id === 'weak-security-headers');
     expect(weakIssue).toBeDefined();
-    expect(weakIssue.detail).toContain('1 von 6');
+    expect(weakIssue.detail).toContain('Schutzmassnahmen');
   });
 
   test('stores all header values in result', () => {

@@ -69,7 +69,7 @@ async function analyzeWebsite(url, page, options = {}) {
       issues.push({
         id: 'unreachable',
         label: 'Website nicht erreichbar',
-        detail: 'Die Website konnte nicht geladen werden oder ist extrem langsam.'
+        detail: 'Ihre Website konnte nicht geladen werden — potenzielle Kunden sehen eine Fehlermeldung statt Ihrem Angebot.'
       });
       return {
         quality: 'Poor', score: 0, issues, loadTimeMs: 0,
@@ -103,8 +103,8 @@ async function analyzeWebsite(url, page, options = {}) {
   if (isBotBlocked) {
     issues.push({
       id: 'bot-blocked',
-      label: 'Bot-Schutz aktiv',
-      detail: 'Die Website blockiert automatisierte Zugriffe — die Analyse konnte nicht durchgeführt werden.'
+      label: 'Analyse nicht möglich',
+      detail: 'Ihre Website blockiert automatisierte Zugriffe — die Qualitätsanalyse konnte nicht durchgeführt werden.'
     });
     return {
       quality: 'None', score: -1, issues, loadTimeMs,
@@ -116,8 +116,8 @@ async function analyzeWebsite(url, page, options = {}) {
   if (!hasSSL) {
     issues.push({
       id: 'no-ssl',
-      label: 'Kein SSL-Zertifikat',
-      detail: 'Die Website verwendet kein HTTPS — Besucher sehen eine "Nicht sicher"-Warnung im Browser.'
+      label: 'Keine sichere Verbindung',
+      detail: 'Ihre Website hat kein SSL-Zertifikat — Besucher sehen die Warnung "Nicht sicher" und verlassen die Seite, bevor sie Ihr Angebot sehen.'
     });
   }
 
@@ -125,14 +125,14 @@ async function analyzeWebsite(url, page, options = {}) {
   if (loadTimeMs > 8000) {
     issues.push({
       id: 'slow-load',
-      label: 'Sehr langsame Ladezeit',
-      detail: `Die Website braucht über ${Math.round(loadTimeMs / 1000)} Sekunden zum Laden — Besucher springen ab.`
+      label: 'Sehr lange Ladezeit',
+      detail: `Ihre Website lädt über ${Math.round(loadTimeMs / 1000)} Sekunden — Studien zeigen, dass über 50% der Besucher nach 3 Sekunden abspringen.`
     });
   } else if (loadTimeMs > 5000) {
     issues.push({
       id: 'moderate-load',
-      label: 'Langsame Ladezeit',
-      detail: `Die Website braucht ${(loadTimeMs / 1000).toFixed(1)} Sekunden zum Laden — Google bevorzugt schnellere Seiten.`
+      label: 'Lange Ladezeit',
+      detail: `Ihre Website lädt ${(loadTimeMs / 1000).toFixed(1)} Sekunden — das kostet Sie Kunden und verschlechtert Ihr Google-Ranking.`
     });
   }
 
@@ -394,14 +394,14 @@ async function analyzeWebsite(url, page, options = {}) {
   if (!analysis.hasViewport) {
     issues.push({
       id: 'no-viewport',
-      label: 'Nicht mobilfreundlich',
-      detail: 'Die Website hat kein Viewport-Meta-Tag — sie wird auf Smartphones schlecht dargestellt.'
+      label: 'Nicht für Smartphones optimiert',
+      detail: 'Ihre Website wird auf dem Handy nicht korrekt angezeigt — über 60% aller Suchanfragen kommen heute von Mobilgeräten.'
     });
   } else if (!analysis.usesMediaQueries && !analysis.hasReact) {
     issues.push({
       id: 'no-responsive',
       label: 'Kein responsives Design',
-      detail: 'Die Website passt sich nicht an verschiedene Bildschirmgrössen an.'
+      detail: 'Ihre Website passt sich nicht an verschiedene Bildschirmgrössen an — Kunden auf Tablets und Smartphones sehen eine abgeschnittene Seite.'
     });
   }
 
@@ -409,22 +409,22 @@ async function analyzeWebsite(url, page, options = {}) {
   if (!analysis.title || analysis.title.length < 10) {
     issues.push({
       id: 'no-title',
-      label: 'Fehlender Seitentitel',
-      detail: 'Die Website hat keinen aussagekräftigen Titel — schlecht für Google-Rankings.'
+      label: 'Schlechte Google-Sichtbarkeit',
+      detail: 'Ihrer Website fehlt ein aussagekräftiger Seitentitel — dadurch erscheint sie bei Google-Suchen deutlich weiter unten.'
     });
   }
   if (!analysis.hasMetaDescription) {
     issues.push({
       id: 'no-meta-desc',
-      label: 'Keine Meta-Beschreibung',
-      detail: 'Ohne Meta-Description zeigt Google einen zufälligen Textausschnitt in den Suchergebnissen.'
+      label: 'Kein Beschreibungstext für Google',
+      detail: 'Ohne Meta-Beschreibung zeigt Google einen zufälligen Textausschnitt — Suchende wissen nicht, was sie bei Ihnen erwartet, und klicken seltener.'
     });
   }
   if (analysis.h1Count === 0) {
     issues.push({
       id: 'no-h1',
-      label: 'Keine H1-Überschrift',
-      detail: 'Die Hauptüberschrift fehlt — ein wichtiges SEO-Signal für Google.'
+      label: 'Fehlende Hauptüberschrift',
+      detail: 'Google erkennt nicht, worum es auf Ihrer Seite geht — das verschlechtert Ihr Ranking für relevante Suchbegriffe.'
     });
   }
 
@@ -432,8 +432,8 @@ async function analyzeWebsite(url, page, options = {}) {
   if (analysis.totalImages > 0 && analysis.imagesWithoutAlt > analysis.totalImages * 0.5) {
     issues.push({
       id: 'missing-alt',
-      label: 'Bilder ohne Alt-Text',
-      detail: `${analysis.imagesWithoutAlt} von ${analysis.totalImages} Bildern haben keinen Alt-Text — schlecht für SEO und Barrierefreiheit.`
+      label: 'Bilder ohne Beschreibung',
+      detail: `${analysis.imagesWithoutAlt} von ${analysis.totalImages} Bildern haben keine Beschreibung — Google kann diese Bilder nicht indexieren, und Sie verpassen Bild-Suchergebnisse.`
     });
   }
 
@@ -441,15 +441,15 @@ async function analyzeWebsite(url, page, options = {}) {
   if (analysis.hasFlash) {
     issues.push({
       id: 'uses-flash',
-      label: 'Verwendet Flash',
-      detail: 'Flash wird von keinem modernen Browser mehr unterstützt.'
+      label: 'Veraltete Technologie (Flash)',
+      detail: 'Ihre Website verwendet Flash — das funktioniert auf keinem modernen Browser oder Smartphone mehr. Besucher sehen leere Bereiche.'
     });
   }
   if (analysis.hasTableLayout) {
     issues.push({
       id: 'table-layout',
-      label: 'Tabellen-Layout',
-      detail: 'Die Website verwendet Tabellen für das Layout — eine veraltete Technik aus den 2000ern.'
+      label: 'Veralteter Seitenaufbau',
+      detail: 'Ihre Website verwendet eine Technik aus den 2000er-Jahren — sie lässt sich nicht für Mobilgeräte anpassen und wirkt auf Besucher veraltet.'
     });
   }
 
@@ -461,7 +461,7 @@ async function analyzeWebsite(url, page, options = {}) {
       issues.push({
         id: 'outdated-wp',
         label: 'Veraltetes WordPress',
-        detail: `WordPress ${techStack.cmsVersion} ist veraltet — Sicherheitslücken und fehlende Features.`
+        detail: `Ihre Website läuft auf WordPress ${techStack.cmsVersion} — diese Version hat bekannte Sicherheitslücken und wird nicht mehr aktualisiert.`
       });
     }
   }
@@ -473,7 +473,7 @@ async function analyzeWebsite(url, page, options = {}) {
       issues.push({
         id: 'outdated-joomla',
         label: 'Veraltetes Joomla',
-        detail: `Joomla ${techStack.cmsVersion} wird nicht mehr unterstützt — Sicherheitsrisiko.`
+        detail: `Joomla ${techStack.cmsVersion} wird nicht mehr unterstützt — Ihre Website ist anfällig für Hackerangriffe.`
       });
     }
   }
@@ -483,8 +483,8 @@ async function analyzeWebsite(url, page, options = {}) {
   if (analysis.copyrightYear && analysis.copyrightYear < currentYear - 2) {
     issues.push({
       id: 'outdated-copyright',
-      label: 'Veraltetes Copyright-Jahr',
-      detail: `Das Copyright zeigt ${analysis.copyrightYear} — die Website wirkt ungepflegt.`
+      label: 'Website wirkt veraltet',
+      detail: `Das Copyright-Jahr auf Ihrer Website zeigt noch ${analysis.copyrightYear} — das signalisiert Besuchern, dass die Seite nicht mehr gepflegt wird.`
     });
   }
 
@@ -492,8 +492,8 @@ async function analyzeWebsite(url, page, options = {}) {
   if (analysis.mixedContentCount > 0) {
     issues.push({
       id: 'mixed-content',
-      label: 'Gemischte Inhalte (HTTP/HTTPS)',
-      detail: 'Einige Ressourcen werden unsicher über HTTP geladen — Browser zeigen Warnungen.'
+      label: 'Sicherheitswarnung im Browser',
+      detail: 'Teile Ihrer Website werden unverschlüsselt geladen — Besucher sehen eine Warnung im Browser, was das Vertrauen in Ihr Geschäft untergräbt.'
     });
   }
 
@@ -610,8 +610,8 @@ function analyzeSecurityHeaders(headers, hasSSL, issues) {
     if (missingCritical.length > 0) {
       issues.push({
         id: 'missing-security-headers',
-        label: 'Fehlende Sicherheits-Header',
-        detail: `Wichtige HTTP-Sicherheits-Header fehlen (${missingCritical.join(', ')}) — die Website ist anfällig für Clickjacking und Cross-Site-Angriffe.`
+        label: 'Fehlender Schutz vor Angriffen',
+        detail: 'Ihrer Website fehlen wichtige Sicherheitseinstellungen — das macht sie anfälliger für Hackerangriffe und kann das Vertrauen Ihrer Kunden gefährden.'
       });
     }
   }
@@ -622,7 +622,7 @@ function analyzeSecurityHeaders(headers, hasSSL, issues) {
       issues.push({
         id: 'weak-security-headers',
         label: 'Schwache Sicherheitskonfiguration',
-        detail: `Nur ${presentCount} von ${total} empfohlenen Sicherheits-Headern sind konfiguriert (Note: ${result.grade}).`
+        detail: 'Ihre Website hat nur minimale Schutzmassnahmen konfiguriert — moderne Websites brauchen bessere Absicherung gegen Missbrauch.'
       });
     }
   }
