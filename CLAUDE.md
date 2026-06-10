@@ -119,6 +119,7 @@ tests/
 - Results stored per-lead: `websiteQuality`, `websiteScore`, `websiteIssues[]`, `websiteLoadTime`, `websiteAnalyzedAt`, `websiteTechStack`, `websiteSecurityGrade`, `websiteOpportunityScore`
 - Issues have German labels and descriptions (for use in outreach emails)
 - UI: "🔬 Analyze Websites" button, color-coded quality badges with tooltip, full findings in lead detail modal
+- **Selection & Re-analysis**: Discovery table has a checkbox column for selecting individual leads. "🔬 Analyze Selected (N)" button appears when leads are checked — allows re-analysis of already-analyzed leads. Bulk "🔬 Analyze Websites" still only targets unanalyzed leads. "Select All" checkbox in table header selects all visible leads.
 
 ### Available Cities
 Zürich, Bern, Basel, Luzern, St. Gallen, Lausanne, Genf, Winterthur, Biel/Bienne, Thun, Aarau, Schaffhausen, Chur, Zug, Solothurn, Baden, Olten, Rapperswil, Frauenfeld, Lugano
