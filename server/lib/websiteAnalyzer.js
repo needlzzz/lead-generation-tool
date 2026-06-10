@@ -390,19 +390,22 @@ async function analyzeWebsite(url, page, options = {}) {
     // Font awesome or icon library
     results.hasIconLibrary = !!document.querySelector('link[href*="font-awesome"], link[href*="fontawesome"], svg.icon, [class*="fa-"]');
 
-    // Mixed content
-    const httpResources = [...document.querySelectorAll('img[src^="http:"], script[src^="http:"], link[href^="http:"]')];
+    // Mixed content — only flag resources that actually load visible content
+    const httpResources = [...document.querySelectorAll('img[src^="http:"], script[src^="http:"], link[rel="stylesheet"][href^="http:"], video[src^="http:"], audio[src^="http:"], iframe[src^="http:"]')];
     results.mixedContentCount = httpResources.length;
 
     // --- Email extraction ---
     const foundEmails = new Set();
 
-    // 1. Extract from mailto: links
-    document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
-      const email = link.getAttribute('href').replace('mailto:', '').split('?')[0].trim().toLowerCase();
-      if (email && email.includes('@') && email.includes('.')) {
-        foundEmails.add(email);
-      }
+    // 1. Extract from mailto: links (decode percent-encoded/obfuscated emails)
+    document.querySelectorAll('a[href^="mailto:"], a[href^="mailto%3"]').forEach(link => {
+      try {
+        const raw = link.getAttribute('href') || '';
+        const decoded = decodeURIComponent(raw).replace('mailto:', '').split('?')[0].trim().toLowerCase();
+        if (decoded && decoded.includes('@') && decoded.includes('.')) {
+          foundEmails.add(decoded);
+        }
+      } catch (e) { /* skip malformed URIs */ }
     });
 
     // 2. Extract from visible text using regex
@@ -420,10 +423,12 @@ async function analyzeWebsite(url, page, options = {}) {
     });
 
     // 3. Extract from href attributes that might contain obfuscated emails
-    document.querySelectorAll('a[href*="@"]').forEach(link => {
-      const href = link.getAttribute('href') || '';
-      const match = href.match(/([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/);
-      if (match) foundEmails.add(match[1].toLowerCase());
+    document.querySelectorAll('a[href*="@"], a[href*="%40"]').forEach(link => {
+      try {
+        const href = decodeURIComponent(link.getAttribute('href') || '');
+        const match = href.match(/([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/);
+        if (match) foundEmails.add(match[1].toLowerCase());
+      } catch (e) { /* skip malformed URIs */ }
     });
 
     results.emails = [...foundEmails];
