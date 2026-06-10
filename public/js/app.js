@@ -9,6 +9,8 @@ let currentCategoryFilter = '';
 let currentCityFilter = '';
 let currentEmailContext = null; // { leadId, emailType }
 let qualitySortOrder = null; // null = no sort, 'asc' = best first, 'desc' = worst first
+let discoverySortField = null; // null, 'category', 'status', 'discovered'
+let discoverySortOrder = null; // null, 'asc', 'desc'
 
 // ============================================================
 // TOAST NOTIFICATIONS
@@ -125,6 +127,7 @@ function renderCurrentTab() {
     case 'outreach': renderOutreachTab(); break;
     case 'replies': renderRepliesTab(); break;
     case 'clients': renderClientsTab(); break;
+    case 'scrapelog': renderScrapeLogTab(); break;
   }
 }
 
@@ -220,9 +223,23 @@ function renderDashboardAlerts(dueData, repliesData) {
 // ============================================================
 
 function toggleQualitySort() {
+  discoverySortField = null;
+  discoverySortOrder = null;
   if (qualitySortOrder === null) qualitySortOrder = 'desc'; // worst first (best prospects)
   else if (qualitySortOrder === 'desc') qualitySortOrder = 'asc';
   else qualitySortOrder = null;
+  renderDiscoveryTab();
+}
+
+function toggleDiscoverySort(field) {
+  if (discoverySortField === field) {
+    if (discoverySortOrder === 'asc') discoverySortOrder = 'desc';
+    else if (discoverySortOrder === 'desc') { discoverySortField = null; discoverySortOrder = null; }
+  } else {
+    discoverySortField = field;
+    discoverySortOrder = 'asc';
+  }
+  qualitySortOrder = null;
   renderDiscoveryTab();
 }
 
@@ -262,6 +279,25 @@ function renderDiscoveryTab() {
       const aRank = qualityRank[a.websiteQuality] || 5;
       const bRank = qualityRank[b.websiteQuality] || 5;
       return qualitySortOrder === 'desc' ? aRank - bRank : bRank - aRank;
+    });
+  }
+
+  // Sort by selected column
+  if (discoverySortField && discoverySortOrder) {
+    leads.sort((a, b) => {
+      let aVal, bVal;
+      if (discoverySortField === 'category') {
+        aVal = (a.category || '').toLowerCase();
+        bVal = (b.category || '').toLowerCase();
+      } else if (discoverySortField === 'status') {
+        aVal = (a.status || '').toLowerCase();
+        bVal = (b.status || '').toLowerCase();
+      } else if (discoverySortField === 'discovered') {
+        aVal = a.dateDiscovered || '';
+        bVal = b.dateDiscovered || '';
+      }
+      const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+      return discoverySortOrder === 'asc' ? cmp : -cmp;
     });
   }
 
@@ -418,6 +454,58 @@ function renderClientsTab() {
   `).join('');
 }
 
+
+// ============================================================
+// SCRAPE LOG TAB
+// ============================================================
+
+function renderScrapeLogTab() {
+  const tbody = document.querySelector('#tableScrapeLog tbody');
+  const empty = document.getElementById('emptyScrapeLog');
+
+  // Build map of category+city → { lastDate, count }
+  const scrapeMap = {};
+  for (const lead of allLeads) {
+    let city = lead.city;
+    if (!city && lead.activityLog && lead.activityLog[0]?.details) {
+      const match = lead.activityLog[0].details.match(/in (.+)$/);
+      if (match) city = match[1];
+    }
+    if (!city) city = '(unbekannt)';
+    const cat = lead.category || '(keine)';
+    const key = `${cat}::${city}`;
+
+    if (!scrapeMap[key]) {
+      scrapeMap[key] = { category: cat, city, lastDate: lead.dateDiscovered, count: 0 };
+    }
+    scrapeMap[key].count++;
+    if (lead.dateDiscovered && (!scrapeMap[key].lastDate || lead.dateDiscovered > scrapeMap[key].lastDate)) {
+      scrapeMap[key].lastDate = lead.dateDiscovered;
+    }
+  }
+
+  const entries = Object.values(scrapeMap).sort((a, b) => {
+    if (!a.lastDate) return 1;
+    if (!b.lastDate) return -1;
+    return b.lastDate.localeCompare(a.lastDate);
+  });
+
+  if (entries.length === 0) {
+    tbody.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  tbody.innerHTML = entries.map(e => `
+    <tr>
+      <td>${esc(e.category)}</td>
+      <td>${esc(e.city)}</td>
+      <td>${e.lastDate || '—'}</td>
+      <td>${e.count}</td>
+    </tr>
+  `).join('');
+}
 
 // ============================================================
 // EVENT LISTENERS

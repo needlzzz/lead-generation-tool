@@ -57,6 +57,7 @@
         <button class="tab" role="tab" aria-selected="false" data-tab="outreach">Outreach Pipeline</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="replies">Replies &amp; Meetings</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="clients">Client Tracker</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="scrapelog">Scrape Log</button>
       </div>
     </nav>
 
@@ -106,14 +107,14 @@
             <tr>
               <th style="width:32px"><input type="checkbox" id="selectAllDiscovery" title="Select all"></th>
               <th>Business Name</th>
-              <th>Category</th>
+              <th style="cursor:pointer" onclick="toggleDiscoverySort('category')" title="Click to sort">Category ⇅</th>
               <th>Address</th>
               <th>Phone</th>
               <th>Email</th>
               <th>Website</th>
               <th style="cursor:pointer" onclick="toggleQualitySort()" title="Click to sort by quality">Quality ⇅</th>
-              <th>Status</th>
-              <th>Discovered</th>
+              <th style="cursor:pointer" onclick="toggleDiscoverySort('status')" title="Click to sort">Status ⇅</th>
+              <th style="cursor:pointer" onclick="toggleDiscoverySort('discovered')" title="Click to sort">Discovered ⇅</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -198,6 +199,23 @@
         <div id="emptyClients" class="empty-state hidden">
           No clients yet. Leads appear here after a meeting is scheduled.
         </div>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="panel-scrapelog">
+      <div class="table-wrap">
+        <table id="tableScrapeLog">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>City</th>
+              <th>Last Scraped</th>
+              <th>Leads Found</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div id="emptyScrapeLog" class="empty-state hidden">No scrape history yet.</div>
       </div>
     </section>
 
