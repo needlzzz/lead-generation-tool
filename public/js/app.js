@@ -229,6 +229,7 @@ function renderDiscoveryTab() {
 
   tbody.innerHTML = leads.map(l => `
     <tr class="clickable" onclick="showActivityLog('${l.id}')">
+      <td onclick="event.stopPropagation()"><input type="checkbox" class="lead-select" data-id="${l.id}" onchange="updateSelectionUI()"></td>
       <td>${esc(l.businessName)}</td>
       <td>${esc(l.category)}</td>
       <td>${esc(l.address)}</td>
@@ -250,6 +251,11 @@ function renderDiscoveryTab() {
       </td>
     </tr>
   `).join('');
+
+  // Reset select-all checkbox
+  const selectAll = document.getElementById('selectAllDiscovery');
+  if (selectAll) selectAll.checked = false;
+  updateSelectionUI();
 }
 
 // ============================================================
@@ -416,7 +422,12 @@ function setupEventListeners() {
 
   // Enrich Emails
   document.getElementById('btnEnrichEmails').addEventListener('click', enrichEmails);
-  document.getElementById('btnAnalyzeWebsites').addEventListener('click', analyzeWebsites);
+  document.getElementById('btnAnalyzeWebsites').addEventListener('click', () => analyzeWebsites(false));
+  document.getElementById('btnAnalyzeSelected').addEventListener('click', () => analyzeWebsites(true));
+  document.getElementById('selectAllDiscovery').addEventListener('change', (e) => {
+    document.querySelectorAll('.lead-select').forEach(cb => { cb.checked = e.target.checked; });
+    updateSelectionUI();
+  });
 
   // CSV Import
   document.getElementById('btnImportCSV').addEventListener('click', () => {
@@ -1164,42 +1175,74 @@ function renderQualityBadge(lead) {
   return `<span class="quality-badge ${badgeClass}" ${tooltip ? `title="${tooltip}"` : ''}>${esc(q)}${score}</span>`;
 }
 
-async function analyzeWebsites() {
+// ============================================================
+// LEAD SELECTION (checkboxes in Discovery table)
+// ============================================================
+
+function getSelectedLeadIds() {
+  return [...document.querySelectorAll('.lead-select:checked')].map(cb => cb.dataset.id);
+}
+
+function updateSelectionUI() {
+  const selectedIds = getSelectedLeadIds();
+  const btnAnalyzeSelected = document.getElementById('btnAnalyzeSelected');
+  if (btnAnalyzeSelected) {
+    if (selectedIds.length > 0) {
+      btnAnalyzeSelected.classList.remove('hidden');
+      btnAnalyzeSelected.textContent = `🔬 Analyze Selected (${selectedIds.length})`;
+    } else {
+      btnAnalyzeSelected.classList.add('hidden');
+    }
+  }
+}
+
+async function analyzeWebsites(selectedOnly = false) {
   const citySelect = document.getElementById('scraperCityFilter').value;
   const catFilter = document.getElementById('categoryFilter').value;
 
-  // Filter leads that have a website and haven't been analyzed yet
-  let leadsToAnalyze = allLeads.filter(l =>
-    l.websiteUrl && !l.websiteAnalyzedAt && (l.status === 'Discovered' || l.status === 'Reached Out')
-  );
+  let leadsToAnalyze;
 
-  // Apply category filter if set
-  if (catFilter) {
-    leadsToAnalyze = leadsToAnalyze.filter(l => l.category === catFilter);
-  }
+  if (selectedOnly) {
+    // Analyze only selected leads (allows re-analysis)
+    const selectedIds = getSelectedLeadIds();
+    leadsToAnalyze = allLeads.filter(l => selectedIds.includes(l.id) && l.websiteUrl);
+  } else {
+    // Bulk analyze: leads with a website that haven't been analyzed yet
+    leadsToAnalyze = allLeads.filter(l =>
+      l.websiteUrl && !l.websiteAnalyzedAt && (l.status === 'Discovered' || l.status === 'Reached Out')
+    );
 
-  // Apply city filter if set
-  if (citySelect !== 'all') {
-    leadsToAnalyze = leadsToAnalyze.filter(l => {
-      if (l.city) return l.city === citySelect;
-      if (l.activityLog && l.activityLog[0]?.details) {
-        return l.activityLog[0].details.includes(`in ${citySelect}`);
-      }
-      return false;
-    });
+    // Apply category filter if set
+    if (catFilter) {
+      leadsToAnalyze = leadsToAnalyze.filter(l => l.category === catFilter);
+    }
+
+    // Apply city filter if set
+    if (citySelect !== 'all') {
+      leadsToAnalyze = leadsToAnalyze.filter(l => {
+        if (l.city) return l.city === citySelect;
+        if (l.activityLog && l.activityLog[0]?.details) {
+          return l.activityLog[0].details.includes(`in ${citySelect}`);
+        }
+        return false;
+      });
+    }
   }
 
   if (leadsToAnalyze.length === 0) {
-    showError('No unanalyzed leads with websites (for current filter).');
+    showError(selectedOnly
+      ? 'No selected leads with websites to analyze.'
+      : 'No unanalyzed leads with websites (for current filter).');
     return;
   }
 
-  const scope = [
-    catFilter || 'all categories',
-    citySelect === 'all' ? 'all cities' : citySelect
-  ].join(', ');
+  const reAnalyzeCount = leadsToAnalyze.filter(l => l.websiteAnalyzedAt).length;
+  const freshCount = leadsToAnalyze.length - reAnalyzeCount;
+  const desc = reAnalyzeCount > 0
+    ? `${leadsToAnalyze.length} websites (${freshCount} new, ${reAnalyzeCount} re-analysis)`
+    : `${leadsToAnalyze.length} websites`;
 
-  if (!confirm(`Analyze ${leadsToAnalyze.length} websites (${scope})? This runs in the background.`)) {
+  if (!confirm(`Analyze ${desc}? This runs in the background.`)) {
     return;
   }
 

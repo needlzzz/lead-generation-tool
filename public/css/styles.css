@@ -572,3 +572,7 @@ form { padding: 16px 20px; }
   cursor: not-allowed;
 }
 #btnGeneratePreview.hidden { display: none; }
+
+/* Lead selection checkboxes */
+.lead-select { width: 16px; height: 16px; cursor: pointer; }
+#selectAllDiscovery { width: 16px; height: 16px; cursor: pointer; }
