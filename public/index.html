@@ -207,10 +207,10 @@
         <table id="tableScrapeLog">
           <thead>
             <tr>
-              <th>Category</th>
-              <th>City</th>
-              <th>Last Scraped</th>
-              <th>Leads Found</th>
+              <th style="cursor:pointer" onclick="toggleScrapeLogSort('category')" title="Click to sort">Category ⇅</th>
+              <th style="cursor:pointer" onclick="toggleScrapeLogSort('city')" title="Click to sort">City ⇅</th>
+              <th style="cursor:pointer" onclick="toggleScrapeLogSort('date')" title="Click to sort">Last Scraped ⇅</th>
+              <th style="cursor:pointer" onclick="toggleScrapeLogSort('count')" title="Click to sort">Leads Found ⇅</th>
             </tr>
           </thead>
           <tbody></tbody>

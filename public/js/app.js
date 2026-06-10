@@ -11,6 +11,8 @@ let currentEmailContext = null; // { leadId, emailType }
 let qualitySortOrder = null; // null = no sort, 'asc' = best first, 'desc' = worst first
 let discoverySortField = null; // null, 'category', 'status', 'discovered'
 let discoverySortOrder = null; // null, 'asc', 'desc'
+let scrapeLogSortField = 'date'; // default sort by date
+let scrapeLogSortOrder = 'desc'; // most recent first
 
 // ============================================================
 // TOAST NOTIFICATIONS
@@ -459,6 +461,17 @@ function renderClientsTab() {
 // SCRAPE LOG TAB
 // ============================================================
 
+function toggleScrapeLogSort(field) {
+  if (scrapeLogSortField === field) {
+    if (scrapeLogSortOrder === 'asc') scrapeLogSortOrder = 'desc';
+    else scrapeLogSortOrder = 'asc';
+  } else {
+    scrapeLogSortField = field;
+    scrapeLogSortOrder = field === 'date' ? 'desc' : 'asc';
+  }
+  renderScrapeLogTab();
+}
+
 function renderScrapeLogTab() {
   const tbody = document.querySelector('#tableScrapeLog tbody');
   const empty = document.getElementById('emptyScrapeLog');
@@ -484,11 +497,25 @@ function renderScrapeLogTab() {
     }
   }
 
-  const entries = Object.values(scrapeMap).sort((a, b) => {
-    if (!a.lastDate) return 1;
-    if (!b.lastDate) return -1;
-    return b.lastDate.localeCompare(a.lastDate);
-  });
+  let entries = Object.values(scrapeMap);
+
+  // Sort by selected field
+  if (scrapeLogSortField && scrapeLogSortOrder) {
+    entries.sort((a, b) => {
+      let aVal, bVal;
+      if (scrapeLogSortField === 'category') {
+        aVal = a.category.toLowerCase(); bVal = b.category.toLowerCase();
+      } else if (scrapeLogSortField === 'city') {
+        aVal = a.city.toLowerCase(); bVal = b.city.toLowerCase();
+      } else if (scrapeLogSortField === 'date') {
+        aVal = a.lastDate || ''; bVal = b.lastDate || '';
+      } else if (scrapeLogSortField === 'count') {
+        aVal = a.count; bVal = b.count;
+      }
+      const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+      return scrapeLogSortOrder === 'asc' ? cmp : -cmp;
+    });
+  }
 
   if (entries.length === 0) {
     tbody.innerHTML = '';
