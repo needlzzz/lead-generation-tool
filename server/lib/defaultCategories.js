@@ -11,11 +11,16 @@ const DEFAULT_CATEGORIES = [
         subject: 'Kurze Frage zu eurer Website – [Business Name]',
         body: `Hallo [Name],
 
-ich bin gerade auf euer Studio gestossen und habe mir kurz eure Online-Präsenz angeschaut.
+ich bin gerade auf euer Studio gestossen und habe mir eure Online-Präsenz angeschaut. Dabei sind mir ein paar Punkte aufgefallen:
 
-Ihr macht offensichtlich gute Arbeit – aber eure Website spiegelt das noch nicht so wider, wie sie könnte. Viele potenzielle Mitglieder entscheiden sich schon auf den ersten Blick, ob sie anfragen oder weiterscrollen.
+[Website-Probleme]
 
-Ich helfe lokalen Studios in Zürich dabei, das zu ändern – mit klaren, modernen Websites, die neue Mitglieder ansprechen und Vertrauen aufbauen.
+Das bedeutet konkret: Potenzielle Mitglieder, die euch googeln, sehen entweder eine langsame, schlecht dargestellte Seite – oder finden euch gar nicht erst.
+
+Um zu zeigen, wie das besser aussehen könnte, habe ich kurz eine Vorschau-Website für euch erstellt:
+👉 [Preview-Link]
+
+Ich helfe lokalen Studios in Zürich dabei, genau solche Websites umzusetzen – modern, schnell und auf den Punkt.
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -61,11 +66,16 @@ Viele Grüsse,
         subject: 'Ihre Online-Präsenz – kurze Anmerkung',
         body: `Sehr geehrte Damen und Herren,
 
-ich bin durch eine Suche auf Ihre Praxis aufmerksam geworden und habe mir Ihre Website kurz angeschaut.
+ich bin durch eine Suche auf Ihre Praxis aufmerksam geworden und habe mir Ihre Website angeschaut. Dabei sind mir folgende Punkte aufgefallen:
 
-Viele Patientinnen und Patienten informieren sich heute zuerst online, bevor sie einen Termin buchen. Eine klare, vertrauenswürdige Website kann dabei den entscheidenden Unterschied machen.
+[Website-Probleme]
 
-Ich unterstütze Praxen in Zürich dabei, ihre digitale Präsenz professionell und unkompliziert aufzubauen oder zu modernisieren.
+Das bedeutet für Sie: Patientinnen und Patienten, die online nach einer Praxis suchen, finden Sie schwerer oder werden von der Darstellung abgeschreckt – bevor sie überhaupt Kontakt aufnehmen.
+
+Um zu zeigen, wie eine moderne Praxis-Website aussehen kann, habe ich eine kurze Vorschau für Sie erstellt:
+👉 [Preview-Link]
+
+Ich unterstütze Praxen in Zürich dabei, ihre digitale Präsenz professionell und unkompliziert zu modernisieren.
 
 Darf ich kurz erläutern, was ich konkret anbiete?
 
@@ -109,11 +119,16 @@ Freundliche Grüsse,
         subject: 'Kurze Frage zu eurem Auftritt online – [Business Name]',
         body: `Hey [Name],
 
-ich hab euren Shop gefunden und direkt mal eure Website angeschaut.
+ich hab euren Shop gefunden und mir eure Website angeschaut. Ein paar Dinge sind mir aufgefallen:
 
-Ihr habt offensichtlich einen guten Ruf – aber online macht ihr euch noch nicht so sichtbar, wie ihr es verdient hättet. Neue Kunden, die nach einem Barbershop in Zürich suchen, landen gerade eher woanders.
+[Website-Probleme]
 
-Ich bau für lokale Shops in Zürich Websites, die genau das ändern – simpel, schnell, und auf den Punkt.
+Das heisst konkret: Neue Kunden, die nach einem Barbershop suchen, landen woanders – weil eure Website sie nicht abholt.
+
+Damit ihr seht, wie das besser aussehen könnte, hab ich eine Vorschau für euch gebaut:
+👉 [Preview-Link]
+
+Ich mach genau sowas für lokale Shops in Zürich – simpel, schnell, und auf den Punkt.
 
 Hätte ich kurz euer Ohr dafür?
 
@@ -157,11 +172,16 @@ Gruss,
         subject: 'Kurze Frage zu deiner Website – [Name]',
         body: `Hey [Name],
 
-ich bin auf dein Business gestossen und hab mir kurz deine Online-Präsenz angeschaut.
+ich bin auf dein Business gestossen und hab mir deine Website angeschaut. Dabei ist mir aufgefallen:
 
-Du machst interessante Arbeit – aber deine Website kommuniziert das noch nicht so, wie sie sollte. Gerade als Solo-Unternehmer ist deine Website oft der erste Eindruck, den potenzielle Kunden von dir bekommen.
+[Website-Probleme]
 
-Ich helfe Selbstständigen in Zürich dabei, das zu ändern – ohne grossen Aufwand deinerseits.
+Das heisst konkret: Potenzielle Kunden, die dich googeln, bekommen einen ersten Eindruck, der nicht zu deiner Arbeit passt – und fragen erst gar nicht an.
+
+Damit du siehst, wie eine moderne Website für dich aussehen könnte, hab ich eine kurze Vorschau erstellt:
+👉 [Preview-Link]
+
+Ich helfe Selbstständigen in Zürich dabei, genau das umzusetzen – ohne grossen Aufwand deinerseits.
 
 Wäre das relevant für dich?
 
@@ -205,11 +225,16 @@ Gruss,
         subject: 'Euer Online-Auftritt – kurze Frage – [Business Name]',
         body: `Hey [Name],
 
-ich bin auf euer Studio gestossen und hab mir eure Online-Präsenz angeschaut.
+ich bin auf euer Studio gestossen und hab mir eure Website angeschaut. Dabei ist mir aufgefallen:
 
-Eure Arbeit sieht stark aus – aber eure Website zeigt das noch nicht so, wie sie könnte. Gerade bei Tattoos entscheiden sich Leute oft anhand der Website, ob sie anfragen oder weitersuchen. Ein gutes Portfolio online kann den Unterschied machen.
+[Website-Probleme]
 
-Ich baue für Studios wie eures moderne Websites, die eure Kunst ins richtige Licht rücken – clean, schnell, und mobilfreundlich.
+Das bedeutet: Leute, die nach einem Tattoo-Studio suchen, sehen eine Website, die eure Arbeit nicht so zeigt, wie sie es verdient. Viele entscheiden sich allein aufgrund der Website, ob sie anfragen oder weiterscrollen.
+
+Damit ihr seht, wie euer Portfolio online viel besser wirken kann, hab ich eine Vorschau gebaut:
+👉 [Preview-Link]
+
+Ich baue für Studios wie eures moderne Websites – clean, schnell, und mobilfreundlich.
 
 Hätte ich kurz euer Ohr dafür?
 
@@ -253,11 +278,16 @@ Gruss,
         subject: 'Kurze Frage zu eurer Website – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf euer Restaurant gestossen und habe mir kurz euren Online-Auftritt angeschaut.
+ich bin auf euer Restaurant gestossen und habe mir euren Online-Auftritt angeschaut. Dabei sind mir ein paar Punkte aufgefallen:
 
-Viele Gäste schauen heute zuerst auf die Website, bevor sie reservieren – Speisekarte, Öffnungszeiten, Atmosphäre. Wenn das online nicht stimmt, gehen sie woanders hin.
+[Website-Probleme]
 
-Ich helfe lokalen Restaurants dabei, eine Website zu haben, die Gäste anspricht und Reservierungen bringt – unkompliziert und ohne grossen Aufwand euerseits.
+Das bedeutet konkret: Gäste, die online nach einem Restaurant suchen, finden Speisekarte, Öffnungszeiten und Atmosphäre nicht auf den ersten Blick – und gehen woanders hin.
+
+Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau-Website erstellt:
+👉 [Preview-Link]
+
+Ich helfe lokalen Restaurants dabei, eine Website zu haben, die Gäste anspricht und Reservierungen bringt.
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -301,11 +331,16 @@ Viele Grüsse,
         subject: 'Euer Online-Auftritt – kurze Anmerkung – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf euren Club gestossen und habe mir eure Website angeschaut.
+ich bin auf euren Club gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
 
-Ihr leistet offensichtlich gute Arbeit – aber online ist das noch nicht so sichtbar, wie es sein könnte. Neue Mitglieder, Eltern, Sponsoren – alle schauen zuerst auf die Website. Wenn die nicht überzeugt, geht ihr unter.
+[Website-Probleme]
 
-Ich helfe lokalen Vereinen und Clubs dabei, eine moderne Website aufzubauen, die neue Mitglieder anzieht und euren Club professionell präsentiert.
+Das heisst konkret: Neue Mitglieder, Eltern oder Sponsoren, die euch online suchen, bekommen keinen guten ersten Eindruck – und fragen woanders an.
+
+Damit ihr seht, wie eine moderne Club-Website aussehen kann, habe ich eine Vorschau erstellt:
+👉 [Preview-Link]
+
+Ich helfe lokalen Vereinen und Clubs dabei, ihre Website aufzufrischen – unkompliziert und zu fairen Konditionen.
 
 Wäre das relevant für euch?
 
@@ -349,11 +384,16 @@ Viele Grüsse,
         subject: 'Kurze Frage zu eurer Website – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf euren Betrieb gestossen und habe mir kurz eure Online-Präsenz angeschaut.
+ich bin auf euren Betrieb gestossen und habe mir eure Online-Präsenz angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
 
-Ihr macht offensichtlich solide Arbeit – aber eure Website spiegelt das noch nicht wider. Viele Kunden suchen heute online nach Handwerkern und entscheiden sich innert Sekunden, ob sie anfragen oder weiterscrollen.
+[Website-Probleme]
 
-Ich helfe lokalen Handwerksbetrieben dabei, eine professionelle Website zu haben, die Vertrauen aufbaut und neue Aufträge bringt – ohne grossen Aufwand euerseits.
+Das bedeutet konkret: Kunden, die online nach einem Handwerker suchen, finden euch schwerer – und entscheiden sich innert Sekunden, ob sie anfragen oder weiterscrollen.
+
+Damit ihr seht, wie eine moderne Handwerker-Website aussehen kann, habe ich eine kurze Vorschau für euch erstellt:
+👉 [Preview-Link]
+
+Ich helfe lokalen Handwerksbetrieben dabei, eine professionelle Website zu haben, die Vertrauen aufbaut und neue Aufträge bringt.
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -397,11 +437,16 @@ Viele Grüsse,
         subject: 'Ihre Online-Präsenz – kurze Anmerkung – [Business Name]',
         body: `Sehr geehrte Damen und Herren,
 
-ich bin auf Ihren Verein aufmerksam geworden und habe mir Ihre Website kurz angeschaut.
+ich bin auf Ihren Verein aufmerksam geworden und habe mir Ihre Website angeschaut. Dabei sind mir einige Punkte aufgefallen:
 
-Viele Vereine haben eine veraltete oder unübersichtliche Website – dabei ist sie oft der erste Kontaktpunkt für neue Mitglieder, Sponsoren und Interessierte. Eine klare, moderne Präsenz kann hier viel bewirken.
+[Website-Probleme]
 
-Ich unterstütze lokale Vereine dabei, ihre digitale Präsenz professionell und unkompliziert aufzubauen oder zu modernisieren – zu fairen Konditionen.
+Das bedeutet für Sie: Neue Mitglieder, Sponsoren und Interessierte finden Ihren Verein online schwerer – oder bekommen keinen überzeugenden ersten Eindruck.
+
+Um zu zeigen, wie eine moderne Vereins-Website aussehen kann, habe ich eine kurze Vorschau für Sie erstellt:
+👉 [Preview-Link]
+
+Ich unterstütze lokale Vereine dabei, ihre digitale Präsenz professionell und unkompliziert zu modernisieren – zu fairen Konditionen.
 
 Darf ich kurz erläutern, was ich konkret anbiete?
 
@@ -445,11 +490,16 @@ Freundliche Grüsse,
         subject: 'Ihre Online-Präsenz – kurze Anmerkung – [Business Name]',
         body: `Sehr geehrte Damen und Herren,
 
-ich bin auf Ihre Kita aufmerksam geworden und habe mir Ihre Website kurz angeschaut.
+ich bin auf Ihre Kita aufmerksam geworden und habe mir Ihre Website angeschaut. Dabei sind mir einige Punkte aufgefallen:
 
-Eltern informieren sich heute fast ausschliesslich online, bevor sie eine Kita kontaktieren. Eine klare, vertrauenswürdige Website mit Informationen zu Konzept, Team und Anmeldung kann den entscheidenden Unterschied machen.
+[Website-Probleme]
 
-Ich unterstütze Kitas und Betreuungseinrichtungen dabei, ihre digitale Präsenz professionell und unkompliziert aufzubauen oder zu modernisieren.
+Das bedeutet für Sie: Eltern, die online nach einer Kita suchen, finden Informationen zu Konzept, Team und Anmeldung nicht auf den ersten Blick – und schauen sich woanders um.
+
+Um zu zeigen, wie eine moderne Kita-Website aussehen kann, habe ich eine kurze Vorschau für Sie erstellt:
+👉 [Preview-Link]
+
+Ich unterstütze Kitas und Betreuungseinrichtungen dabei, ihre digitale Präsenz professionell und unkompliziert zu modernisieren.
 
 Darf ich kurz erläutern, was ich konkret anbiete?
 
