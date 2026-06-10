@@ -30,7 +30,7 @@ async function captureScreenshot(slug, previewSiteRepoPath) {
   }
 
   // 2. Construct file path to built HTML and verify it exists
-  const htmlPath = path.join(previewSiteRepoPath, 'dist', 'previews', slug, 'de', 'index.html');
+  const htmlPath = path.join(previewSiteRepoPath, 'dist', 'previews', slug, 'index.html');
   if (!fs.existsSync(htmlPath)) {
     return {
       success: false,

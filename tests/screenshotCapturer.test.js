@@ -88,15 +88,15 @@ describe('screenshotCapturer - with Playwright available', () => {
 
       expect(result.success).toBe(false);
       expect(result.error).toContain('Built HTML not found:');
-      expect(result.error).toContain(path.join(testRepoPath, 'dist', 'previews', testSlug, 'de', 'index.html'));
+      expect(result.error).toContain(path.join(testRepoPath, 'dist', 'previews', testSlug, 'index.html'));
     });
 
-    test('checks the correct HTML path (dist/previews/{slug}/de/index.html)', async () => {
+    test('checks the correct HTML path (dist/previews/{slug}/index.html)', async () => {
       mockFs.existsSync.mockReturnValue(false);
 
       await captureScreenshot(testSlug, testRepoPath);
 
-      const expectedPath = path.join(testRepoPath, 'dist', 'previews', testSlug, 'de', 'index.html');
+      const expectedPath = path.join(testRepoPath, 'dist', 'previews', testSlug, 'index.html');
       expect(mockFs.existsSync).toHaveBeenCalledWith(expectedPath);
     });
 
@@ -172,7 +172,7 @@ describe('screenshotCapturer - with Playwright available', () => {
     test('navigates to file:// URL with networkidle and 10s timeout', async () => {
       await captureScreenshot(testSlug, testRepoPath);
 
-      const expectedUrl = `file://${path.join(testRepoPath, 'dist', 'previews', testSlug, 'de', 'index.html')}`;
+      const expectedUrl = `file://${path.join(testRepoPath, 'dist', 'previews', testSlug, 'index.html')}`;
       expect(mockPage.goto).toHaveBeenCalledWith(
         expectedUrl,
         { waitUntil: 'networkidle', timeout: 10000 }
