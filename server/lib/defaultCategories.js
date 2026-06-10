@@ -22,6 +22,7 @@ Kunden, die online einen Maler suchen, entscheiden innert Sekunden – und eure 
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -67,6 +68,7 @@ Kunden, die einen Elektriker suchen, entscheiden sich für den Betrieb, der onli
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -112,6 +114,7 @@ Hauseigentümer, die einen Sanitär- oder Heizungsbetrieb suchen, vergleichen on
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -157,6 +160,7 @@ Kunden, die eine Schreinerei suchen, wollen eure Referenzen und Handwerkskunst s
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -202,6 +206,7 @@ Kunden, die online eine Reinigungsfirma suchen, vergleichen in Sekunden – eine
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -247,6 +252,7 @@ Leute, die einen Umzug planen, vergleichen Firmen online – eine klare, vertrau
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -292,6 +298,7 @@ Kunden, die einen Gartenbauer suchen, möchten eure Projekte sehen – Vorher/Na
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -341,6 +348,7 @@ Fahrschüler vergleichen Angebote fast ausschliesslich online – eine moderne W
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -390,6 +398,7 @@ Kundinnen, die online nach einem Kosmetikstudio suchen, achten besonders auf ein
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -435,6 +444,7 @@ Kundinnen wollen online eure Arbeiten sehen und direkt einen Termin buchen – e
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -480,6 +490,7 @@ Neue Kunden entscheiden anhand der Website, ob sie vorbeikommen oder weiterscrol
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -525,6 +536,7 @@ Neue Kunden checken euren Online-Auftritt, bevor sie vorbeikommen – eine moder
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -570,6 +582,7 @@ Kunden wollen eure Arbeiten sehen, bevor sie einen Termin anfragen – eine star
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -619,6 +632,7 @@ Neue Teilnehmer wollen online euer Angebot sehen und sich direkt anmelden – ei
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -664,6 +678,7 @@ Neue Schüler wollen online euer Kursangebot sehen und sich unkompliziert anmeld
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -709,6 +724,7 @@ Eltern und Schüler vergleichen Musikschulen online – eine klare Übersicht de
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -754,6 +770,7 @@ Hundebesitzer suchen online nach Kursangeboten und entscheiden schnell, wo sie s
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -799,6 +816,7 @@ Neue Mitglieder vergleichen Studios online – Kursplan, Preise und Bilder entsc
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -844,6 +862,7 @@ Neue Mitglieder informieren sich online über Trainingszeiten und Angebot – ei
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -893,6 +912,7 @@ Gäste schauen zuerst die Speisekarte online an, bevor sie reservieren – eine 
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -938,6 +958,7 @@ Kunden suchen online nach Öffnungszeiten, Sortiment und Bestellmöglichkeiten �
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -983,6 +1004,7 @@ Eventplaner und Firmen vergleichen Catering-Anbieter online – Bilder eurer Kre
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -1032,6 +1054,7 @@ Kunden bestellen Blumen zunehmend online – eine ansprechende Website mit Sorti
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -1077,6 +1100,7 @@ Velofahrer recherchieren online, bevor sie in den Laden kommen – Sortiment, We
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -1122,6 +1146,7 @@ Autobesitzer suchen online nach einer vertrauenswürdigen Werkstatt – eine pro
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -1167,6 +1192,7 @@ Firmen und Vereine, die Drucksachen brauchen, vergleichen Anbieter online – ei
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -1212,6 +1238,7 @@ Leute in einer Notsituation suchen den schnellsten, vertrauenswürdigsten Schlü
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -1261,6 +1288,7 @@ Kunden buchen den Fotografen, dessen Portfolio sie online am meisten überzeugt 
 
 Damit du siehst, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -1306,6 +1334,7 @@ Brautpaare recherchieren monatelang online – eine emotionale, professionelle W
 
 Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
 
@@ -1355,6 +1384,7 @@ Patientinnen und Patienten, die online nach einem Zahnarzt suchen, vergleichen P
 
 Um zu zeigen, wie eine moderne Praxis-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Darf ich kurz erläutern, was ich konkret anbiete?
 
@@ -1400,6 +1430,7 @@ Tierhalter, die online nach einer Tierarztpraxis suchen, möchten sofort sehen, 
 
 Um zu zeigen, wie eine moderne Praxis-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Darf ich kurz erläutern, was ich konkret anbiete?
 
@@ -1445,6 +1476,7 @@ Kundinnen und Kunden erwarten bei einem Optiker eine professionelle und moderne 
 
 Um zu zeigen, wie eine moderne Optiker-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Darf ich kurz erläutern, was ich konkret anbiete?
 
@@ -1490,6 +1522,7 @@ Patientinnen und Patienten, die online nach Podologie suchen, möchten sofort Ve
 
 Um zu zeigen, wie eine moderne Praxis-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Darf ich kurz erläutern, was ich konkret anbiete?
 
@@ -1535,6 +1568,7 @@ Patientinnen und Patienten vergleichen Physiotherapie-Praxen online – eine ver
 
 Um zu zeigen, wie eine moderne Praxis-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Darf ich kurz erläutern, was ich konkret anbiete?
 
@@ -1580,6 +1614,7 @@ Patientinnen und Patienten – oder deren Angehörige – suchen online nach Erg
 
 Um zu zeigen, wie eine moderne Praxis-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Darf ich kurz erläutern, was ich konkret anbiete?
 
@@ -1625,6 +1660,7 @@ Eltern und zuweisende Fachpersonen suchen online nach Logopädie – eine veralt
 
 Um zu zeigen, wie eine moderne Praxis-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Darf ich kurz erläutern, was ich konkret anbiete?
 
@@ -1670,6 +1706,7 @@ Patientinnen und Patienten, die nach Akupunktur oder TCM suchen, wünschen sich 
 
 Um zu zeigen, wie eine moderne Praxis-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Darf ich kurz erläutern, was ich konkret anbiete?
 
@@ -1715,6 +1752,7 @@ Werdende Eltern suchen online nach einer Hebamme und entscheiden oft innert Seku
 
 Um zu zeigen, wie eine moderne Hebammen-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Darf ich kurz erläutern, was ich konkret anbiete?
 
@@ -1760,6 +1798,7 @@ Klientinnen und Klienten, die nach Hypnose oder Coaching suchen, brauchen eine W
 
 Um zu zeigen, wie eine moderne Coaching-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Darf ich kurz erläutern, was ich konkret anbiete?
 
@@ -1809,6 +1848,7 @@ Mandanten, die online nach einem Rechtsanwalt suchen, bewerten Kompetenz oft anh
 
 Um zu zeigen, wie eine moderne Kanzlei-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Darf ich kurz erläutern, was ich konkret anbiete?
 
@@ -1854,6 +1894,7 @@ Unternehmer, die online nach einem Treuhänder suchen, bewerten Seriosität oft 
 
 Um zu zeigen, wie eine moderne Treuhand-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Darf ich kurz erläutern, was ich konkret anbiete?
 
@@ -1899,6 +1940,7 @@ Bauherren und Auftraggeber möchten Ihre Projekte und Referenzen online sehen �
 
 Um zu zeigen, wie eine moderne Architektur-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Darf ich kurz erläutern, was ich konkret anbiete?
 
@@ -1944,6 +1986,7 @@ Eigentümer und Mieter informieren sich online – eine professionelle Website s
 
 Um zu zeigen, wie eine moderne Website für Immobilienverwaltungen aussehen kann, habe ich eine kurze Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Darf ich kurz erläutern, was ich konkret anbiete?
 
@@ -1989,6 +2032,7 @@ Angehörige in einer schwierigen Situation suchen online nach einem vertrauensw�
 
 Um zu zeigen, wie eine moderne Website für Ihr Institut aussehen kann, habe ich eine kurze Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Darf ich kurz erläutern, was ich konkret anbiete?
 
@@ -2034,6 +2078,7 @@ Eltern, die online nach einer Kita suchen, möchten sofort ein gutes Gefühl bek
 
 Um zu zeigen, wie eine moderne Kita-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
 👉 [Preview-Link]
+[Preview-Disclaimer]
 
 Darf ich kurz erläutern, was ich konkret anbiete?
 

@@ -40,12 +40,12 @@ function makeTemplate(subject, body) {
 describe('[Preview-Link] placeholder', () => {
   test('resolves to previewUrl when present', () => {
     const lead = makeLead({
-      previewUrl: 'https://preview.kaelint.ch/a7f3b92e-coiffeur-mueller-bern/de/'
+      previewUrl: 'https://preview.kaelint.ch/a7f3b92e-coiffeur-mueller-bern/'
     });
     const template = makeTemplate('Ihre Vorschau', 'Sehen Sie hier: [Preview-Link]');
     const result = renderTemplate(template, lead, makeSettings());
 
-    expect(result.body).toBe('Sehen Sie hier: https://preview.kaelint.ch/a7f3b92e-coiffeur-mueller-bern/de/');
+    expect(result.body).toBe('Sehen Sie hier: https://preview.kaelint.ch/a7f3b92e-coiffeur-mueller-bern/');
   });
 
   test('resolves to empty string when previewUrl is null', () => {
@@ -72,7 +72,7 @@ describe('[Preview-Link] placeholder', () => {
 describe('[Preview-Screenshot] placeholder', () => {
   test('resolves to screenshot URL derived from previewUrl', () => {
     const lead = makeLead({
-      previewUrl: 'https://preview.kaelint.ch/a7f3b92e-coiffeur-mueller-bern/de/'
+      previewUrl: 'https://preview.kaelint.ch/a7f3b92e-coiffeur-mueller-bern/'
     });
     const template = makeTemplate('Test', 'Screenshot: [Preview-Screenshot]');
     const result = renderTemplate(template, lead, makeSettings());
@@ -99,7 +99,7 @@ describe('[Preview-Screenshot] placeholder', () => {
 
   test('correctly derives screenshot URL with different language paths', () => {
     const lead = makeLead({
-      previewUrl: 'https://preview.kaelint.ch/b8c4d123-restaurant-bella-zuerich/fr/'
+      previewUrl: 'https://preview.kaelint.ch/b8c4d123-restaurant-bella-zuerich/'
     });
     const template = makeTemplate('Test', '[Preview-Screenshot]');
     const result = renderTemplate(template, lead, makeSettings());
@@ -256,7 +256,7 @@ describe('All placeholders combined', () => {
         { label: 'Kein SSL', detail: 'Website nicht verschlüsselt' },
         { label: 'Nicht mobil', detail: 'Keine responsive Darstellung' }
       ],
-      previewUrl: 'https://preview.kaelint.ch/a7f3b92e-coiffeur-mueller-bern/de/',
+      previewUrl: 'https://preview.kaelint.ch/a7f3b92e-coiffeur-mueller-bern/',
       previewExpiresAt: '2025-08-15T00:00:00.000Z'
     });
     const settings = makeSettings({
@@ -273,10 +273,10 @@ describe('All placeholders combined', () => {
     expect(result.subject).toBe('Vorschau für Coiffeur Müller');
     expect(result.body).toContain('Hallo Hans Müller,');
     expect(result.body).toContain('Score von 35/100');
-    expect(result.body).toContain('• Kein SSL: Website nicht verschlüsselt');
-    expect(result.body).toContain('• Nicht mobil: Keine responsive Darstellung');
+    expect(result.body).toContain('• Kein SSL');
+    expect(result.body).toContain('• Nicht mobil');
     expect(result.body).toContain('Kurzfassung: Kein SSL, Nicht mobil');
-    expect(result.body).toContain('Ihre neue Website: https://preview.kaelint.ch/a7f3b92e-coiffeur-mueller-bern/de/');
+    expect(result.body).toContain('Ihre neue Website: https://preview.kaelint.ch/a7f3b92e-coiffeur-mueller-bern/');
     expect(result.body).toContain('Screenshot: https://preview.kaelint.ch/a7f3b92e-coiffeur-mueller-bern/screenshot.png');
     expect(result.body).toContain('Gültig bis: 15. August 2025');
     expect(result.body).toContain('Termin buchen: https://calendly.com/kaelint');

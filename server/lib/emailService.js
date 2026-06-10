@@ -26,23 +26,31 @@ function renderTemplate(template, lead, settings) {
     ? lead.contactPerson
     : `Team von ${lead.businessName}`;
 
-  // Format website issues as a bullet list for email templates
-  const websiteIssuesList = (lead.websiteIssues && lead.websiteIssues.length > 0)
-    ? lead.websiteIssues.map(i => `• ${i.label}: ${i.detail}`).join('\n\n')
+  // Format website issues — only top 3 most impactful for email brevity
+  const ESSENTIAL_ISSUES = ['no-ssl', 'no-viewport', 'no-responsive', 'slow-load', 'no-cta', 'no-contact-form', 'outdated-copyright', 'outdated-wp', 'outdated-joomla', 'free-plan-cms'];
+  const essentialIssues = (lead.websiteIssues || []).filter(i => ESSENTIAL_ISSUES.includes(i.id));
+  const topIssues = essentialIssues.length > 0 ? essentialIssues.slice(0, 3) : (lead.websiteIssues || []).slice(0, 3);
+  const websiteIssuesList = topIssues.length > 0
+    ? topIssues.map(i => `• ${i.label}`).join('\n')
     : '';
 
   // Short summary (first 2-3 issues, one-liner)
-  const websiteIssuesSummary = (lead.websiteIssues && lead.websiteIssues.length > 0)
-    ? lead.websiteIssues.slice(0, 3).map(i => i.label).join(', ')
+  const websiteIssuesSummary = topIssues.length > 0
+    ? topIssues.map(i => i.label).join(', ')
     : '';
 
-  // Preview screenshot URL: derive from previewUrl by replacing the language path with screenshot.png
+  // Preview screenshot URL: derive from previewUrl
   const previewScreenshotUrl = lead.previewUrl
-    ? lead.previewUrl.replace(/[a-z]{2}\/$/, 'screenshot.png')
+    ? lead.previewUrl + 'screenshot.png'
     : '';
 
   // Preview expiry date in German format
   const previewExpiryFormatted = formatGermanDate(lead.previewExpiresAt);
+
+  // Preview disclaimer
+  const previewDisclaimer = lead.previewUrl
+    ? '(Hinweis: Die Vorschau enthält Platzhalter-Bilder. Mit Ihren echten Fotos sieht das Ergebnis noch besser aus.)'
+    : '';
 
   let subject = template.subject || '';
   let body = template.body || '';
@@ -58,7 +66,8 @@ function renderTemplate(template, lead, settings) {
     '[Website-Score]': lead.websiteScore != null ? `${lead.websiteScore}/100` : '',
     '[Preview-Link]': lead.previewUrl || '',
     '[Preview-Screenshot]': previewScreenshotUrl,
-    '[Preview-Ablauf]': previewExpiryFormatted
+    '[Preview-Ablauf]': previewExpiryFormatted,
+    '[Preview-Disclaimer]': previewDisclaimer
   };
 
   for (const [placeholder, value] of Object.entries(replacements)) {
