@@ -11,6 +11,9 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static frontend files
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
+// Serve docs as static files (for usage guide link)
+app.use('/docs', express.static(path.join(__dirname, '..', 'docs')));
+
 // API Routes
 app.use('/api/leads', require('./routes/leads'));
 app.use('/api/categories', require('./routes/categories'));
