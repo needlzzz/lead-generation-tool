@@ -220,13 +220,13 @@ test('Property 7: Preview placeholders never appear literally in output', () => 
   fc.assert(
     fc.property(
       fc.option(fc.webUrl()),        // previewUrl (might be null)
-      fc.option(fc.date()),           // previewExpiresAt (might be null)
+      fc.option(fc.date({ min: new Date('2020-01-01'), max: new Date('2030-12-31') })),           // previewExpiresAt (might be null)
       (previewUrl, previewExpiresAt) => {
         const lead = {
           businessName: 'Test GmbH',
           contactPerson: 'Max Muster',
           previewUrl: previewUrl || null,
-          previewExpiresAt: previewExpiresAt ? previewExpiresAt.toISOString() : null
+          previewExpiresAt: previewExpiresAt && !isNaN(previewExpiresAt.getTime()) ? previewExpiresAt.toISOString() : null
         };
         const template = {
           subject: 'Demo: [Preview-Link] [Preview-Screenshot] [Preview-Ablauf]',

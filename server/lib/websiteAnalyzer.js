@@ -39,29 +39,31 @@ async function analyzeWebsite(url, page, options = {}) {
     url = 'https://' + url;
   }
 
-  // --- Check 1: SSL ---
-  const hasSSL = url.startsWith('https://');
-  if (!hasSSL) {
-    issues.push({
-      id: 'no-ssl',
-      label: 'Kein SSL-Zertifikat',
-      detail: 'Die Website verwendet kein HTTPS — Besucher sehen eine "Nicht sicher"-Warnung im Browser.'
-    });
-  }
+  // Always try HTTPS first, even if URL was stored with http://
+  // (Many sites redirect http → https, and we should detect that)
+  const httpsUrl = url.replace(/^http:\/\//, 'https://');
+  let navigatedUrl = httpsUrl;
+  let hasSSL = true;
 
-  // --- Check 2: Load the page, measure timing, capture response headers ---
+  // --- Check 1 & 2: Load the page, measure timing, capture response headers, determine SSL ---
   const startTime = Date.now();
   try {
-    const response = await page.goto(url, { waitUntil: 'load', timeout: 20000 });
+    const response = await page.goto(httpsUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
     if (response) {
       responseHeaders = response.headers() || {};
+      // Check the actual URL we landed on (after redirects)
+      navigatedUrl = page.url();
+      hasSSL = navigatedUrl.startsWith('https://');
     }
   } catch (err) {
-    // If load times out, try with domcontentloaded
+    // HTTPS failed — try HTTP fallback
     try {
-      const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
+      const httpUrl = url.replace(/^https:\/\//, 'http://');
+      const response = await page.goto(httpUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
       if (response) {
         responseHeaders = response.headers() || {};
+        navigatedUrl = page.url();
+        hasSSL = navigatedUrl.startsWith('https://'); // Maybe it redirected to HTTPS
       }
     } catch (err2) {
       issues.push({
@@ -77,14 +79,56 @@ async function analyzeWebsite(url, page, options = {}) {
   }
   loadTimeMs = Date.now() - startTime;
 
-  // --- Check 3: Page speed ---
-  if (loadTimeMs > 5000) {
+  // Wait for full load after domcontentloaded (non-blocking timing)
+  try {
+    await page.waitForLoadState('load', { timeout: 10000 });
+  } catch (e) {
+    // Ignore — some sites never fully fire 'load' due to third-party scripts
+  }
+
+  // --- Detect bot protection / WAF blocking ---
+  const pageTitle = await page.title();
+  const currentUrl = page.url();
+  const isBotBlocked = (
+    pageTitle.toLowerCase().includes('access interrupted') ||
+    pageTitle.toLowerCase().includes('access denied') ||
+    pageTitle.toLowerCase().includes('attention required') ||
+    pageTitle.toLowerCase().includes('just a moment') ||
+    pageTitle.toLowerCase().includes('checking your browser') ||
+    currentUrl.includes('/notify-Notify') ||
+    currentUrl.includes('challenge') ||
+    currentUrl.includes('captcha')
+  );
+
+  if (isBotBlocked) {
+    issues.push({
+      id: 'bot-blocked',
+      label: 'Bot-Schutz aktiv',
+      detail: 'Die Website blockiert automatisierte Zugriffe — die Analyse konnte nicht durchgeführt werden.'
+    });
+    return {
+      quality: 'None', score: -1, issues, loadTimeMs,
+      techStack: null, securityHeaders: null, opportunityScore: 50
+    };
+  }
+
+  // SSL issue: only flag if HTTPS is truly unavailable
+  if (!hasSSL) {
+    issues.push({
+      id: 'no-ssl',
+      label: 'Kein SSL-Zertifikat',
+      detail: 'Die Website verwendet kein HTTPS — Besucher sehen eine "Nicht sicher"-Warnung im Browser.'
+    });
+  }
+
+  // --- Check 3: Page speed (adjusted thresholds for Playwright cold load) ---
+  if (loadTimeMs > 8000) {
     issues.push({
       id: 'slow-load',
       label: 'Sehr langsame Ladezeit',
       detail: `Die Website braucht über ${Math.round(loadTimeMs / 1000)} Sekunden zum Laden — Besucher springen ab.`
     });
-  } else if (loadTimeMs > 3000) {
+  } else if (loadTimeMs > 5000) {
     issues.push({
       id: 'moderate-load',
       label: 'Langsame Ladezeit',
@@ -663,6 +707,7 @@ function calculateScore(issues, loadTimeMs) {
 
   const deductions = {
     'unreachable': 100,
+    'bot-blocked': 0,
     'no-ssl': 20,
     'slow-load': 15,
     'moderate-load': 8,
