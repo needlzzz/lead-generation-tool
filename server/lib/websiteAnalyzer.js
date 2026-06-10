@@ -157,7 +157,16 @@ async function analyzeWebsite(url, page, options = {}) {
     // Images without alt
     const images = document.querySelectorAll('img');
     results.totalImages = images.length;
-    results.imagesWithoutAlt = [...images].filter(img => !img.getAttribute('alt') || img.getAttribute('alt').trim() === '').length;
+    const noAltImages = [...images].filter(img => !img.getAttribute('alt') || img.getAttribute('alt').trim() === '');
+    results.imagesWithoutAlt = noAltImages.length;
+    // Collect filenames of images without alt (up to 5 for display)
+    results.imagesWithoutAltNames = noAltImages.slice(0, 5).map(img => {
+      const src = img.getAttribute('src') || '';
+      // Extract filename from URL path
+      const parts = src.split('/');
+      const filename = parts[parts.length - 1]?.split('?')[0] || src;
+      return filename || '(unbekannt)';
+    });
 
     // Outdated tech signals
     results.hasFlash = !!document.querySelector('embed[type*="flash"], object[type*="flash"], .swf');
@@ -464,10 +473,14 @@ async function analyzeWebsite(url, page, options = {}) {
 
   // Accessibility
   if (analysis.totalImages > 0 && analysis.imagesWithoutAlt > analysis.totalImages * 0.5) {
+    const fileList = analysis.imagesWithoutAltNames && analysis.imagesWithoutAltNames.length > 0
+      ? ` (z.B. ${analysis.imagesWithoutAltNames.join(', ')})`
+      : '';
+    const moreNote = analysis.imagesWithoutAlt > 5 ? ` und ${analysis.imagesWithoutAlt - 5} weitere` : '';
     issues.push({
       id: 'missing-alt',
       label: 'Bilder ohne Beschreibung',
-      detail: `${analysis.imagesWithoutAlt} von ${analysis.totalImages} Bildern haben keine Beschreibung — Google kann diese Bilder nicht indexieren, und Sie verpassen Bild-Suchergebnisse.`
+      detail: `${analysis.imagesWithoutAlt} von ${analysis.totalImages} Bildern haben keine Beschreibung${fileList}${moreNote} — Google kann diese Bilder nicht indexieren, und Sie verpassen Bild-Suchergebnisse.`
     });
   }
 
