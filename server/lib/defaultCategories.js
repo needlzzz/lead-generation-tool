@@ -28,7 +28,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -78,7 +78,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -128,7 +128,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -178,7 +178,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -228,7 +228,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -278,7 +278,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -328,7 +328,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -382,7 +382,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -436,7 +436,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -486,7 +486,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -536,7 +536,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -586,7 +586,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -636,7 +636,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -690,7 +690,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -740,7 +740,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -790,7 +790,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -840,7 +840,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -890,7 +890,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -940,7 +940,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -994,7 +994,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -1044,7 +1044,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -1094,7 +1094,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -1148,7 +1148,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -1198,7 +1198,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -1248,7 +1248,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -1298,7 +1298,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -1348,7 +1348,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -1402,7 +1402,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -1452,7 +1452,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -1506,7 +1506,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -1556,7 +1556,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -1606,7 +1606,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -1656,7 +1656,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -1706,7 +1706,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -1756,7 +1756,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -1806,7 +1806,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -1856,7 +1856,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -1906,7 +1906,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -1956,7 +1956,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -2010,7 +2010,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -2060,7 +2060,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -2110,7 +2110,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -2160,7 +2160,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -2210,7 +2210,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
@@ -2260,7 +2260,7 @@ Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusa
 
 [Preview-Disclaimer]
 
-Ich freue mich, wenn Sie einen Blick darauf werfen, und stehe gerne für Fragen zur Verfügung.
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
 
 Freundliche Grüsse
 [Dein Name]`
