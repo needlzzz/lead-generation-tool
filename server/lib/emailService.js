@@ -74,7 +74,7 @@ function renderTemplate(template, lead, settings) {
   const websiteIssuesList = topIssues.length > 0
     ? topIssues.map(i => {
         const consequence = CONSEQUENCES[i.id] || '';
-        return consequence ? `${i.label} → ${consequence}` : `${i.label}`;
+        return consequence ? `• ${i.label} → ${consequence}` : `• ${i.label}`;
       }).join('\n\n')
     : '';
 
