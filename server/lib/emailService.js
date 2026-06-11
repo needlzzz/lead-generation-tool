@@ -26,6 +26,18 @@ function renderTemplate(template, lead, settings) {
     ? lead.contactPerson
     : `Team von ${lead.businessName}`;
 
+  // Personalized greeting — use last name if contact person is known, otherwise plain
+  let greeting = 'Guten Tag';
+  if (lead.contactPerson && lead.contactPerson.trim()) {
+    const parts = lead.contactPerson.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      const lastName = parts[parts.length - 1];
+      greeting = `Guten Tag Herr/Frau ${lastName}`;
+    } else {
+      greeting = `Guten Tag ${parts[0]}`;
+    }
+  }
+
   // Format website issues — top 5 most impactful for email urgency
   const ESSENTIAL_ISSUES = ['no-ssl', 'no-viewport', 'no-responsive', 'slow-load', 'no-cta', 'no-contact-form', 'outdated-copyright', 'outdated-wp', 'outdated-joomla', 'free-plan-cms', 'no-trust-signals', 'no-favicon', 'no-opening-hours'];
   const essentialIssues = (lead.websiteIssues || []).filter(i => ESSENTIAL_ISSUES.includes(i.id));
@@ -92,6 +104,7 @@ function renderTemplate(template, lead, settings) {
 
   const replacements = {
     '[Name]': contactName,
+    '[Greeting]': greeting,
     '[Name / Team von Business Name]': contactName,
     '[Business Name]': lead.businessName || '',
     '[CALENDLY-LINK]': settings.calendlyLink || '',

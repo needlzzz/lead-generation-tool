@@ -12,7 +12,7 @@ const DEFAULT_CATEGORIES = [
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -62,7 +62,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -112,7 +112,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -162,7 +162,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -212,7 +212,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -262,7 +262,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -312,7 +312,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -366,7 +366,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -420,7 +420,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -470,7 +470,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -520,7 +520,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -570,7 +570,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -620,7 +620,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -674,7 +674,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -724,7 +724,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -774,7 +774,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -824,7 +824,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -874,7 +874,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -924,7 +924,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -978,7 +978,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -1028,7 +1028,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -1078,7 +1078,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -1132,7 +1132,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -1182,7 +1182,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -1232,7 +1232,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -1282,7 +1282,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -1332,7 +1332,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -1386,7 +1386,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -1436,7 +1436,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -1490,7 +1490,7 @@ Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -1540,7 +1540,7 @@ Freundliche Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -1590,7 +1590,7 @@ Freundliche Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -1640,7 +1640,7 @@ Freundliche Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -1690,7 +1690,7 @@ Freundliche Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -1740,7 +1740,7 @@ Freundliche Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -1790,7 +1790,7 @@ Freundliche Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -1840,7 +1840,7 @@ Freundliche Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -1890,7 +1890,7 @@ Freundliche Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -1940,7 +1940,7 @@ Freundliche Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -1994,7 +1994,7 @@ Freundliche Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -2044,7 +2044,7 @@ Freundliche Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -2094,7 +2094,7 @@ Freundliche Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -2144,7 +2144,7 @@ Freundliche Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -2194,7 +2194,7 @@ Freundliche Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
@@ -2244,7 +2244,7 @@ Freundliche Grüsse,
     templates: {
       email1: {
         subject: 'Website [Business Name] – Potenzial entdeckt',
-        body: `Guten Tag
+        body: `[Greeting]
 
 Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
 
