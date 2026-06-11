@@ -1348,7 +1348,7 @@ async function enrichEmails() {
     showError(`Enrichment error: ${err.message}`);
   } finally {
     btn.disabled = false;
-    btn.textContent = '📧 Enrich Emails';
+    btn.textContent = 'Enrich Emails';
   }
 }
 
@@ -1388,7 +1388,7 @@ function updateSelectionUI() {
   if (btnAnalyzeSelected) {
     if (selectedIds.length > 0) {
       btnAnalyzeSelected.classList.remove('hidden');
-      btnAnalyzeSelected.textContent = `🔬 Analyze Selected (${selectedIds.length})`;
+      btnAnalyzeSelected.textContent = `Analyze Selected (${selectedIds.length})`;
     } else {
       btnAnalyzeSelected.classList.add('hidden');
     }
@@ -1514,7 +1514,7 @@ async function analyzeWebsites(selectedOnly = false) {
     showError(`Analysis error: ${err.message}`);
   } finally {
     btn.disabled = false;
-    btn.textContent = '🔬 Analyze Websites';
+    btn.textContent = 'Analyze';
   }
 }
 
