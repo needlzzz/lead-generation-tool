@@ -138,12 +138,13 @@ function renderCurrentTab() {
 // ============================================================
 
 function renderStatusBadges() {
+  const container = document.getElementById('statusBadges');
+  if (!container) return;
   const counts = {};
   const statuses = ['Discovered', 'Reached Out', 'Replied', 'No Response', 'Meeting Scheduled', 'Client Won', 'Lost'];
   statuses.forEach(s => counts[s] = 0);
   allLeads.forEach(l => { if (counts[l.status] !== undefined) counts[l.status]++; });
 
-  const container = document.getElementById('statusBadges');
   container.innerHTML = statuses.map(s => {
     const cls = statusClass(s);
     return `<span class="badge ${cls}">${statusLabel(s)} <span class="badge-count">${counts[s]}</span></span>`;
