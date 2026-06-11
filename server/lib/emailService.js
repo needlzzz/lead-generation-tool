@@ -26,10 +26,10 @@ function renderTemplate(template, lead, settings) {
     ? lead.contactPerson
     : `Team von ${lead.businessName}`;
 
-  // Format website issues — only top 3 most impactful for email brevity
-  const ESSENTIAL_ISSUES = ['no-ssl', 'no-viewport', 'no-responsive', 'slow-load', 'no-cta', 'no-contact-form', 'outdated-copyright', 'outdated-wp', 'outdated-joomla', 'free-plan-cms'];
+  // Format website issues — top 5 most impactful for email urgency
+  const ESSENTIAL_ISSUES = ['no-ssl', 'no-viewport', 'no-responsive', 'slow-load', 'no-cta', 'no-contact-form', 'outdated-copyright', 'outdated-wp', 'outdated-joomla', 'free-plan-cms', 'no-trust-signals', 'no-favicon', 'no-opening-hours'];
   const essentialIssues = (lead.websiteIssues || []).filter(i => ESSENTIAL_ISSUES.includes(i.id));
-  const topIssues = essentialIssues.length > 0 ? essentialIssues.slice(0, 3) : (lead.websiteIssues || []).slice(0, 3);
+  const topIssues = essentialIssues.length > 0 ? essentialIssues.slice(0, 5) : (lead.websiteIssues || []).slice(0, 5);
   const websiteIssuesList = topIssues.length > 0
     ? topIssues.map(i => `• ${i.label}`).join('\n')
     : '';

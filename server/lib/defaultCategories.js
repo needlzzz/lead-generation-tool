@@ -11,20 +11,22 @@ const DEFAULT_CATEGORIES = [
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf euren Betrieb gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Kunden, die online einen Maler suchen, entscheiden innert Sekunden – und eure Website macht es ihnen gerade nicht leicht.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -57,20 +59,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf euren Betrieb gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Kunden, die einen Elektriker suchen, entscheiden sich für den Betrieb, der online am professionellsten wirkt – da hat eure Seite noch Luft nach oben.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -103,20 +107,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf euren Betrieb gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Hauseigentümer, die einen Sanitär- oder Heizungsbetrieb suchen, vergleichen online – eine veraltete Website kann den Unterschied zwischen Auftrag und keinem Auftrag machen.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -149,20 +155,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf eure Schreinerei gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Kunden, die eine Schreinerei suchen, wollen eure Referenzen und Handwerkskunst sehen – eine veraltete Website zeigt das nicht optimal.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -195,20 +203,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf eure Firma gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Kunden, die online eine Reinigungsfirma suchen, vergleichen in Sekunden – eine professionelle Website schafft das Vertrauen, das zur Anfrage führt.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -241,20 +251,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf eure Firma gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Leute, die einen Umzug planen, vergleichen Firmen online – eine klare, vertrauenswürdige Website macht oft den Unterschied bei der Anfrage.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -287,20 +299,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf euren Betrieb gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Kunden, die einen Gartenbauer suchen, möchten eure Projekte sehen – Vorher/Nachher, Referenzen. Eure aktuelle Website macht es ihnen schwer, das zu finden.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -337,20 +351,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf eure Fahrschule gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Fahrschüler vergleichen Angebote fast ausschliesslich online – eine moderne Website mit klaren Preisen und einfacher Buchung bringt euch mehr Anmeldungen.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -387,20 +403,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf euer Studio gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Kundinnen, die online nach einem Kosmetikstudio suchen, achten besonders auf eine ansprechende Website – eure aktuelle Seite zeigt nicht, was ihr wirklich bietet.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -433,20 +451,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf euer Studio gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Kundinnen wollen online eure Arbeiten sehen und direkt einen Termin buchen – eine moderne Website macht das möglich und bringt euch mehr Buchungen.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -479,20 +499,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurem Online-Auftritt – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf euren Salon gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Neue Kunden entscheiden anhand der Website, ob sie vorbeikommen oder weiterscrollen – eure aktuelle Seite macht es ihnen nicht leicht.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -525,20 +547,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurem Online-Auftritt – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf euren Barbershop gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Neue Kunden checken euren Online-Auftritt, bevor sie vorbeikommen – eine moderne Website mit Galerie und Online-Buchung bringt euch mehr Walk-ins.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -571,20 +595,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf euer Studio gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Kunden wollen eure Arbeiten sehen, bevor sie einen Termin anfragen – eine starke Online-Galerie ist für Tattoo-Studios praktisch Pflicht.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -621,20 +647,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf euer Studio gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Neue Teilnehmer wollen online euer Angebot sehen und sich direkt anmelden – eine klare Website mit Kursplan macht den Unterschied.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -667,20 +695,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf eure Tanzschule gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Neue Schüler wollen online euer Kursangebot sehen und sich unkompliziert anmelden – eine moderne Website macht das möglich.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -713,20 +743,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf eure Musikschule gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Eltern und Schüler vergleichen Musikschulen online – eine klare Übersicht der Instrumente, Lehrer und Preise bringt euch mehr Anmeldungen.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -759,20 +791,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf eure Hundeschule gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Hundebesitzer suchen online nach Kursangeboten und entscheiden schnell, wo sie sich anmelden – eine klare Website mit Kursübersicht macht den Unterschied.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -805,20 +839,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf euer Studio gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Neue Mitglieder vergleichen Studios online – Kursplan, Preise und Bilder entscheiden, ob sie ein Probetraining buchen oder nicht.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -851,20 +887,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf euren Verein gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Neue Mitglieder informieren sich online über Trainingszeiten und Angebot – eine moderne Website macht es ihnen leicht, sich anzumelden.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -901,20 +939,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf euer Restaurant gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Gäste schauen zuerst die Speisekarte online an, bevor sie reservieren – eine moderne Website mit Karte und Reservierungsmöglichkeit bringt euch mehr Gäste.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -947,20 +987,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf eure Bäckerei gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Kunden suchen online nach Öffnungszeiten, Sortiment und Bestellmöglichkeiten – eine moderne Website macht es ihnen leicht und bringt euch mehr Laufkundschaft.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -993,20 +1035,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf euer Catering gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Eventplaner und Firmen vergleichen Catering-Anbieter online – Bilder eurer Kreationen und klare Angebote machen den Unterschied bei der Anfrage.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -1043,20 +1087,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf euren Laden gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Kunden bestellen Blumen zunehmend online – eine ansprechende Website mit Sortiment und Bestellmöglichkeit bringt euch mehr Aufträge.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -1089,20 +1135,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf euren Laden gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Velofahrer recherchieren online, bevor sie in den Laden kommen – Sortiment, Werkstatt-Services und Öffnungszeiten müssen auf den ersten Blick klar sein.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -1135,20 +1183,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf eure Garage gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Autobesitzer suchen online nach einer vertrauenswürdigen Werkstatt – eine professionelle Website mit klaren Leistungen und Bewertungen macht den Unterschied.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -1181,20 +1231,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf eure Druckerei gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Firmen und Vereine, die Drucksachen brauchen, vergleichen Anbieter online – ein klarer Überblick über Leistungen und Referenzen bringt euch mehr Anfragen.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -1227,20 +1279,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf euren Betrieb gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Leute in einer Notsituation suchen den schnellsten, vertrauenswürdigsten Schlüsseldienst online – eure Website entscheidet, ob sie bei euch anrufen.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -1277,20 +1331,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf dein Portfolio gestossen und habe mir deine Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Kunden buchen den Fotografen, dessen Portfolio sie online am meisten überzeugt – eine moderne Website ist dein wichtigstes Verkaufstool.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit du siehst, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -1323,20 +1379,22 @@ Grüsse,
     tone: 'casual',
     templates: {
       email1: {
-        subject: 'Kurze Frage zu eurer Website – [Business Name]',
+        subject: 'Ihre Website verliert Kunden – [Business Name]',
         body: `Hallo [Name],
 
-ich bin auf euer Angebot gestossen und habe mir eure Website angeschaut. Dabei sind mir ein paar Dinge aufgefallen:
+ich habe mir die Website von [Business Name] genauer angeschaut und möchte Ihnen kurz zeigen, was mir aufgefallen ist — weil es Sie aktuell Kunden kostet:
 
 [Website-Probleme]
 
-Brautpaare recherchieren monatelang online – eine emotionale, professionelle Website mit Referenzen und Bildern ist entscheidend für die Buchung.
+Was das für Sie bedeutet: Jeder dieser Punkte führt dazu, dass potenzielle Kunden abspringen, bevor sie überhaupt anfragen. Bei Google werden Sie deshalb schlechter gefunden als Ihre Konkurrenz — und die bekommt die Aufträge, die eigentlich Ihnen gehören.
 
-Damit ihr seht, wie das besser aussehen könnte, habe ich eine Vorschau erstellt:
+Ich habe eine Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Wäre das etwas, worüber es sich lohnt, kurz zu sprechen?
+Eine moderne, schnelle Website mit klarem Design löst all diese Probleme — und bringt Ihnen nachweislich mehr Anfragen.
+
+Soll ich Ihnen in 15 Minuten zeigen, wie das konkret aussehen würde?
 
 Viele Grüsse,
 [Dein Name]`
@@ -1373,20 +1431,22 @@ Grüsse,
     tone: 'formal',
     templates: {
       email1: {
-        subject: 'Ihre Online-Präsenz – kurze Anmerkung – [Business Name]',
+        subject: 'Ihre Online-Präsenz – konkrete Verbesserungspotenziale – [Business Name]',
         body: `Sehr geehrte Damen und Herren,
 
-ich bin auf Ihre Praxis aufmerksam geworden und habe mir Ihre Website angeschaut. Dabei sind mir folgende Punkte aufgefallen:
+ich habe mir die Website von [Business Name] angeschaut und möchte Sie auf folgende Punkte aufmerksam machen, die sich direkt auf Ihre Sichtbarkeit und Anfragen auswirken:
 
 [Website-Probleme]
 
-Patientinnen und Patienten, die online nach einem Zahnarzt suchen, vergleichen Praxen anhand der Website – eine veraltete Seite kann Vertrauen kosten.
+Diese Punkte bedeuten konkret: Personen, die online nach einem Zahnarzt suchen, finden Sie schwerer — und entscheiden sich für einen Anbieter, dessen Website moderner und vertrauenswürdiger wirkt.
 
-Um zu zeigen, wie eine moderne Praxis-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
+Ich habe eine unverbindliche Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Darf ich kurz erläutern, was ich konkret anbiete?
+Eine moderne, professionelle Website stärkt das Vertrauen vom ersten Klick an und bringt Ihnen mehr Anfragen.
+
+Darf ich Ihnen in einem kurzen Gespräch zeigen, wie das für Sie konkret aussehen würde?
 
 Freundliche Grüsse,
 [Dein Name]`
@@ -1419,20 +1479,22 @@ Freundliche Grüsse,
     tone: 'formal',
     templates: {
       email1: {
-        subject: 'Ihre Online-Präsenz – kurze Anmerkung – [Business Name]',
+        subject: 'Ihre Online-Präsenz – konkrete Verbesserungspotenziale – [Business Name]',
         body: `Sehr geehrte Damen und Herren,
 
-ich bin auf Ihre Praxis aufmerksam geworden und habe mir Ihre Website angeschaut. Dabei sind mir folgende Punkte aufgefallen:
+ich habe mir die Website von [Business Name] angeschaut und möchte Sie auf folgende Punkte aufmerksam machen, die sich direkt auf Ihre Sichtbarkeit und Anfragen auswirken:
 
 [Website-Probleme]
 
-Tierhalter, die online nach einer Tierarztpraxis suchen, möchten sofort sehen, dass ihr Tier bei Ihnen in guten Händen ist – eine veraltete Website vermittelt das nicht.
+Diese Punkte bedeuten konkret: Personen, die online nach einem Tierarzt suchen, finden Sie schwerer — und entscheiden sich für einen Anbieter, dessen Website moderner und vertrauenswürdiger wirkt.
 
-Um zu zeigen, wie eine moderne Praxis-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
+Ich habe eine unverbindliche Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Darf ich kurz erläutern, was ich konkret anbiete?
+Eine moderne, professionelle Website stärkt das Vertrauen vom ersten Klick an und bringt Ihnen mehr Anfragen.
+
+Darf ich Ihnen in einem kurzen Gespräch zeigen, wie das für Sie konkret aussehen würde?
 
 Freundliche Grüsse,
 [Dein Name]`
@@ -1465,20 +1527,22 @@ Freundliche Grüsse,
     tone: 'formal',
     templates: {
       email1: {
-        subject: 'Ihre Online-Präsenz – kurze Anmerkung – [Business Name]',
+        subject: 'Ihre Online-Präsenz – konkrete Verbesserungspotenziale – [Business Name]',
         body: `Sehr geehrte Damen und Herren,
 
-ich bin auf Ihr Geschäft aufmerksam geworden und habe mir Ihre Website angeschaut. Dabei sind mir folgende Punkte aufgefallen:
+ich habe mir die Website von [Business Name] angeschaut und möchte Sie auf folgende Punkte aufmerksam machen, die sich direkt auf Ihre Sichtbarkeit und Anfragen auswirken:
 
 [Website-Probleme]
 
-Kundinnen und Kunden erwarten bei einem Optiker eine professionelle und moderne Präsentation – Design und Ästhetik spielen in Ihrer Branche eine zentrale Rolle.
+Diese Punkte bedeuten konkret: Personen, die online nach einem Optiker suchen, finden Sie schwerer — und entscheiden sich für einen Anbieter, dessen Website moderner und vertrauenswürdiger wirkt.
 
-Um zu zeigen, wie eine moderne Optiker-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
+Ich habe eine unverbindliche Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Darf ich kurz erläutern, was ich konkret anbiete?
+Eine moderne, professionelle Website stärkt das Vertrauen vom ersten Klick an und bringt Ihnen mehr Anfragen.
+
+Darf ich Ihnen in einem kurzen Gespräch zeigen, wie das für Sie konkret aussehen würde?
 
 Freundliche Grüsse,
 [Dein Name]`
@@ -1511,20 +1575,22 @@ Freundliche Grüsse,
     tone: 'formal',
     templates: {
       email1: {
-        subject: 'Ihre Online-Präsenz – kurze Anmerkung – [Business Name]',
+        subject: 'Ihre Online-Präsenz – konkrete Verbesserungspotenziale – [Business Name]',
         body: `Sehr geehrte Damen und Herren,
 
-ich bin auf Ihre Praxis aufmerksam geworden und habe mir Ihre Website angeschaut. Dabei sind mir folgende Punkte aufgefallen:
+ich habe mir die Website von [Business Name] angeschaut und möchte Sie auf folgende Punkte aufmerksam machen, die sich direkt auf Ihre Sichtbarkeit und Anfragen auswirken:
 
 [Website-Probleme]
 
-Patientinnen und Patienten, die online nach Podologie suchen, möchten sofort Vertrauen fassen – eine veraltete Website erschwert das.
+Diese Punkte bedeuten konkret: Personen, die online nach Podologie suchen, finden Sie schwerer — und entscheiden sich für einen Anbieter, dessen Website moderner und vertrauenswürdiger wirkt.
 
-Um zu zeigen, wie eine moderne Praxis-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
+Ich habe eine unverbindliche Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Darf ich kurz erläutern, was ich konkret anbiete?
+Eine moderne, professionelle Website stärkt das Vertrauen vom ersten Klick an und bringt Ihnen mehr Anfragen.
+
+Darf ich Ihnen in einem kurzen Gespräch zeigen, wie das für Sie konkret aussehen würde?
 
 Freundliche Grüsse,
 [Dein Name]`
@@ -1557,20 +1623,22 @@ Freundliche Grüsse,
     tone: 'formal',
     templates: {
       email1: {
-        subject: 'Ihre Online-Präsenz – kurze Anmerkung – [Business Name]',
+        subject: 'Ihre Online-Präsenz – konkrete Verbesserungspotenziale – [Business Name]',
         body: `Sehr geehrte Damen und Herren,
 
-ich bin auf Ihre Praxis aufmerksam geworden und habe mir Ihre Website angeschaut. Dabei sind mir folgende Punkte aufgefallen:
+ich habe mir die Website von [Business Name] angeschaut und möchte Sie auf folgende Punkte aufmerksam machen, die sich direkt auf Ihre Sichtbarkeit und Anfragen auswirken:
 
 [Website-Probleme]
 
-Patientinnen und Patienten vergleichen Physiotherapie-Praxen online – eine veraltete Seite kann dazu führen, dass sie sich für eine andere Praxis entscheiden.
+Diese Punkte bedeuten konkret: Personen, die online nach Physiotherapie suchen, finden Sie schwerer — und entscheiden sich für einen Anbieter, dessen Website moderner und vertrauenswürdiger wirkt.
 
-Um zu zeigen, wie eine moderne Praxis-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
+Ich habe eine unverbindliche Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Darf ich kurz erläutern, was ich konkret anbiete?
+Eine moderne, professionelle Website stärkt das Vertrauen vom ersten Klick an und bringt Ihnen mehr Anfragen.
+
+Darf ich Ihnen in einem kurzen Gespräch zeigen, wie das für Sie konkret aussehen würde?
 
 Freundliche Grüsse,
 [Dein Name]`
@@ -1603,20 +1671,22 @@ Freundliche Grüsse,
     tone: 'formal',
     templates: {
       email1: {
-        subject: 'Ihre Online-Präsenz – kurze Anmerkung – [Business Name]',
+        subject: 'Ihre Online-Präsenz – konkrete Verbesserungspotenziale – [Business Name]',
         body: `Sehr geehrte Damen und Herren,
 
-ich bin auf Ihre Praxis aufmerksam geworden und habe mir Ihre Website angeschaut. Dabei sind mir folgende Punkte aufgefallen:
+ich habe mir die Website von [Business Name] angeschaut und möchte Sie auf folgende Punkte aufmerksam machen, die sich direkt auf Ihre Sichtbarkeit und Anfragen auswirken:
 
 [Website-Probleme]
 
-Patientinnen und Patienten – oder deren Angehörige – suchen online nach Ergotherapie und entscheiden oft anhand des ersten Eindrucks, ob sie Kontakt aufnehmen.
+Diese Punkte bedeuten konkret: Personen, die online nach Ergotherapie suchen, finden Sie schwerer — und entscheiden sich für einen Anbieter, dessen Website moderner und vertrauenswürdiger wirkt.
 
-Um zu zeigen, wie eine moderne Praxis-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
+Ich habe eine unverbindliche Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Darf ich kurz erläutern, was ich konkret anbiete?
+Eine moderne, professionelle Website stärkt das Vertrauen vom ersten Klick an und bringt Ihnen mehr Anfragen.
+
+Darf ich Ihnen in einem kurzen Gespräch zeigen, wie das für Sie konkret aussehen würde?
 
 Freundliche Grüsse,
 [Dein Name]`
@@ -1649,20 +1719,22 @@ Freundliche Grüsse,
     tone: 'formal',
     templates: {
       email1: {
-        subject: 'Ihre Online-Präsenz – kurze Anmerkung – [Business Name]',
+        subject: 'Ihre Online-Präsenz – konkrete Verbesserungspotenziale – [Business Name]',
         body: `Sehr geehrte Damen und Herren,
 
-ich bin auf Ihre Praxis aufmerksam geworden und habe mir Ihre Website angeschaut. Dabei sind mir folgende Punkte aufgefallen:
+ich habe mir die Website von [Business Name] angeschaut und möchte Sie auf folgende Punkte aufmerksam machen, die sich direkt auf Ihre Sichtbarkeit und Anfragen auswirken:
 
 [Website-Probleme]
 
-Eltern und zuweisende Fachpersonen suchen online nach Logopädie – eine veraltete Website kann dazu führen, dass Anfragen ausbleiben.
+Diese Punkte bedeuten konkret: Personen, die online nach Logopädie suchen, finden Sie schwerer — und entscheiden sich für einen Anbieter, dessen Website moderner und vertrauenswürdiger wirkt.
 
-Um zu zeigen, wie eine moderne Praxis-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
+Ich habe eine unverbindliche Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Darf ich kurz erläutern, was ich konkret anbiete?
+Eine moderne, professionelle Website stärkt das Vertrauen vom ersten Klick an und bringt Ihnen mehr Anfragen.
+
+Darf ich Ihnen in einem kurzen Gespräch zeigen, wie das für Sie konkret aussehen würde?
 
 Freundliche Grüsse,
 [Dein Name]`
@@ -1695,20 +1767,22 @@ Freundliche Grüsse,
     tone: 'formal',
     templates: {
       email1: {
-        subject: 'Ihre Online-Präsenz – kurze Anmerkung – [Business Name]',
+        subject: 'Ihre Online-Präsenz – konkrete Verbesserungspotenziale – [Business Name]',
         body: `Sehr geehrte Damen und Herren,
 
-ich bin auf Ihre Praxis aufmerksam geworden und habe mir Ihre Website angeschaut. Dabei sind mir folgende Punkte aufgefallen:
+ich habe mir die Website von [Business Name] angeschaut und möchte Sie auf folgende Punkte aufmerksam machen, die sich direkt auf Ihre Sichtbarkeit und Anfragen auswirken:
 
 [Website-Probleme]
 
-Patientinnen und Patienten, die nach Akupunktur oder TCM suchen, wünschen sich eine Seite, die Kompetenz und Vertrauen ausstrahlt – eine veraltete Website kann hier hinderlich sein.
+Diese Punkte bedeuten konkret: Personen, die online nach Akupunktur oder TCM suchen, finden Sie schwerer — und entscheiden sich für einen Anbieter, dessen Website moderner und vertrauenswürdiger wirkt.
 
-Um zu zeigen, wie eine moderne Praxis-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
+Ich habe eine unverbindliche Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Darf ich kurz erläutern, was ich konkret anbiete?
+Eine moderne, professionelle Website stärkt das Vertrauen vom ersten Klick an und bringt Ihnen mehr Anfragen.
+
+Darf ich Ihnen in einem kurzen Gespräch zeigen, wie das für Sie konkret aussehen würde?
 
 Freundliche Grüsse,
 [Dein Name]`
@@ -1741,20 +1815,22 @@ Freundliche Grüsse,
     tone: 'formal',
     templates: {
       email1: {
-        subject: 'Ihre Online-Präsenz – kurze Anmerkung – [Business Name]',
+        subject: 'Ihre Online-Präsenz – konkrete Verbesserungspotenziale – [Business Name]',
         body: `Sehr geehrte Damen und Herren,
 
-ich bin auf Ihr Angebot aufmerksam geworden und habe mir Ihre Website angeschaut. Dabei sind mir folgende Punkte aufgefallen:
+ich habe mir die Website von [Business Name] angeschaut und möchte Sie auf folgende Punkte aufmerksam machen, die sich direkt auf Ihre Sichtbarkeit und Anfragen auswirken:
 
 [Website-Probleme]
 
-Werdende Eltern suchen online nach einer Hebamme und entscheiden oft innert Sekunden, ob sie Kontakt aufnehmen – eine professionelle Website schafft das nötige Vertrauen.
+Diese Punkte bedeuten konkret: Personen, die online nach einer Hebamme suchen, finden Sie schwerer — und entscheiden sich für einen Anbieter, dessen Website moderner und vertrauenswürdiger wirkt.
 
-Um zu zeigen, wie eine moderne Hebammen-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
+Ich habe eine unverbindliche Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Darf ich kurz erläutern, was ich konkret anbiete?
+Eine moderne, professionelle Website stärkt das Vertrauen vom ersten Klick an und bringt Ihnen mehr Anfragen.
+
+Darf ich Ihnen in einem kurzen Gespräch zeigen, wie das für Sie konkret aussehen würde?
 
 Freundliche Grüsse,
 [Dein Name]`
@@ -1787,20 +1863,22 @@ Freundliche Grüsse,
     tone: 'formal',
     templates: {
       email1: {
-        subject: 'Ihre Online-Präsenz – kurze Anmerkung – [Business Name]',
+        subject: 'Ihre Online-Präsenz – konkrete Verbesserungspotenziale – [Business Name]',
         body: `Sehr geehrte Damen und Herren,
 
-ich bin auf Ihr Angebot aufmerksam geworden und habe mir Ihre Website angeschaut. Dabei sind mir folgende Punkte aufgefallen:
+ich habe mir die Website von [Business Name] angeschaut und möchte Sie auf folgende Punkte aufmerksam machen, die sich direkt auf Ihre Sichtbarkeit und Anfragen auswirken:
 
 [Website-Probleme]
 
-Klientinnen und Klienten, die nach Hypnose oder Coaching suchen, brauchen eine Website, die Seriosität und Vertrauen vermittelt – der erste Eindruck ist entscheidend.
+Diese Punkte bedeuten konkret: Personen, die online nach Coaching oder Hypnose suchen, finden Sie schwerer — und entscheiden sich für einen Anbieter, dessen Website moderner und vertrauenswürdiger wirkt.
 
-Um zu zeigen, wie eine moderne Coaching-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
+Ich habe eine unverbindliche Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Darf ich kurz erläutern, was ich konkret anbiete?
+Eine moderne, professionelle Website stärkt das Vertrauen vom ersten Klick an und bringt Ihnen mehr Anfragen.
+
+Darf ich Ihnen in einem kurzen Gespräch zeigen, wie das für Sie konkret aussehen würde?
 
 Freundliche Grüsse,
 [Dein Name]`
@@ -1837,20 +1915,22 @@ Freundliche Grüsse,
     tone: 'formal',
     templates: {
       email1: {
-        subject: 'Ihre Online-Präsenz – kurze Anmerkung – [Business Name]',
+        subject: 'Ihre Online-Präsenz – konkrete Verbesserungspotenziale – [Business Name]',
         body: `Sehr geehrte Damen und Herren,
 
-ich bin auf Ihre Kanzlei aufmerksam geworden und habe mir Ihre Website angeschaut. Dabei sind mir folgende Punkte aufgefallen:
+ich habe mir die Website von [Business Name] angeschaut und möchte Sie auf folgende Punkte aufmerksam machen, die sich direkt auf Ihre Sichtbarkeit und Anfragen auswirken:
 
 [Website-Probleme]
 
-Mandanten, die online nach einem Rechtsanwalt suchen, bewerten Kompetenz oft anhand der Website – ein professioneller Auftritt schafft Vertrauen vor dem ersten Gespräch.
+Diese Punkte bedeuten konkret: Personen, die online nach einem Rechtsanwalt suchen, finden Sie schwerer — und entscheiden sich für einen Anbieter, dessen Website moderner und vertrauenswürdiger wirkt.
 
-Um zu zeigen, wie eine moderne Kanzlei-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
+Ich habe eine unverbindliche Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Darf ich kurz erläutern, was ich konkret anbiete?
+Eine moderne, professionelle Website stärkt das Vertrauen vom ersten Klick an und bringt Ihnen mehr Anfragen.
+
+Darf ich Ihnen in einem kurzen Gespräch zeigen, wie das für Sie konkret aussehen würde?
 
 Freundliche Grüsse,
 [Dein Name]`
@@ -1883,20 +1963,22 @@ Freundliche Grüsse,
     tone: 'formal',
     templates: {
       email1: {
-        subject: 'Ihre Online-Präsenz – kurze Anmerkung – [Business Name]',
+        subject: 'Ihre Online-Präsenz – konkrete Verbesserungspotenziale – [Business Name]',
         body: `Sehr geehrte Damen und Herren,
 
-ich bin auf Ihr Treuhandbüro aufmerksam geworden und habe mir Ihre Website angeschaut. Dabei sind mir folgende Punkte aufgefallen:
+ich habe mir die Website von [Business Name] angeschaut und möchte Sie auf folgende Punkte aufmerksam machen, die sich direkt auf Ihre Sichtbarkeit und Anfragen auswirken:
 
 [Website-Probleme]
 
-Unternehmer, die online nach einem Treuhänder suchen, bewerten Seriosität oft anhand der Website – ein moderner Auftritt signalisiert Kompetenz.
+Diese Punkte bedeuten konkret: Personen, die online nach einem Treuhänder suchen, finden Sie schwerer — und entscheiden sich für einen Anbieter, dessen Website moderner und vertrauenswürdiger wirkt.
 
-Um zu zeigen, wie eine moderne Treuhand-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
+Ich habe eine unverbindliche Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Darf ich kurz erläutern, was ich konkret anbiete?
+Eine moderne, professionelle Website stärkt das Vertrauen vom ersten Klick an und bringt Ihnen mehr Anfragen.
+
+Darf ich Ihnen in einem kurzen Gespräch zeigen, wie das für Sie konkret aussehen würde?
 
 Freundliche Grüsse,
 [Dein Name]`
@@ -1929,20 +2011,22 @@ Freundliche Grüsse,
     tone: 'formal',
     templates: {
       email1: {
-        subject: 'Ihre Online-Präsenz – kurze Anmerkung – [Business Name]',
+        subject: 'Ihre Online-Präsenz – konkrete Verbesserungspotenziale – [Business Name]',
         body: `Sehr geehrte Damen und Herren,
 
-ich bin auf Ihr Büro aufmerksam geworden und habe mir Ihre Website angeschaut. Dabei sind mir folgende Punkte aufgefallen:
+ich habe mir die Website von [Business Name] angeschaut und möchte Sie auf folgende Punkte aufmerksam machen, die sich direkt auf Ihre Sichtbarkeit und Anfragen auswirken:
 
 [Website-Probleme]
 
-Bauherren und Auftraggeber möchten Ihre Projekte und Referenzen online sehen – eine moderne Website ist für ein Architekturbüro quasi eine digitale Visitenkarte.
+Diese Punkte bedeuten konkret: Personen, die online nach einem Architekturbüro suchen, finden Sie schwerer — und entscheiden sich für einen Anbieter, dessen Website moderner und vertrauenswürdiger wirkt.
 
-Um zu zeigen, wie eine moderne Architektur-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
+Ich habe eine unverbindliche Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Darf ich kurz erläutern, was ich konkret anbiete?
+Eine moderne, professionelle Website stärkt das Vertrauen vom ersten Klick an und bringt Ihnen mehr Anfragen.
+
+Darf ich Ihnen in einem kurzen Gespräch zeigen, wie das für Sie konkret aussehen würde?
 
 Freundliche Grüsse,
 [Dein Name]`
@@ -1975,20 +2059,22 @@ Freundliche Grüsse,
     tone: 'formal',
     templates: {
       email1: {
-        subject: 'Ihre Online-Präsenz – kurze Anmerkung – [Business Name]',
+        subject: 'Ihre Online-Präsenz – konkrete Verbesserungspotenziale – [Business Name]',
         body: `Sehr geehrte Damen und Herren,
 
-ich bin auf Ihre Verwaltung aufmerksam geworden und habe mir Ihre Website angeschaut. Dabei sind mir folgende Punkte aufgefallen:
+ich habe mir die Website von [Business Name] angeschaut und möchte Sie auf folgende Punkte aufmerksam machen, die sich direkt auf Ihre Sichtbarkeit und Anfragen auswirken:
 
 [Website-Probleme]
 
-Eigentümer und Mieter informieren sich online – eine professionelle Website stärkt das Vertrauen und erleichtert die Kommunikation.
+Diese Punkte bedeuten konkret: Personen, die online nach einer Immobilienverwaltung suchen, finden Sie schwerer — und entscheiden sich für einen Anbieter, dessen Website moderner und vertrauenswürdiger wirkt.
 
-Um zu zeigen, wie eine moderne Website für Immobilienverwaltungen aussehen kann, habe ich eine kurze Vorschau erstellt:
+Ich habe eine unverbindliche Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Darf ich kurz erläutern, was ich konkret anbiete?
+Eine moderne, professionelle Website stärkt das Vertrauen vom ersten Klick an und bringt Ihnen mehr Anfragen.
+
+Darf ich Ihnen in einem kurzen Gespräch zeigen, wie das für Sie konkret aussehen würde?
 
 Freundliche Grüsse,
 [Dein Name]`
@@ -2021,20 +2107,22 @@ Freundliche Grüsse,
     tone: 'formal',
     templates: {
       email1: {
-        subject: 'Ihre Online-Präsenz – kurze Anmerkung – [Business Name]',
+        subject: 'Ihre Online-Präsenz – konkrete Verbesserungspotenziale – [Business Name]',
         body: `Sehr geehrte Damen und Herren,
 
-ich bin auf Ihr Institut aufmerksam geworden und habe mir Ihre Website angeschaut. Dabei sind mir folgende Punkte aufgefallen:
+ich habe mir die Website von [Business Name] angeschaut und möchte Sie auf folgende Punkte aufmerksam machen, die sich direkt auf Ihre Sichtbarkeit und Anfragen auswirken:
 
 [Website-Probleme]
 
-Angehörige in einer schwierigen Situation suchen online nach einem vertrauenswürdigen Bestattungsinstitut – eine würdevolle, klare Website gibt Halt und Orientierung.
+Diese Punkte bedeuten konkret: Personen, die online nach einem Bestattungsinstitut suchen, finden Sie schwerer — und entscheiden sich für einen Anbieter, dessen Website moderner und vertrauenswürdiger wirkt.
 
-Um zu zeigen, wie eine moderne Website für Ihr Institut aussehen kann, habe ich eine kurze Vorschau erstellt:
+Ich habe eine unverbindliche Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Darf ich kurz erläutern, was ich konkret anbiete?
+Eine moderne, professionelle Website stärkt das Vertrauen vom ersten Klick an und bringt Ihnen mehr Anfragen.
+
+Darf ich Ihnen in einem kurzen Gespräch zeigen, wie das für Sie konkret aussehen würde?
 
 Freundliche Grüsse,
 [Dein Name]`
@@ -2067,20 +2155,22 @@ Freundliche Grüsse,
     tone: 'formal',
     templates: {
       email1: {
-        subject: 'Ihre Online-Präsenz – kurze Anmerkung – [Business Name]',
+        subject: 'Ihre Online-Präsenz – konkrete Verbesserungspotenziale – [Business Name]',
         body: `Sehr geehrte Damen und Herren,
 
-ich bin auf Ihre Einrichtung aufmerksam geworden und habe mir Ihre Website angeschaut. Dabei sind mir folgende Punkte aufgefallen:
+ich habe mir die Website von [Business Name] angeschaut und möchte Sie auf folgende Punkte aufmerksam machen, die sich direkt auf Ihre Sichtbarkeit und Anfragen auswirken:
 
 [Website-Probleme]
 
-Eltern, die online nach einer Kita suchen, möchten sofort ein gutes Gefühl bekommen – eine einladende, informative Website kann den Unterschied bei der Anmeldung machen.
+Diese Punkte bedeuten konkret: Personen, die online nach einer Kita suchen, finden Sie schwerer — und entscheiden sich für einen Anbieter, dessen Website moderner und vertrauenswürdiger wirkt.
 
-Um zu zeigen, wie eine moderne Kita-Website aussehen kann, habe ich eine kurze Vorschau erstellt:
+Ich habe eine unverbindliche Vorschau erstellt, wie Ihre neue Website aussehen könnte:
 👉 [Preview-Link]
 [Preview-Disclaimer]
 
-Darf ich kurz erläutern, was ich konkret anbiete?
+Eine moderne, professionelle Website stärkt das Vertrauen vom ersten Klick an und bringt Ihnen mehr Anfragen.
+
+Darf ich Ihnen in einem kurzen Gespräch zeigen, wie das für Sie konkret aussehen würde?
 
 Freundliche Grüsse,
 [Dein Name]`
