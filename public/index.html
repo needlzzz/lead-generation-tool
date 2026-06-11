@@ -31,7 +31,7 @@
       <div class="header-top">
         <h1>Lead Generation CRM</h1>
         <div class="header-actions">
-          <a href="/docs/usage-guide.md" target="_blank" class="btn btn-sm" title="How to use this tool" style="text-decoration:none">❓ How-To</a>
+          <a href="/docs/usage-guide.md" target="_blank" class="btn btn-sm" title="How to use this tool" style="text-decoration:none">Help</a>
           <button id="btnSettings" class="btn-icon" title="Settings">⚙</button>
         </div>
       </div>
@@ -64,8 +64,8 @@
     <!-- Tab Panels -->
     <section class="tab-panel active" id="panel-discovery">
       <div class="panel-toolbar">
-        <button class="btn btn-primary" id="btnAddLead" style="font-size:1rem;padding:8px 20px">➕ New Lead</button>
-        <button class="btn btn-primary" id="btnImportCSV" style="font-size:1rem;padding:8px 20px">📥 CSV Import</button>
+        <button class="btn btn-primary" id="btnAddLead" style="font-size:1rem;padding:8px 20px">New Lead</button>
+        <button class="btn btn-primary" id="btnImportCSV" style="font-size:1rem;padding:8px 20px">Import CSV</button>
         <input type="file" id="csvFileInput" accept=".csv" class="hidden">
         <select id="categoryFilter" class="category-filter">
           <option value="">All Categories</option>
@@ -93,13 +93,13 @@
           <option value="Zug">Zug</option>
           <option value="Zürich">Zürich</option>
         </select>
-        <button class="btn" id="btnDiscoverLeads" title="Requires Playwright/Chromium">🔍 Auto-Discover (Scraper)</button>
-        <button class="btn" id="btnEnrichEmails" title="Find emails via local.ch">📧 Enrich Emails</button>
-        <button class="btn" id="btnAnalyzeWebsites" title="Analyze website quality">🔬 Analyze Websites</button>
-        <button class="btn btn-primary hidden" id="btnAnalyzeSelected" title="Analyze selected leads">🔬 Analyze Selected</button>
+        <button class="btn" id="btnDiscoverLeads" title="Requires Playwright/Chromium">Discover</button>
+        <button class="btn" id="btnEnrichEmails" title="Find emails via local.ch">Enrich Emails</button>
+        <button class="btn" id="btnAnalyzeWebsites" title="Analyze website quality">Analyze</button>
+        <button class="btn btn-primary hidden" id="btnAnalyzeSelected" title="Analyze selected leads">Analyze Selected</button>
         <label style="display:flex;align-items:center;gap:4px;font-size:0.85rem;cursor:pointer"><input type="checkbox" id="filterNoWebsite"> No website only</label>
         <label style="display:flex;align-items:center;gap:4px;font-size:0.85rem;cursor:pointer"><input type="checkbox" id="filterHasEmail"> Has email only</label>
-        <button class="btn" id="btnExportDiscovery">📤 CSV Export</button>
+        <button class="btn" id="btnExportDiscovery">Export</button>
       </div>
       <div class="table-wrap">
         <table id="tableDiscovery">
@@ -128,7 +128,7 @@
 
     <section class="tab-panel" id="panel-outreach">
       <div class="panel-toolbar">
-        <button class="btn" id="btnExportOutreach">📤 CSV Export</button>
+        <button class="btn" id="btnExportOutreach">Export</button>
       </div>
       <div class="table-wrap">
         <table id="tableOutreach">
@@ -155,7 +155,7 @@
 
     <section class="tab-panel" id="panel-replies">
       <div class="panel-toolbar">
-        <button class="btn" id="btnExportReplies">📤 CSV Export</button>
+        <button class="btn" id="btnExportReplies">Export</button>
       </div>
       <div class="table-wrap">
         <table id="tableReplies">
@@ -180,7 +180,7 @@
 
     <section class="tab-panel" id="panel-clients">
       <div class="panel-toolbar">
-        <button class="btn" id="btnExportClients">📤 CSV Export</button>
+        <button class="btn" id="btnExportClients">Export</button>
       </div>
       <div class="table-wrap">
         <table id="tableClients">
@@ -289,8 +289,8 @@
         </div>
         <div class="form-actions">
           <button type="button" class="btn" onclick="closeModal('modalEmail')">Close</button>
-          <button type="button" class="btn" id="btnEditEmail" onclick="toggleEmailEdit()">✏️ Edit</button>
-          <button type="button" class="btn btn-primary" id="btnSendEmail">📧 Send</button>
+          <button type="button" class="btn" id="btnEditEmail" onclick="toggleEmailEdit()">Edit</button>
+          <button type="button" class="btn btn-primary" id="btnSendEmail">Send</button>
         </div>
       </div>
     </div>

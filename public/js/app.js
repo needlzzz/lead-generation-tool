@@ -199,11 +199,11 @@ function renderDashboardAlerts(dueData, repliesData) {
   let fuHtml = '';
   dueData.followUp1Due.forEach(l => {
     fuHtml += `<div class="alert-item"><span class="alert-info"><strong>${esc(l.businessName)}</strong> — Follow-Up 1 due</span>
-      <button class="btn btn-sm btn-primary" onclick="previewEmail('${l.id}','email2')">📧 Send FU1</button></div>`;
+      <button class="btn btn-sm btn-primary" onclick="previewEmail('${l.id}','email2')">Send FU1</button></div>`;
   });
   dueData.followUp2Due.forEach(l => {
     fuHtml += `<div class="alert-item"><span class="alert-info"><strong>${esc(l.businessName)}</strong> — Follow-Up 2 due</span>
-      <button class="btn btn-sm btn-primary" onclick="previewEmail('${l.id}','email3')">📧 Send FU2</button></div>`;
+      <button class="btn btn-sm btn-primary" onclick="previewEmail('${l.id}','email3')">Send FU2</button></div>`;
   });
   dueData.markColdDue.forEach(l => {
     fuHtml += `<div class="alert-item overdue"><span class="alert-info"><strong>${esc(l.businessName)}</strong> — Mark as cold?</span>
@@ -326,15 +326,15 @@ function renderDiscoveryTab() {
       <td onclick="event.stopPropagation()">
         <div class="actions">
           ${l.websiteAnalyzedAt && !l.previewUrl && (l.status === 'Discovered' || l.status === 'Reached Out')
-            ? `<button class="btn btn-sm" onclick="startPreviewGeneration('${l.id}')" title="Generate Preview">🎨</button>` : ''}
+            ? `<button class="btn btn-sm" onclick="startPreviewGeneration('${l.id}')" title="Generate Preview">Preview</button>` : ''}
           ${l.previewUrl
-            ? `<button class="btn btn-sm" onclick="window.open('${esc(l.previewUrl)}', '_blank')" title="View Preview">👁</button>` : ''}
+            ? `<button class="btn btn-sm" onclick="window.open('${esc(l.previewUrl)}', '_blank')" title="View Preview">View</button>` : ''}
           ${l.status === 'Discovered' && l.email && l.websiteQuality !== 'Not a Fit'
-            ? `<button class="btn btn-sm btn-primary" onclick="previewEmail('${l.id}','email1')">📧 Email 1</button>` : ''}
+            ? `<button class="btn btn-sm btn-primary" onclick="previewEmail('${l.id}','email1')">Email 1</button>` : ''}
           ${l.status === 'Discovered'
-            ? `<button class="btn btn-sm" onclick="doTransition('${l.id}','mark-not-a-fit')">✖ Not a Fit</button>` : ''}
-          <button class="btn btn-sm" onclick="editLead('${l.id}')">✏️</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteLead('${l.id}')">🗑</button>
+            ? `<button class="btn btn-sm" onclick="doTransition('${l.id}','mark-not-a-fit')">Not a Fit</button>` : ''}
+          <button class="btn btn-sm" onclick="editLead('${l.id}')">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteLead('${l.id}')">Del</button>
         </div>
       </td>
     </tr>
@@ -737,7 +737,7 @@ async function previewEmail(leadId, emailType) {
     document.getElementById('emailBodyEdit').value = result.body;
     document.getElementById('emailBodyEdit').classList.add('hidden');
     document.getElementById('emailBody').classList.remove('hidden');
-    document.getElementById('btnEditEmail').textContent = '✏️ Edit';
+    document.getElementById('btnEditEmail').textContent = 'Edit';
     const typeLabels = { email1: 'Email 1 — Cold Outreach', email2: 'Follow-Up 1', email3: 'Follow-Up 2' };
     document.getElementById('emailPreviewTitle').textContent = typeLabels[emailType] || 'Email';
     currentEmailContext = { leadId, emailType };
@@ -757,13 +757,13 @@ function toggleEmailEdit() {
     pre.classList.add('hidden');
     textarea.classList.remove('hidden');
     textarea.focus();
-    btn.textContent = '👁 Preview';
+    btn.textContent = 'Preview';
   } else {
     // Switch back to preview
     pre.textContent = textarea.value;
     textarea.classList.add('hidden');
     pre.classList.remove('hidden');
-    btn.textContent = '✏️ Edit';
+    btn.textContent = 'Edit';
   }
 }
 
@@ -875,7 +875,7 @@ function showActivityLog(leadId) {
     findingsEl.classList.remove('hidden');
     findingsEl.innerHTML = `
       <div class="findings-header">
-        <strong>🔬 Website Analysis</strong>
+        <strong>Website Analysis</strong>
         <span class="quality-badge ${({
           'Poor': 'quality-poor', 'Outdated': 'quality-outdated',
           'Good': 'quality-good', 'None': 'quality-none', 'Not a Fit': 'quality-notafit'
@@ -947,7 +947,7 @@ function renderPreviewSection(lead) {
   if (canGenerate) {
     container.innerHTML = `
       <div class="preview-section-inner">
-        <button class="btn btn-primary" id="btnGeneratePreview" onclick="startPreviewGeneration('${lead.id}')">🎨 Generate Preview</button>
+        <button class="btn btn-primary" id="btnGeneratePreview" onclick="startPreviewGeneration('${lead.id}')">Generate Preview</button>
         <div id="previewProgress" class="preview-progress hidden"></div>
         <div id="previewResult" class="preview-result hidden"></div>
         <div id="previewError" class="preview-error hidden"></div>
@@ -987,7 +987,7 @@ function renderPreviewResult(container, lead) {
   container.innerHTML = `
     <div class="preview-section-inner">
       <div class="preview-result">
-        <strong>🎨 Preview Site</strong>
+        <strong>Preview Site</strong>
         <a href="${esc(lead.previewUrl)}" target="_blank" class="preview-link">${esc(lead.previewUrl)}</a>
         ${screenshotUrl ? `<img src="${esc(screenshotUrl)}" alt="Preview Screenshot" class="preview-thumbnail" onerror="this.style.display='none'">` : ''}
       </div>
@@ -1065,7 +1065,7 @@ async function startPreviewGeneration(leadId) {
     previewGenerationInProgress = false;
     if (btn && !btn.classList.contains('hidden')) {
       btn.disabled = false;
-      btn.textContent = '🎨 Generate Preview';
+      btn.textContent = 'Generate Preview';
     }
   }
 }
@@ -1110,7 +1110,7 @@ function retryPreviewGeneration(leadId) {
   if (btn) {
     btn.classList.remove('hidden');
     btn.disabled = false;
-    btn.textContent = '🎨 Generate Preview';
+    btn.textContent = 'Generate Preview';
   }
   startPreviewGeneration(leadId);
 }
@@ -1226,7 +1226,7 @@ async function discoverLeads() {
     showError(`Scraper error: ${err.message}`);
   } finally {
     btn.disabled = false;
-    btn.textContent = '🔍 Auto-Discover (Scraper)';
+    btn.textContent = 'Discover';
   }
 }
 
@@ -1670,8 +1670,8 @@ function renderCategoriesList() {
       <div class="category-card-header">
         <h4>${esc(c.name)}</h4>
         <div class="actions">
-          <button class="btn btn-sm" onclick="editCategory('${c.id}')">✏️ Edit</button>
-          <button class="btn btn-sm btn-danger" onclick="deleteCategory('${c.id}')">🗑</button>
+          <button class="btn btn-sm" onclick="editCategory('${c.id}')">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteCategory('${c.id}')">Del</button>
         </div>
       </div>
       <div class="category-card-meta">Search term: ${esc(c.searchTerm)} · Tone: ${c.tone === 'formal' ? 'Formal (Sie)' : 'Casual (Du)'}</div>
