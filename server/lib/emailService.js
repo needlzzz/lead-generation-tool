@@ -31,46 +31,48 @@ function renderTemplate(template, lead, settings) {
   const essentialIssues = (lead.websiteIssues || []).filter(i => ESSENTIAL_ISSUES.includes(i.id));
   const topIssues = essentialIssues.length > 0 ? essentialIssues.slice(0, 5) : (lead.websiteIssues || []).slice(0, 5);
 
-  // Consequence map — connects each finding to a specific business impact
+  // Consequence map — connects each finding to a constructive, helpful explanation
   const CONSEQUENCES = {
-    'no-ssl': 'Besucher sehen "Nicht sicher" und verlassen die Seite sofort',
-    'no-viewport': 'Über 60% der Kunden surfen mobil — sie sehen Ihre Seite abgeschnitten',
-    'no-responsive': 'Auf Smartphones und Tablets ist Ihre Seite kaum benutzbar',
-    'slow-load': 'Über 50% springen ab, wenn eine Seite länger als 3 Sekunden lädt',
-    'moderate-load': 'Langsame Seiten verlieren Kunden und werden von Google abgestraft',
-    'no-cta': 'Besucher wissen nicht, was sie tun sollen — und gehen wieder',
-    'no-contact-form': 'Kunden müssen selbst eine E-Mail schreiben — die meisten tun es nicht',
-    'no-opening-hours': 'Kunden rufen unnötig an oder gehen direkt zur Konkurrenz',
-    'no-social-media': 'Sie verpassen Reichweite und Vertrauen über soziale Medien',
-    'no-favicon': 'Im Browser-Tab wirkt Ihre Seite unprofessionell',
-    'no-trust-signals': 'Ohne Team-Fotos oder Bewertungen fehlt das Vertrauen',
-    'no-title': 'Google zeigt Ihre Seite weiter unten — weniger Klicks, weniger Kunden',
-    'no-meta-desc': 'In den Google-Ergebnissen fehlt ein überzeugender Text',
-    'no-h1': 'Google versteht nicht, wofür Ihre Seite steht',
-    'missing-alt': 'Ihre Bilder erscheinen nicht in der Google-Bildersuche',
-    'outdated-copyright': 'Besucher denken, die Seite wird nicht mehr gepflegt',
-    'outdated-wp': 'Bekannte Sicherheitslücken — Ihre Seite kann gehackt werden',
-    'outdated-joomla': 'Veraltete Software — ein Sicherheitsrisiko für Sie und Ihre Kunden',
-    'mixed-content': 'Browser zeigen eine Warnung — das zerstört das Vertrauen',
-    'uses-flash': 'Flash funktioniert auf keinem modernen Gerät mehr',
-    'table-layout': 'Eine Technik aus den 2000ern — auf Mobilgeräten unbrauchbar',
-    'missing-security-headers': 'Ihre Seite ist anfälliger für Manipulationen',
-    'weak-security-headers': 'Minimaler Schutz — moderne Websites brauchen mehr',
-    'free-plan-cms': 'Werbung des Anbieters auf Ihrer Seite wirkt unprofessionell',
-    'no-google-maps': 'Kunden finden den Weg zu Ihnen nicht auf den ersten Blick'
+    'no-ssl': 'Ein SSL-Zertifikat schützt die Daten Ihrer Besucher und zeigt ihnen: hier bin ich sicher',
+    'no-viewport': 'Über 60% surfen heute mobil — eine angepasste Darstellung macht Ihre Seite für alle zugänglich',
+    'no-responsive': 'Auf Smartphones und Tablets soll Ihre Seite genauso einladend wirken wie am Computer',
+    'slow-load': 'Schnellere Seiten halten Besucher länger — und werden von Google besser bewertet',
+    'moderate-load': 'Jede Sekunde weniger Ladezeit bedeutet spürbar mehr Besucher, die bleiben',
+    'no-cta': 'Ein einfacher Button wie „Jetzt anfragen" gibt Besuchern Orientierung und macht den nächsten Schritt leichter',
+    'no-contact-form': 'Viele Menschen füllen lieber ein kurzes Formular aus, als selbst eine E-Mail zu verfassen — das senkt die Hemmschwelle spürbar',
+    'no-opening-hours': 'Wer sofort sieht, wann er vorbeikommen kann, fühlt sich willkommen — und kommt tatsächlich vorbei',
+    'no-social-media': 'Social-Media-Links zeigen, dass Sie aktiv sind — das schafft Nähe und Vertrauen',
+    'no-favicon': 'Ein kleines Icon im Browser-Tab macht Ihre Seite wiedererkennbar und professioneller',
+    'no-trust-signals': 'Team-Fotos oder Kundenstimmen zeigen, wer hinter dem Geschäft steht — das schafft sofort Vertrauen',
+    'no-title': 'Ein treffender Seitentitel hilft Google, Sie für die richtigen Suchbegriffe anzuzeigen',
+    'no-meta-desc': 'Eine gute Beschreibung in den Google-Ergebnissen überzeugt Suchende, auf Ihren Link zu klicken',
+    'no-h1': 'Eine klare Hauptüberschrift hilft Besuchern und Google zu verstehen, worum es bei Ihnen geht',
+    'missing-alt': 'Bildbeschreibungen helfen Google, Ihre Fotos in der Bildersuche zu zeigen — kostenlose Sichtbarkeit',
+    'outdated-copyright': 'Ein aktuelles Copyright-Jahr signalisiert Besuchern: hier passiert etwas, die Seite lebt',
+    'outdated-wp': 'Eine aktuelle WordPress-Version schützt vor Sicherheitslücken und bringt neue Funktionen',
+    'outdated-joomla': 'Ein Update auf die aktuelle Version schliesst bekannte Sicherheitslücken',
+    'mixed-content': 'Wenn alles verschlüsselt geladen wird, verschwindet die Browser-Warnung — und das Vertrauen steigt',
+    'uses-flash': 'Ohne Flash funktioniert Ihre Seite auf allen modernen Geräten einwandfrei',
+    'table-layout': 'Ein moderner Aufbau macht Ihre Seite schnell, flexibel und mobilfreundlich',
+    'missing-security-headers': 'Zusätzliche Sicherheitseinstellungen schützen Ihre Besucher und stärken das Vertrauen',
+    'weak-security-headers': 'Mehr Schutz im Hintergrund gibt Ihren Besuchern ein sicheres Gefühl',
+    'free-plan-cms': 'Ohne die Werbung des Anbieters wirkt Ihre Seite deutlich professioneller'
   };
 
   const websiteIssuesList = topIssues.length > 0
     ? topIssues.map(i => {
         const consequence = CONSEQUENCES[i.id] || '';
-        return consequence ? `• ${i.label} → ${consequence}` : `• ${i.label}`;
-      }).join('\n')
+        return consequence ? `${i.label} → ${consequence}` : `${i.label}`;
+      }).join('\n\n')
     : '';
 
   // Short summary (first 2-3 issues, one-liner)
   const websiteIssuesSummary = topIssues.length > 0
     ? topIssues.map(i => i.label).join(', ')
     : '';
+
+  // Issue count for template
+  const websiteIssuesCount = topIssues.length > 0 ? String(topIssues.length) : '0';
 
   // Preview screenshot URL: derive from previewUrl
   const previewScreenshotUrl = lead.previewUrl
@@ -96,6 +98,7 @@ function renderTemplate(template, lead, settings) {
     '[Dein Name]': settings.userName || '',
     '[Website-Probleme]': websiteIssuesList,
     '[Website-Probleme-Kurz]': websiteIssuesSummary,
+    '[Website-Probleme-Anzahl]': websiteIssuesCount,
     '[Website-Score]': lead.websiteScore != null ? `${lead.websiteScore}/100` : '',
     '[Preview-Link]': lead.previewUrl || '',
     '[Preview-Screenshot]': previewScreenshotUrl,

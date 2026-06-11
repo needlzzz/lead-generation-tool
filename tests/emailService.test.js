@@ -273,8 +273,8 @@ describe('All placeholders combined', () => {
     expect(result.subject).toBe('Vorschau für Coiffeur Müller');
     expect(result.body).toContain('Hallo Hans Müller,');
     expect(result.body).toContain('Score von 35/100');
-    expect(result.body).toContain('• Kein SSL');
-    expect(result.body).toContain('• Nicht mobil');
+    expect(result.body).toContain('Kein SSL');
+    expect(result.body).toContain('Nicht mobil');
     expect(result.body).toContain('Kurzfassung: Kein SSL, Nicht mobil');
     expect(result.body).toContain('Ihre neue Website: https://preview.kaelint.ch/a7f3b92e-coiffeur-mueller-bern/');
     expect(result.body).toContain('Screenshot: https://preview.kaelint.ch/a7f3b92e-coiffeur-mueller-bern/screenshot.png');
