@@ -20,8 +20,9 @@ A local-first, self-hosted CRM for discovering local businesses across Switzerla
 ## Key Commands
 
 ```bash
-npm start              # Launch Express server on localhost:3000
-npm test               # Run Jest test suite
+npm start              # Server on localhost:3000
+npm test               # Unit + property tests (excludes e2e)
+npm run test:e2e:preview  # E2E preview build test (slow, real Astro build)
 npm run install-browsers  # Install Playwright Chromium (for scraper)
 ```
 
@@ -103,23 +104,35 @@ tests/
 ### Website Quality Analysis
 - Endpoint: `POST /api/scraper/analyze-websites` (SSE stream)
 - Automated checks per website:
-  - **SSL/HTTPS** — missing certificate
+  - **SSL/HTTPS** — tries HTTPS first (even if URL stored as http://), checks final URL after redirects
   - **Mobile-friendliness** — viewport meta tag, responsive design (media queries)
-  - **Page load speed** — timed page load, flags >3s and >5s
+  - **Page load speed** — timed page load, flags >5s and >8s (accounts for Playwright cold load)
   - **SEO basics** — title tag, meta description, H1 heading
-  - **Accessibility** — images without alt text
+  - **Accessibility** — images without alt text (shows specific filenames)
   - **Outdated tech** — Flash, table-based layout, old WordPress/Joomla versions
   - **Copyright year** — flags if >2 years old (site appears unmaintained)
   - **Mixed content** — HTTP resources on HTTPS pages
   - **Security headers** — HSTS, CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy. Graded A+ to F.
-  - **CMS/Tech stack detection** — WordPress (version + plugins + theme), Wix, Jimdo, Squarespace, Shopify, Joomla, Webflow, TYPO3, Drupal, Webflow. Also detects React/Next.js/Vue/Angular, analytics (GA, Matomo, Hotjar, Plausible), e-commerce (WooCommerce, Shopify).
+  - **CMS/Tech stack detection** — WordPress (version + plugins + theme), Wix, Jimdo, Squarespace, Shopify, Joomla, Webflow, TYPO3, Drupal. Also detects React/Next.js/Vue/Angular, analytics (GA, Matomo, Hotjar, Plausible), e-commerce (WooCommerce, Shopify). Detects free CMS plans.
+  - **Bot/WAF protection detection** — returns quality "None" with clear message when site blocks automated access
+  - **Email extraction** — decodes percent-encoded/obfuscated mailto links during analysis
   - **Opportunity scoring** — composite 0-100 score factoring in: website quality (inverted), issue count, CMS type (WordPress users more open to redesign), copyright staleness, Google rating (higher-rated = more budget)
+  - **New metrics**: page count, nav depth, word count, CTA detection, contact form detection, opening hours detection, social media count, favicon, team section, testimonials, Google reviews link, free CMS plan detection
+  - **New issues**: no-cta, no-contact-form, no-opening-hours, no-social-media, no-favicon, no-trust-signals, free-plan-cms
 - Scoring: 0-100 points, deductions per issue
 - Quality labels: Good (80+), Outdated (50-79), Poor (<50)
-- Results stored per-lead: `websiteQuality`, `websiteScore`, `websiteIssues[]`, `websiteLoadTime`, `websiteAnalyzedAt`, `websiteTechStack`, `websiteSecurityGrade`, `websiteOpportunityScore`
-- Issues have German labels and descriptions (for use in outreach emails)
+- Results stored per-lead: `websiteQuality`, `websiteScore`, `websiteIssues[]`, `websiteLoadTime`, `websiteAnalyzedAt`, `websiteTechStack`, `websiteSecurityGrade`, `websiteOpportunityScore`, `websiteComplexity`
+- Site complexity data stored per lead (`websiteComplexity` field) — used by config generator to mirror client's existing features
+- Issues have German labels and client-facing descriptions (constructive, not fear-based)
 - UI: "🔬 Analyze Websites" button, color-coded quality badges with tooltip, full findings in lead detail modal
 - **Selection & Re-analysis**: Discovery table has a checkbox column for selecting individual leads. "🔬 Analyze Selected (N)" button appears when leads are checked — allows re-analysis of already-analyzed leads. Bulk "🔬 Analyze Websites" still only targets unanalyzed leads. "Select All" checkbox in table header selects all visible leads.
+
+### Discovery & Scraping Features
+- Re-scraping allowed (no longer blocks already-scraped category+city combinations)
+- 45 categories (up from 10) covering Handwerk, Beauty, Sport, Gastro, Gewerbe, Kreativ, Medizin, Recht, Institutionell
+- Category and city dropdowns sorted alphabetically
+- Discovery table columns sortable (Category, Status, Discovered, Quality)
+- Scrape Log tab with matrix/grid view (categories × cities, showing coverage at a glance)
 
 ### Available Cities
 Zürich, Bern, Basel, Luzern, St. Gallen, Lausanne, Genf, Winterthur, Biel/Bienne, Thun, Aarau, Schaffhausen, Chur, Zug, Solothurn, Baden, Olten, Rapperswil, Frauenfeld, Lugano
@@ -137,22 +150,30 @@ Calendar days, no weekend logic.
 
 ## Data Model (Key Entities)
 
-- **Lead**: id, businessName, category, address, phone, email, websiteUrl, websiteQuality, websiteScore, websiteIssues[], websiteLoadTime, websiteAnalyzedAt, websiteTechStack, websiteSecurityGrade, websiteOpportunityScore, googleRating, contactPerson, status, dates (discovered, email1, followup1, followup2, reply, meeting), replySentiment, decision, startDate, notes, activityLog[], previewUrl, previewScreenshotPath, previewGeneratedAt, previewExpiresAt
+- **Lead**: id, businessName, category, address, phone, email, websiteUrl, websiteQuality, websiteScore, websiteIssues[], websiteLoadTime, websiteAnalyzedAt, websiteTechStack, websiteSecurityGrade, websiteOpportunityScore, websiteComplexity, googleRating, contactPerson, status, dates (discovered, email1, followup1, followup2, reply, meeting), replySentiment, decision, startDate, notes, activityLog[], previewUrl, previewScreenshotPath, previewGeneratedAt, previewExpiresAt
 - **Category**: id, name, searchTerm, tone (formal/casual), templates (email1/2/3 with subject + body)
 - **Settings**: userName, calendlyLink, previewSiteRepoPath, smtp config (host, port, username, password, fromAddress, useProxy)
 
 ## Email Template Placeholders
 
+- `[Greeting]` → "Guten Tag Herr/Frau Nachname" if contactPerson known, "Guten Tag" if not
 - `[Name]` → contactPerson or "Team von [Business Name]" if empty
 - `[Business Name]` → lead's businessName
 - `[CALENDLY-LINK]` → from settings
 - `[Dein Name]` → from settings
-- `[Website-Probleme]` → full bullet list of website issues (German)
-- `[Website-Probleme-Kurz]` → short comma-separated issue labels (first 3)
+- `[Website-Probleme]` → top 5 essential issues with bullet points + constructive consequence (format: `• Label → Constructive helpful explanation`)
+- `[Website-Probleme-Anzahl]` → count of issues shown
+- `[Website-Probleme-Kurz]` → short comma-separated issue labels
 - `[Website-Score]` → website score as "X/100"
 - `[Preview-Link]` → previewUrl or empty string if not generated
 - `[Preview-Screenshot]` → screenshot URL at preview.kaelint.ch/{slug}/screenshot.png
 - `[Preview-Ablauf]` → formatted expiry date in German (e.g., "15. Juli 2026")
+- `[Preview-Disclaimer]` → placeholder image note
+
+### Email Template Style
+- Warm, constructive tone (not fear-based/urgent)
+- Same unified template for all 45 categories
+- Edit button in email preview modal (edit body before sending, backend accepts customBody/customSubject)
 
 ## SMTP Configuration
 
@@ -222,17 +243,36 @@ Calendar days, no weekend logic.
 ## Testing Approach
 
 - Jest for unit tests on backend modules (pipeline, dataStore, emailService, csvService, slugGenerator, previewRegistry, configGenerator, previewGenerator, screenshotCapturer)
-- Property-based tests with fast-check (slug format, config validity, color derivation, email placeholders)
+- 272 unit tests + 8 property-based tests with fast-check (slug format, config validity, color derivation, email placeholders)
+- E2E preview build test: `npm run test:e2e:preview` (real Astro build test, slow)
+- `npm test` excludes e2e tests (uses `--testPathIgnorePatterns=e2e`)
 - No frontend tests — manual testing only
 - No integration/E2E tests for the scraper (depends on live Google Maps / local.ch DOM)
-- Run `npm test` to validate logic modules
 
 ## Preview Site Generation
 
 - Generates personalized demo websites for cold outreach leads
 - Uses kaelint-website-business as the build system (invoked via child_process)
-- Deployed atomically to Cloudflare Pages at `preview.kaelint.ch/{slug}/de/`
+- Preview URL is `preview.kaelint.ch/{slug}/` (no /de/ prefix)
+- Config generator uses `websiteComplexity` to mirror client's existing features
+- Gallery image paths fixed (filename only, no directory prefix)
+- `postalCode` defaults to "0000" (Zod schema requires non-empty)
+- Screenshot capturer looks for index.html at slug root
+- `slugify()` handles null/undefined input
+- Preview generator validates `previewSiteRepoPath` before starting
+- `buildPriceList()` generates default price list data when feature enabled
 - Previews expire after 30 days (removed on next deploy)
 - Settings: `previewSiteRepoPath` points to local kaelint-website-business checkout
 - Screenshot captured via Playwright (non-blocking on failure)
 - SSE streaming for real-time progress in the UI
+- E2E test: `npm run test:e2e:preview` (real Astro build test)
+
+## UI/UX
+
+- Full CSS rewrite with kaelint-crm design tokens (CSS custom properties)
+- ARIA tablist navigation
+- Toast notification system (`showToast()`)
+- Preview buttons in table rows (Preview, View)
+- Status badges removed from header
+- Content spans full viewport width (no max-width constraint)
+- Emojis removed from most buttons (text labels), kept for: 🔍 Discover, ✖ (Not a Fit), ✏️ (Edit)
