@@ -330,8 +330,8 @@ function renderDiscoveryTab() {
           ${l.status === 'Discovered' && l.email && l.websiteQuality !== 'Not a Fit'
             ? `<button class="btn btn-sm btn-primary" onclick="previewEmail('${l.id}','email1')">Email 1</button>` : ''}
           ${l.status === 'Discovered'
-            ? `<button class="btn btn-sm" onclick="doTransition('${l.id}','mark-not-a-fit')">Not a Fit</button>` : ''}
-          <button class="btn btn-sm" onclick="editLead('${l.id}')">Edit</button>
+            ? `<button class="btn btn-sm" onclick="doTransition('${l.id}','mark-not-a-fit')">✖</button>` : ''}
+          <button class="btn btn-sm" onclick="editLead('${l.id}')">✏️</button>
           <button class="btn btn-sm btn-danger" onclick="deleteLead('${l.id}')">Del</button>
         </div>
       </td>
@@ -1219,7 +1219,7 @@ async function discoverLeads() {
     showError(`Scraper error: ${err.message}`);
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Discover';
+    btn.textContent = '🔍 Discover';
   }
 }
 
@@ -1663,7 +1663,7 @@ function renderCategoriesList() {
       <div class="category-card-header">
         <h4>${esc(c.name)}</h4>
         <div class="actions">
-          <button class="btn btn-sm" onclick="editCategory('${c.id}')">Edit</button>
+          <button class="btn btn-sm" onclick="editCategory('${c.id}')">✏️</button>
           <button class="btn btn-sm btn-danger" onclick="deleteCategory('${c.id}')">Del</button>
         </div>
       </div>
