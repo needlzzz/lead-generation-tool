@@ -11,8 +11,6 @@ let currentEmailContext = null; // { leadId, emailType }
 let qualitySortOrder = null; // null = no sort, 'asc' = best first, 'desc' = worst first
 let discoverySortField = null; // null, 'category', 'status', 'discovered'
 let discoverySortOrder = null; // null, 'asc', 'desc'
-let scrapeLogSortField = 'date'; // default sort by date
-let scrapeLogSortOrder = 'desc'; // most recent first
 
 // ============================================================
 // TOAST NOTIFICATIONS
@@ -462,35 +460,30 @@ function renderClientsTab() {
 // SCRAPE LOG TAB
 // ============================================================
 
-function toggleScrapeLogSort(field) {
-  if (scrapeLogSortField === field) {
-    if (scrapeLogSortOrder === 'asc') scrapeLogSortOrder = 'desc';
-    else scrapeLogSortOrder = 'asc';
-  } else {
-    scrapeLogSortField = field;
-    scrapeLogSortOrder = field === 'date' ? 'desc' : 'asc';
-  }
-  renderScrapeLogTab();
-}
-
 function renderScrapeLogTab() {
-  const tbody = document.querySelector('#tableScrapeLog tbody');
+  const container = document.getElementById('scrapeLogMatrix');
   const empty = document.getElementById('emptyScrapeLog');
 
   // Build map of category+city → { lastDate, count }
   const scrapeMap = {};
+  const allCities = new Set();
+  const allCats = new Set();
+
   for (const lead of allLeads) {
     let city = lead.city;
     if (!city && lead.activityLog && lead.activityLog[0]?.details) {
       const match = lead.activityLog[0].details.match(/in (.+)$/);
       if (match) city = match[1];
     }
-    if (!city) city = '(unbekannt)';
+    if (!city) continue; // Skip leads without a city for the matrix
     const cat = lead.category || '(keine)';
     const key = `${cat}::${city}`;
 
+    allCities.add(city);
+    allCats.add(cat);
+
     if (!scrapeMap[key]) {
-      scrapeMap[key] = { category: cat, city, lastDate: lead.dateDiscovered, count: 0 };
+      scrapeMap[key] = { lastDate: lead.dateDiscovered, count: 0 };
     }
     scrapeMap[key].count++;
     if (lead.dateDiscovered && (!scrapeMap[key].lastDate || lead.dateDiscovered > scrapeMap[key].lastDate)) {
@@ -498,41 +491,41 @@ function renderScrapeLogTab() {
     }
   }
 
-  let entries = Object.values(scrapeMap);
-
-  // Sort by selected field
-  if (scrapeLogSortField && scrapeLogSortOrder) {
-    entries.sort((a, b) => {
-      let aVal, bVal;
-      if (scrapeLogSortField === 'category') {
-        aVal = a.category.toLowerCase(); bVal = b.category.toLowerCase();
-      } else if (scrapeLogSortField === 'city') {
-        aVal = a.city.toLowerCase(); bVal = b.city.toLowerCase();
-      } else if (scrapeLogSortField === 'date') {
-        aVal = a.lastDate || ''; bVal = b.lastDate || '';
-      } else if (scrapeLogSortField === 'count') {
-        aVal = a.count; bVal = b.count;
-      }
-      const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
-      return scrapeLogSortOrder === 'asc' ? cmp : -cmp;
-    });
-  }
-
-  if (entries.length === 0) {
-    tbody.innerHTML = '';
+  if (allCats.size === 0) {
+    container.innerHTML = '';
     empty.classList.remove('hidden');
     return;
   }
   empty.classList.add('hidden');
 
-  tbody.innerHTML = entries.map(e => `
-    <tr>
-      <td>${esc(e.category)}</td>
-      <td>${esc(e.city)}</td>
-      <td>${e.lastDate || '—'}</td>
-      <td>${e.count}</td>
-    </tr>
-  `).join('');
+  const cities = [...allCities].sort((a, b) => a.localeCompare(b, 'de'));
+  const categories = [...allCats].sort((a, b) => a.localeCompare(b, 'de'));
+
+  // Build matrix table
+  let html = '<table class="scrape-matrix"><thead><tr><th>Category</th>';
+  for (const city of cities) {
+    html += `<th class="matrix-city">${esc(city)}</th>`;
+  }
+  html += '<th>Total</th></tr></thead><tbody>';
+
+  for (const cat of categories) {
+    let rowTotal = 0;
+    html += `<tr><td class="matrix-cat">${esc(cat)}</td>`;
+    for (const city of cities) {
+      const key = `${cat}::${city}`;
+      const data = scrapeMap[key];
+      if (data) {
+        rowTotal += data.count;
+        html += `<td class="matrix-cell matrix-cell--has" title="${esc(cat)} in ${esc(city)}: ${data.count} leads (${data.lastDate || '?'})">${data.count}</td>`;
+      } else {
+        html += `<td class="matrix-cell matrix-cell--empty">—</td>`;
+      }
+    }
+    html += `<td class="matrix-total">${rowTotal}</td></tr>`;
+  }
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
 }
 
 // ============================================================

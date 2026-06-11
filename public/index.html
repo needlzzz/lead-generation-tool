@@ -203,20 +203,8 @@
     </section>
 
     <section class="tab-panel" id="panel-scrapelog">
-      <div class="table-wrap">
-        <table id="tableScrapeLog">
-          <thead>
-            <tr>
-              <th style="cursor:pointer" onclick="toggleScrapeLogSort('category')" title="Click to sort">Category ⇅</th>
-              <th style="cursor:pointer" onclick="toggleScrapeLogSort('city')" title="Click to sort">City ⇅</th>
-              <th style="cursor:pointer" onclick="toggleScrapeLogSort('date')" title="Click to sort">Last Scraped ⇅</th>
-              <th style="cursor:pointer" onclick="toggleScrapeLogSort('count')" title="Click to sort">Leads Found ⇅</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-        <div id="emptyScrapeLog" class="empty-state hidden">No scrape history yet.</div>
-      </div>
+      <div class="table-wrap" id="scrapeLogMatrix"></div>
+      <div id="emptyScrapeLog" class="empty-state hidden">No scrape history yet.</div>
     </section>
 
     <!-- Modals -->
