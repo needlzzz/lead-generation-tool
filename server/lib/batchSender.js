@@ -58,7 +58,10 @@ function createBrevoTransport(brevoConfig) {
     auth: {
       user: brevoConfig.username,
       pass: brevoConfig.password
-    }
+    },
+    connectionTimeout: 30000,
+    greetingTimeout: 30000,
+    socketTimeout: 30000
   });
 }
 
@@ -227,8 +230,8 @@ async function processQueue(settings, categories) {
       lead.activityLog = lead.activityLog || [];
       lead.activityLog.push({
         date: now,
-        action: `Batch ${item.emailType} sent`,
-        details: `Email sent to ${lead.email}`
+        action: 'Email sent',
+        details: `${item.emailType} sent to ${lead.email} (batch)`
       });
       dataStore.save('leads', lead);
 
@@ -529,7 +532,7 @@ function buildAutoQueue(leads, today) {
  * @param {string} [today] - Current date as YYYY-MM-DD (optional, defaults to today)
  * @returns {Array} Array of { leadId, emailType } for eligible leads
  */
-function buildQueueForType(leads, emailType, today) {
+function buildTypedQueue(leads, emailType, today) {
   if (!today) today = new Date().toISOString().slice(0, 10);
   const queue = [];
 
@@ -567,7 +570,7 @@ module.exports = {
   getStatus,
   isRunning,
   buildAutoQueue,
-  buildQueueForType,
+  buildTypedQueue,
   // Exported for testing
   _isWithinSendWindow: isWithinSendWindow,
   _createBrevoTransport: createBrevoTransport,

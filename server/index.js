@@ -22,6 +22,7 @@ app.use('/api/scraper', require('./routes/scraper'));
 app.use('/api/email', require('./routes/email'));
 app.use('/api/csv', require('./routes/csv'));
 app.use('/api/previews', require('./routes/previews'));
+app.use('/api/batch', require('./routes/batch'));
 
 // Fallback to index.html for SPA
 app.get('*', (req, res) => {

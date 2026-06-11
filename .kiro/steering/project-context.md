@@ -45,20 +45,27 @@ server/
     previewRegistry.js     JSON persistence for preview lifecycle state
     screenshotCapturer.js  Playwright-based hero screenshot capture
     slugGenerator.js       URL-safe slug generation with uniqueness retry
+    batchPreviewGenerator.js  Batch preview orchestrator (parallel builds, single deploy)
+    batchSender.js            Batch email send queue processor (Brevo SMTP)
+    quotaTracker.js           Daily email send quota persistence + enforcement
   routes/
     leads.js             Lead CRUD + pipeline transitions
     categories.js        Category CRUD
-    settings.js          Settings + SMTP test + send test email
+    settings.js          Settings + SMTP test + send test email + batch config
     scraper.js           Scraper + enrichment + website analysis endpoints (SSE)
     email.js             Email preview + send
     csv.js               CSV import/export
-    previews.js            Preview generation SSE endpoint + state API
+    previews.js          Preview generation SSE endpoint + state API
+    batch.js             Batch preview generation + email send endpoints
   data/                  Runtime data (JSON files, gitignored)
     leads.json
     categories.json
     settings.json
-    previews.json          Preview registry (generated, gitignored)
-    previews/{slug}/       Screenshot storage per preview
+    previews.json                Preview registry (generated, gitignored)
+    previews/{slug}/             Screenshot storage per preview
+    batch-preview-state.json     Batch preview generation state (gitignored)
+    send-queue-state.json        Email send queue state (gitignored)
+    send-quota.json              Daily email send quota tracker (gitignored)
 public/
   index.html             SPA shell
   css/styles.css         Styles with status colors
@@ -71,6 +78,14 @@ tests/
   dataStore.test.js
   emailService.test.js
   csvService.test.js
+  quotaTracker.test.js
+  quotaTracker.property.test.js
+  batchSender.test.js
+  batchSender.property.test.js
+  batchPreviewGenerator.test.js
+  batchPreviewGenerator.property.test.js
+  batchRoutes.test.js
+  settingsBatch.test.js
 ```
 
 ## Architecture Principles
@@ -152,7 +167,7 @@ Calendar days, no weekend logic.
 
 - **Lead**: id, businessName, category, address, phone, email, websiteUrl, websiteQuality, websiteScore, websiteIssues[], websiteLoadTime, websiteAnalyzedAt, websiteTechStack, websiteSecurityGrade, websiteOpportunityScore, websiteComplexity, googleRating, contactPerson, status, dates (discovered, email1, followup1, followup2, reply, meeting), replySentiment, decision, startDate, notes, activityLog[], previewUrl, previewScreenshotPath, previewGeneratedAt, previewExpiresAt
 - **Category**: id, name, searchTerm, tone (formal/casual), templates (email1/2/3 with subject + body)
-- **Settings**: userName, calendlyLink, previewSiteRepoPath, smtp config (host, port, username, password, fromAddress, useProxy)
+- **Settings**: userName, calendlyLink, previewSiteRepoPath, smtp config (host, port, username, password, fromAddress, useProxy), smtp.brevo config (host, port, username, password, fromAddress), batch config (previewConcurrency, maxEmailsPerDay, sendDelayMin, sendDelayMax, sendWindowStart, sendWindowEnd, sendWindowTimezone)
 
 ## Email Template Placeholders
 
@@ -179,9 +194,29 @@ Calendar days, no weekend logic.
 
 - Configurable host, port, username, password, from address
 - **Corporate proxy support**: checkbox to route SMTP through `http://aproxy.corproot.net:8080` (HTTP CONNECT tunnel via Nodemailer built-in)
+- **Brevo SMTP relay** (for batch sending): separate config under `smtp.brevo` — host (`smtp-relay.brevo.com`), port (587), username, password, fromAddress. No proxy used for Brevo.
 - **Test Connection**: saves settings first, then verifies SMTP connectivity; shows verbose error with host/port/user/error code
 - **Send Test Email**: input recipient address, sends a real test email to verify delivery
 - Results displayed persistently inline (not disappearing alerts)
+
+## Batch Settings
+
+| Field | Type | Range | Default | Description |
+|-------|------|-------|---------|-------------|
+| `batch.previewConcurrency` | integer | 1–10 | 2 | Parallel preview builds |
+| `batch.maxEmailsPerDay` | integer | 1–1000 | 250 | Daily email send cap |
+| `batch.sendDelayMin` | integer (seconds) | 1–3600 | 60 | Minimum delay between sends |
+| `batch.sendDelayMax` | integer (seconds) | 1–3600 | 120 | Maximum delay between sends |
+| `batch.sendWindowStart` | string (HH:MM) | — | 08:00 | Send window open |
+| `batch.sendWindowEnd` | string (HH:MM) | — | 17:00 | Send window close |
+| `batch.sendWindowTimezone` | IANA timezone | — | Europe/Zurich | Timezone for send window |
+| `smtp.brevo.host` | string | — | smtp-relay.brevo.com | Brevo SMTP host |
+| `smtp.brevo.port` | integer | 1–65535 | 587 | Brevo SMTP port |
+| `smtp.brevo.username` | string | — | — | Brevo login email |
+| `smtp.brevo.password` | string | — | — | Brevo SMTP Key (masked in GET) |
+| `smtp.brevo.fromAddress` | string (email) | — | — | Verified sender address |
+
+Validation: `sendDelayMin` ≤ `sendDelayMax`, `sendWindowStart` < `sendWindowEnd`, timezone must be valid IANA. Invalid values return HTTP 400 with specific field error.
 
 ## Status Colors
 
@@ -213,7 +248,7 @@ Calendar days, no weekend logic.
 | POST | /api/scraper/discover | Scrape Google Maps (requires categoryId, optional city) |
 | POST | /api/scraper/enrich-emails | Enrich emails via SSE (optional leadIds, city) |
 | POST | /api/scraper/analyze-websites | Analyze website quality via SSE (optional leadIds) |
-| GET/PUT | /api/settings | Read/update settings |
+| GET/PUT | /api/settings | Read/update settings (incl. batch + Brevo SMTP config) |
 | POST | /api/settings/test-smtp | Test SMTP connection (verbose errors) |
 | POST | /api/settings/send-test-email | Send test email to specified recipient |
 | GET/POST | /api/leads | List/create leads |
@@ -225,6 +260,11 @@ Calendar days, no weekend logic.
 | GET | /api/csv/export/:type | Export CSV |
 | POST | /api/previews/generate | Generate preview site (SSE stream) |
 | GET | /api/previews/:leadId | Get preview state for a lead |
+| POST | /api/batch/generate-previews | Batch preview generation (SSE stream) |
+| GET | /api/batch/preview-status | Batch preview state |
+| POST | /api/batch/send-emails | Start/resume batch email send (HTTP 202) |
+| GET | /api/batch/send-status | Email send state + quota info |
+| POST | /api/batch/send-stop | Graceful stop email sending |
 
 ## Important Conventions
 
@@ -242,8 +282,9 @@ Calendar days, no weekend logic.
 
 ## Testing Approach
 
-- Jest for unit tests on backend modules (pipeline, dataStore, emailService, csvService, slugGenerator, previewRegistry, configGenerator, previewGenerator, screenshotCapturer)
-- 272 unit tests + 8 property-based tests with fast-check (slug format, config validity, color derivation, email placeholders)
+- Jest for unit tests on backend modules (pipeline, dataStore, emailService, csvService, slugGenerator, previewRegistry, configGenerator, previewGenerator, screenshotCapturer, quotaTracker, batchSender, batchPreviewGenerator, batchRoutes, settingsBatch)
+- 399 unit tests + 18 property-based tests with fast-check (slug format, config validity, color derivation, email placeholders, quota invariant, delay bounds, bounce permanence, state machine validity, send queue monotonicity, single deploy)
+- Property test files: `slugGenerator`, `configGenerator`, `quotaTracker`, `batchSender`, `batchPreviewGenerator`
 - E2E preview build test: `npm run test:e2e:preview` (real Astro build test, slow)
 - `npm test` excludes e2e tests (uses `--testPathIgnorePatterns=e2e`)
 - No frontend tests — manual testing only
@@ -266,6 +307,47 @@ Calendar days, no weekend logic.
 - Screenshot captured via Playwright (non-blocking on failure)
 - SSE streaming for real-time progress in the UI
 - E2E test: `npm run test:e2e:preview` (real Astro build test)
+
+### Batch Preview Generation
+- Processes up to 1000 leads in a single batch run (designed for overnight 600+ builds)
+- Configurable concurrency (1–10, default 2) via `settings.batch.previewConcurrency`
+- Serialized builds via semaphore: only one build occupies `src/assets/images/` at a time (avoids Astro `import.meta.glob()` race condition)
+- Parallel config gen, slug creation, and screenshot capture between serialized build steps
+- Single deploy at end: `deploy-previews.mjs` invoked once after all builds complete (timeout 300s)
+- On deploy success: all completed entries marked "deployed" in registry
+- On deploy failure: entries stay "built", SSE event "deploy_failed" emitted
+- State persisted to `server/data/batch-preview-state.json` (queue, completed, failed, status)
+- Supports resume after interruption: POST with `resume: true` continues from first unprocessed lead
+- Skip logic: leads with existing valid (non-expired, matching data hash) preview are skipped
+- Individual build failures are recorded and skipped — remaining queue continues
+
+## Batch Email Sending
+
+- Sequential email processing via Brevo SMTP relay (`smtp-relay.brevo.com:587`, STARTTLS, no proxy)
+- Configurable random delays between sends (default 60–120s) for human-like sending patterns
+- Daily quota tracking via `server/data/send-quota.json` — lazy UTC day reset, atomic file write
+- Send window enforcement (default 08:00–17:00 CET) using `Intl.DateTimeFormat` timezone conversion
+- Auto-eligibility queue builder: email3 (follow-up 2 due) → email2 (follow-up 1 due) → email1 (new cold outreach)
+- Excludes leads without email and leads where `emailBounced: true`
+- On success: updates lead pipeline state (status, dates, activityLog) matching single-send behavior
+- On SMTP 5xx: marks lead `emailBounced: true`, stores `emailBounceReason`, adds to failed as "hard_bounce"
+- On SMTP 4xx / timeout (30s): adds to failed as "transient", skips to next lead
+- Pause/resume: pauses on quota exhaustion or outside send window, polls every 60s, auto-resumes when conditions clear
+- Graceful stop via POST /api/batch/send-stop (finishes current send within 120s)
+- State persisted to `server/data/send-queue-state.json` (queue, completed, failed, status, timestamps)
+- Resume capability: POST with `resume: true` loads persisted state and continues
+
+### Quota Tracking (`send-quota.json`)
+
+```json
+{ "date": "2026-06-11", "count": 147, "lastSentAt": "2026-06-11T14:23:00.000Z" }
+```
+
+- Lazy day reset: compares stored date to UTC today; stale date → count=0
+- Atomic write: temp file + `fs.renameSync`
+- Missing/corrupt file treated as count=0
+- I/O write failure throws → sender pauses (avoids exceeding limit without tracking)
+- `canSend()` checks `count < settings.batch.maxEmailsPerDay`
 
 ## UI/UX
 
