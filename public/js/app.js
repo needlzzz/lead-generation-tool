@@ -460,16 +460,27 @@ function renderClientsTab() {
 // SCRAPE LOG TAB
 // ============================================================
 
-function renderScrapeLogTab() {
+async function renderScrapeLogTab() {
   const container = document.getElementById('scrapeLogMatrix');
   const empty = document.getElementById('emptyScrapeLog');
+
+  // Always fetch ALL leads (unfiltered) so the matrix shows every category
+  let leads = allLeads;
+  if (currentCategoryFilter) {
+    try {
+      const res = await API.get('/api/leads');
+      leads = res.leads;
+    } catch (err) {
+      // Fall back to filtered allLeads if fetch fails
+    }
+  }
 
   // Build map of category+city → { lastDate, count }
   const scrapeMap = {};
   const allCities = new Set();
   const allCats = new Set();
 
-  for (const lead of allLeads) {
+  for (const lead of leads) {
     let city = lead.city;
     if (!city && lead.activityLog && lead.activityLog[0]?.details) {
       const match = lead.activityLog[0].details.match(/in (.+)$/);
