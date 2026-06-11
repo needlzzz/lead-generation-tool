@@ -285,9 +285,11 @@
           <div class="email-field"><strong>To:</strong> <span id="emailTo"></span></div>
           <div class="email-field"><strong>Subject:</strong> <span id="emailSubject"></span></div>
           <pre id="emailBody" class="email-body"></pre>
+          <textarea id="emailBodyEdit" class="email-body hidden" rows="15" style="width:100%;font-family:inherit;font-size:0.85rem;line-height:1.6;resize:vertical;"></textarea>
         </div>
         <div class="form-actions">
           <button type="button" class="btn" onclick="closeModal('modalEmail')">Close</button>
+          <button type="button" class="btn" id="btnEditEmail" onclick="toggleEmailEdit()">✏️ Edit</button>
           <button type="button" class="btn btn-primary" id="btnSendEmail">📧 Send</button>
         </div>
       </div>

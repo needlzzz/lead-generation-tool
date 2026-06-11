@@ -38,7 +38,7 @@ router.post('/preview', (req, res) => {
 
 // POST /api/email/send
 router.post('/send', async (req, res) => {
-  const { leadId, emailType } = req.body;
+  const { leadId, emailType, customBody, customSubject } = req.body;
   if (!leadId || !emailType) {
     return res.status(400).json({ error: 'leadId and emailType are required' });
   }
@@ -61,8 +61,12 @@ router.post('/send', async (req, res) => {
 
   const rendered = renderTemplate(template, lead, settings);
 
+  // Use custom body/subject if provided (from user edits in the modal)
+  const finalSubject = customSubject || rendered.subject;
+  const finalBody = customBody || rendered.body;
+
   try {
-    await sendEmail(settings.smtp, settings.smtp.fromAddress, lead.email, rendered.subject, rendered.body);
+    await sendEmail(settings.smtp, settings.smtp.fromAddress, lead.email, finalSubject, finalBody);
 
     // Execute the corresponding pipeline transition
     const now = new Date().toISOString();

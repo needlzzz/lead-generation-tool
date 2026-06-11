@@ -733,6 +733,10 @@ async function previewEmail(leadId, emailType) {
     document.getElementById('emailTo').textContent = result.to;
     document.getElementById('emailSubject').textContent = result.subject;
     document.getElementById('emailBody').textContent = result.body;
+    document.getElementById('emailBodyEdit').value = result.body;
+    document.getElementById('emailBodyEdit').classList.add('hidden');
+    document.getElementById('emailBody').classList.remove('hidden');
+    document.getElementById('btnEditEmail').textContent = '✏️ Edit';
     const typeLabels = { email1: 'Email 1 — Cold Outreach', email2: 'Follow-Up 1', email3: 'Follow-Up 2' };
     document.getElementById('emailPreviewTitle').textContent = typeLabels[emailType] || 'Email';
     currentEmailContext = { leadId, emailType };
@@ -742,11 +746,41 @@ async function previewEmail(leadId, emailType) {
   }
 }
 
+function toggleEmailEdit() {
+  const pre = document.getElementById('emailBody');
+  const textarea = document.getElementById('emailBodyEdit');
+  const btn = document.getElementById('btnEditEmail');
+  if (textarea.classList.contains('hidden')) {
+    // Switch to edit mode
+    textarea.value = pre.textContent;
+    pre.classList.add('hidden');
+    textarea.classList.remove('hidden');
+    textarea.focus();
+    btn.textContent = '👁 Preview';
+  } else {
+    // Switch back to preview
+    pre.textContent = textarea.value;
+    textarea.classList.add('hidden');
+    pre.classList.remove('hidden');
+    btn.textContent = '✏️ Edit';
+  }
+}
+
 async function sendCurrentEmail() {
   if (!currentEmailContext) return;
   showLoading('Sending email...');
   try {
-    await API.post('/api/email/send', currentEmailContext);
+    // Use edited body if the textarea was active
+    const textarea = document.getElementById('emailBodyEdit');
+    const customBody = !textarea.classList.contains('hidden') ? textarea.value : null;
+    const pre = document.getElementById('emailBody');
+    const body = customBody || pre.textContent;
+
+    await API.post('/api/email/send', {
+      ...currentEmailContext,
+      customBody: body,
+      customSubject: document.getElementById('emailSubject').textContent
+    });
     closeModal('modalEmail');
     currentEmailContext = null;
     await loadData();
