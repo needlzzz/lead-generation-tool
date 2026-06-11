@@ -4,6 +4,68 @@ const { testConnection, sendEmail } = require('../lib/emailService');
 
 const router = express.Router();
 
+/**
+ * Validate batch settings fields that are explicitly provided in the request.
+ * Only validates fields present in the `batch` object (partial updates are allowed).
+ * @param {object} batch - The batch settings object from the request body
+ * @returns {string[]} Array of error messages (empty if valid)
+ */
+function validateBatchSettings(batch) {
+  const errors = [];
+
+  if (batch.previewConcurrency !== undefined) {
+    if (!Number.isInteger(batch.previewConcurrency) || batch.previewConcurrency < 1 || batch.previewConcurrency > 10) {
+      errors.push('previewConcurrency must be an integer between 1 and 10');
+    }
+  }
+
+  if (batch.maxEmailsPerDay !== undefined) {
+    if (!Number.isInteger(batch.maxEmailsPerDay) || batch.maxEmailsPerDay < 1 || batch.maxEmailsPerDay > 1000) {
+      errors.push('maxEmailsPerDay must be an integer between 1 and 1000');
+    }
+  }
+
+  if (batch.sendDelayMin !== undefined) {
+    if (!Number.isInteger(batch.sendDelayMin) || batch.sendDelayMin < 1 || batch.sendDelayMin > 3600) {
+      errors.push('sendDelayMin must be an integer between 1 and 3600');
+    }
+  }
+
+  if (batch.sendDelayMax !== undefined) {
+    if (!Number.isInteger(batch.sendDelayMax) || batch.sendDelayMax < 1 || batch.sendDelayMax > 3600) {
+      errors.push('sendDelayMax must be an integer between 1 and 3600');
+    }
+  }
+
+  // Cross-field validation: sendDelayMin ≤ sendDelayMax
+  // Use provided values or fall back to existing/default for comparison
+  const delayMin = batch.sendDelayMin !== undefined ? batch.sendDelayMin : null;
+  const delayMax = batch.sendDelayMax !== undefined ? batch.sendDelayMax : null;
+  if (delayMin !== null && delayMax !== null && Number.isInteger(delayMin) && Number.isInteger(delayMax)) {
+    if (delayMin > delayMax) {
+      errors.push('sendDelayMin must be ≤ sendDelayMax');
+    }
+  }
+
+  // Cross-field validation: sendWindowStart < sendWindowEnd
+  if (batch.sendWindowStart !== undefined && batch.sendWindowEnd !== undefined) {
+    if (batch.sendWindowStart >= batch.sendWindowEnd) {
+      errors.push('sendWindowStart must be before sendWindowEnd');
+    }
+  }
+
+  // Timezone validation via Intl.DateTimeFormat
+  if (batch.sendWindowTimezone !== undefined) {
+    try {
+      Intl.DateTimeFormat('en', { timeZone: batch.sendWindowTimezone });
+    } catch (e) {
+      errors.push('sendWindowTimezone must be a valid IANA timezone');
+    }
+  }
+
+  return errors;
+}
+
 const DEFAULT_SETTINGS = {
   userName: '',
   calendlyLink: '',
@@ -14,7 +76,23 @@ const DEFAULT_SETTINGS = {
     username: '',
     password: '',
     fromAddress: '',
-    useProxy: false
+    useProxy: false,
+    brevo: {
+      host: 'smtp-relay.brevo.com',
+      port: 587,
+      username: '',
+      password: '',
+      fromAddress: ''
+    }
+  },
+  batch: {
+    previewConcurrency: 2,
+    maxEmailsPerDay: 250,
+    sendDelayMin: 60,
+    sendDelayMax: 120,
+    sendWindowStart: '08:00',
+    sendWindowEnd: '17:00',
+    sendWindowTimezone: 'Europe/Zurich'
   }
 };
 
@@ -25,13 +103,27 @@ router.get('/', (req, res) => {
     settings = { ...DEFAULT_SETTINGS };
   } else {
     // Merge with defaults so new fields are always present
-    settings = { ...DEFAULT_SETTINGS, ...settings, smtp: { ...DEFAULT_SETTINGS.smtp, ...(settings.smtp || {}) } };
+    const storedSmtp = settings.smtp || {};
+    const storedBrevo = storedSmtp.brevo || {};
+    settings = {
+      ...DEFAULT_SETTINGS,
+      ...settings,
+      smtp: {
+        ...DEFAULT_SETTINGS.smtp,
+        ...storedSmtp,
+        brevo: { ...DEFAULT_SETTINGS.smtp.brevo, ...storedBrevo }
+      },
+      batch: { ...DEFAULT_SETTINGS.batch, ...(settings.batch || {}) }
+    };
   }
 
-  // Mask password in response
+  // Mask passwords in response
   const masked = JSON.parse(JSON.stringify(settings));
   if (masked.smtp && masked.smtp.password) {
     masked.smtp.password = '********';
+  }
+  if (masked.smtp && masked.smtp.brevo && masked.smtp.brevo.password) {
+    masked.smtp.brevo.password = '********';
   }
 
   res.json({ settings: masked });
@@ -39,23 +131,54 @@ router.get('/', (req, res) => {
 
 // PUT /api/settings
 router.put('/', (req, res) => {
-  const { userName, calendlyLink, previewSiteRepoPath, smtp } = req.body;
+  const { userName, calendlyLink, previewSiteRepoPath, smtp, batch } = req.body;
+
+  // Validate batch settings if provided
+  if (batch && typeof batch === 'object') {
+    const validationErrors = validateBatchSettings(batch);
+    if (validationErrors.length > 0) {
+      return res.status(400).json({ error: 'Batch settings invalid', details: validationErrors });
+    }
+  }
 
   const existing = dataStore.readSingleton('settings') || { ...DEFAULT_SETTINGS };
+  const existingSmtp = existing.smtp || DEFAULT_SETTINGS.smtp;
+  const existingBrevo = existingSmtp.brevo || DEFAULT_SETTINGS.smtp.brevo;
+  const existingBatch = existing.batch || DEFAULT_SETTINGS.batch;
+
+  const incomingBrevo = smtp && smtp.brevo ? smtp.brevo : {};
 
   const settings = {
     userName: userName !== undefined ? userName : existing.userName,
     calendlyLink: calendlyLink !== undefined ? calendlyLink : existing.calendlyLink,
     previewSiteRepoPath: previewSiteRepoPath !== undefined ? previewSiteRepoPath : (existing.previewSiteRepoPath || DEFAULT_SETTINGS.previewSiteRepoPath),
     smtp: {
-      host: smtp && smtp.host !== undefined ? smtp.host : existing.smtp.host,
-      port: smtp && smtp.port !== undefined ? smtp.port : existing.smtp.port,
-      username: smtp && smtp.username !== undefined ? smtp.username : existing.smtp.username,
+      host: smtp && smtp.host !== undefined ? smtp.host : existingSmtp.host,
+      port: smtp && smtp.port !== undefined ? smtp.port : existingSmtp.port,
+      username: smtp && smtp.username !== undefined ? smtp.username : existingSmtp.username,
       password: smtp && smtp.password !== undefined && smtp.password !== '********'
         ? smtp.password
-        : existing.smtp.password,
-      fromAddress: smtp && smtp.fromAddress !== undefined ? smtp.fromAddress : existing.smtp.fromAddress,
-      useProxy: smtp && smtp.useProxy !== undefined ? smtp.useProxy : (existing.smtp.useProxy || false)
+        : existingSmtp.password,
+      fromAddress: smtp && smtp.fromAddress !== undefined ? smtp.fromAddress : existingSmtp.fromAddress,
+      useProxy: smtp && smtp.useProxy !== undefined ? smtp.useProxy : (existingSmtp.useProxy || false),
+      brevo: {
+        host: incomingBrevo.host !== undefined ? incomingBrevo.host : existingBrevo.host,
+        port: incomingBrevo.port !== undefined ? incomingBrevo.port : existingBrevo.port,
+        username: incomingBrevo.username !== undefined ? incomingBrevo.username : existingBrevo.username,
+        password: incomingBrevo.password !== undefined && incomingBrevo.password !== '********'
+          ? incomingBrevo.password
+          : existingBrevo.password,
+        fromAddress: incomingBrevo.fromAddress !== undefined ? incomingBrevo.fromAddress : existingBrevo.fromAddress
+      }
+    },
+    batch: {
+      previewConcurrency: batch && batch.previewConcurrency !== undefined ? batch.previewConcurrency : existingBatch.previewConcurrency,
+      maxEmailsPerDay: batch && batch.maxEmailsPerDay !== undefined ? batch.maxEmailsPerDay : existingBatch.maxEmailsPerDay,
+      sendDelayMin: batch && batch.sendDelayMin !== undefined ? batch.sendDelayMin : existingBatch.sendDelayMin,
+      sendDelayMax: batch && batch.sendDelayMax !== undefined ? batch.sendDelayMax : existingBatch.sendDelayMax,
+      sendWindowStart: batch && batch.sendWindowStart !== undefined ? batch.sendWindowStart : existingBatch.sendWindowStart,
+      sendWindowEnd: batch && batch.sendWindowEnd !== undefined ? batch.sendWindowEnd : existingBatch.sendWindowEnd,
+      sendWindowTimezone: batch && batch.sendWindowTimezone !== undefined ? batch.sendWindowTimezone : existingBatch.sendWindowTimezone
     }
   };
 
@@ -65,6 +188,9 @@ router.put('/', (req, res) => {
   const masked = JSON.parse(JSON.stringify(settings));
   if (masked.smtp.password) {
     masked.smtp.password = '********';
+  }
+  if (masked.smtp.brevo && masked.smtp.brevo.password) {
+    masked.smtp.brevo.password = '********';
   }
 
   res.json({ settings: masked });
@@ -134,3 +260,4 @@ router.post('/send-test-email', async (req, res) => {
 });
 
 module.exports = router;
+module.exports.validateBatchSettings = validateBatchSettings;

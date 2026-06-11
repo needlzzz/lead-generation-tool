@@ -6,8 +6,8 @@ Implements batch preview generation and throttled email sending for the Lead Gen
 
 ## Tasks
 
-- [ ] 1. Implement quota tracker module
-  - [ ] 1.1 Create `server/lib/quotaTracker.js` with `getCount`, `increment`, and `canSend` functions
+- [x] 1. Implement quota tracker module
+  - [x] 1.1 Create `server/lib/quotaTracker.js` with `getCount`, `increment`, and `canSend` functions
     - Read `server/data/send-quota.json` with lazy day reset (compare stored date to UTC today)
     - Atomic write via temp file + `fs.renameSync`
     - Handle missing/corrupt file as count=0
@@ -15,7 +15,7 @@ Implements batch preview generation and throttled email sending for the Lead Gen
     - `canSend()` checks `count < settings.batch.maxEmailsPerDay`
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7_
 
-  - [ ]* 1.2 Write unit tests for quotaTracker
+  - [x] 1.2 Write unit tests for quotaTracker
     - Test day reset logic (stale date → count=0)
     - Test increment + atomic write
     - Test I/O failure handling (mock fs.writeFileSync to throw)
@@ -23,13 +23,13 @@ Implements batch preview generation and throttled email sending for the Lead Gen
     - Test canSend boundary (count equals maxEmailsPerDay)
     - _Requirements: 10.1, 10.3, 10.5_
 
-  - [ ]* 1.3 Write property test for quota invariant
+  - [x] 1.3 Write property test for quota invariant
     - **Property 1: Quota Invariant**
     - For any sequence of increment calls within a day, count SHALL never exceed `maxEmailsPerDay`
     - **Validates: Requirements 5.3, 5.4, 5.5**
 
 - [ ] 2. Implement batch sender module
-  - [ ] 2.1 Create `server/lib/batchSender.js` with `start`, `stop`, `resume`, `getStatus`, and `isRunning` functions
+  - [x] 2.1 Create `server/lib/batchSender.js` with `start`, `stop`, `resume`, `getStatus`, and `isRunning` functions
     - Sequential email processing loop (background async)
     - Brevo transport creation (host, port, username, password, no proxy)
     - Send window check using `Intl.DateTimeFormat` with configured timezone
@@ -58,7 +58,7 @@ Implements batch preview generation and throttled email sending for the Lead Gen
     - Exclude leads without email address and leads where `emailBounced` is true
     - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-  - [ ]* 2.5 Write unit tests for batchSender
+  - [ ] 2.5 Write unit tests for batchSender
     - Test success flow (mock Nodemailer transport)
     - Test quota pause + resume
     - Test window pause + resume (mock Intl.DateTimeFormat)
@@ -70,12 +70,12 @@ Implements batch preview generation and throttled email sending for the Lead Gen
     - Test empty queue (no eligible leads)
     - _Requirements: 10.1, 10.3, 10.5_
 
-  - [ ]* 2.6 Write property test for delay bounds
+  - [ ] 2.6 Write property test for delay bounds
     - **Property 2: Delay Bounds**
     - The random delay SHALL always be within `[sendDelayMin, sendDelayMax]` (inclusive) for any valid min/max combination
     - **Validates: Requirements 4.6**
 
-  - [ ]* 2.7 Write property test for bounce permanence
+  - [ ] 2.7 Write property test for bounce permanence
     - **Property 6: Bounce Permanence**
     - A lead marked `emailBounced: true` SHALL never appear in any generated send queue
     - **Validates: Requirements 8.1, 8.2**
@@ -111,7 +111,7 @@ Implements batch preview generation and throttled email sending for the Lead Gen
     - Resume via POST with `resume: true`: continue from first lead not in completed/failed
     - _Requirements: 2.3_
 
-  - [ ]* 4.5 Write unit tests for batchPreviewGenerator
+  - [ ] 4.5 Write unit tests for batchPreviewGenerator
     - Test concurrency limiting (mock execSync, verify semaphore behavior)
     - Test failure skip (single lead fails, rest continue)
     - Test deploy-once (verify execSync called once for deploy)
@@ -120,17 +120,17 @@ Implements batch preview generation and throttled email sending for the Lead Gen
     - Test resume from partial state
     - _Requirements: 10.1, 10.3, 10.5_
 
-  - [ ]* 4.6 Write property test for state machine validity
+  - [ ] 4.6 Write property test for state machine validity
     - **Property 3: State Machine Validity**
     - Batch state transitions SHALL only follow: `idle → running → deploying → complete` or `idle → running → failed`. No backward transitions.
     - **Validates: Requirements 2.1, 2.4**
 
-  - [ ]* 4.7 Write property test for send queue monotonicity
+  - [ ] 4.7 Write property test for send queue monotonicity
     - **Property 4: Send Queue Monotonicity**
     - A lead in `completed` or `failed` SHALL never be re-processed in the same batch run
     - **Validates: Requirements 6.3, 6.5**
 
-  - [ ]* 4.8 Write property test for single deploy
+  - [ ] 4.8 Write property test for single deploy
     - **Property 5: Single Deploy**
     - During a batch preview run, `deploy-previews.mjs` SHALL be invoked at most once
     - **Validates: Requirements 1.8**
@@ -138,8 +138,8 @@ Implements batch preview generation and throttled email sending for the Lead Gen
 - [ ] 5. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 6. Extend settings route with batch and Brevo SMTP configuration
-  - [ ] 6.1 Add batch settings and Brevo SMTP fields to `server/routes/settings.js`
+- [x] 6. Extend settings route with batch and Brevo SMTP configuration
+  - [x] 6.1 Add batch settings and Brevo SMTP fields to `server/routes/settings.js`
     - Add `batch` object to DEFAULT_SETTINGS with all 7 fields (previewConcurrency, maxEmailsPerDay, sendDelayMin, sendDelayMax, sendWindowStart, sendWindowEnd, sendWindowTimezone)
     - Add `smtp.brevo` nested object (host, port, username, password, fromAddress)
     - Merge with defaults on GET (ensure new fields always present)
@@ -147,14 +147,14 @@ Implements batch preview generation and throttled email sending for the Lead Gen
     - Preserve stored Brevo password on PUT when value is "********"
     - _Requirements: 3.1, 3.2, 3.3, 9.1, 9.4, 9.5_
 
-  - [ ] 6.2 Add batch settings validation to settings PUT handler
+  - [x] 6.2 Add batch settings validation to settings PUT handler
     - Validate: previewConcurrency 1-10, maxEmailsPerDay 1-1000, sendDelayMin/Max 1-3600
     - Validate: sendDelayMin ≤ sendDelayMax, sendWindowStart < sendWindowEnd
     - Validate: sendWindowTimezone is valid IANA timezone (via Intl.DateTimeFormat)
     - Return HTTP 400 with specific field error message on invalid input
     - _Requirements: 3.4, 9.3_
 
-  - [ ]* 6.3 Write unit tests for settings batch validation
+  - [x] 6.3 Write unit tests for settings batch validation
     - Test valid batch settings accepted
     - Test each validation rule rejection (out of bounds, min > max, invalid timezone)
     - Test Brevo password masking and preservation
@@ -174,7 +174,7 @@ Implements batch preview generation and throttled email sending for the Lead Gen
     - Add `app.use('/api/batch', require('./routes/batch'));`
     - _Requirements: 1.1_
 
-  - [ ]* 7.3 Write unit tests for batch route handlers
+  - [ ] 7.3 Write unit tests for batch route handlers
     - Test POST /generate-previews request validation (invalid IDs, max 1000, 409 conflict)
     - Test POST /send-emails request validation (missing Brevo config → 400, empty queue → 200)
     - Test POST /send-stop returns current state
