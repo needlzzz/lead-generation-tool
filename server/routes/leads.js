@@ -46,7 +46,58 @@ function projectLead(lead) {
 }
 
 // ---------------------------------------------------------------------------
-// GET /api/leads — paginated, filtered, lightweight
+// Server-side sorting
+// ---------------------------------------------------------------------------
+
+const QUALITY_RANK = { 'Poor': 1, 'Outdated': 2, 'Good': 3, 'None': 4, 'Not a Fit': 5 };
+
+function sortLeads(leads, field, order) {
+  const dir = order === 'asc' ? 1 : -1;
+
+  return leads.slice().sort((a, b) => {
+    let aVal, bVal;
+
+    switch (field) {
+      case 'quality':
+        aVal = QUALITY_RANK[a.websiteQuality] || 99;
+        bVal = QUALITY_RANK[b.websiteQuality] || 99;
+        break;
+      case 'score':
+        aVal = a.websiteScore != null ? a.websiteScore : -1;
+        bVal = b.websiteScore != null ? b.websiteScore : -1;
+        break;
+      case 'category':
+        aVal = (a.category || '').toLowerCase();
+        bVal = (b.category || '').toLowerCase();
+        return dir * aVal.localeCompare(bVal, 'de');
+      case 'status':
+        aVal = (a.status || '').toLowerCase();
+        bVal = (b.status || '').toLowerCase();
+        return dir * aVal.localeCompare(bVal, 'de');
+      case 'discovered':
+        aVal = a.dateDiscovered || '';
+        bVal = b.dateDiscovered || '';
+        return dir * aVal.localeCompare(bVal);
+      case 'city':
+        aVal = (a.city || '').toLowerCase();
+        bVal = (b.city || '').toLowerCase();
+        return dir * aVal.localeCompare(bVal, 'de');
+      case 'opportunity':
+        aVal = a.websiteOpportunityScore != null ? a.websiteOpportunityScore : -1;
+        bVal = b.websiteOpportunityScore != null ? b.websiteOpportunityScore : -1;
+        break;
+      default:
+        return 0;
+    }
+
+    if (aVal < bVal) return -1 * dir;
+    if (aVal > bVal) return 1 * dir;
+    return 0;
+  });
+}
+
+// ---------------------------------------------------------------------------
+// GET /api/leads — paginated, filtered, sorted, lightweight
 // ---------------------------------------------------------------------------
 
 router.get('/', (req, res) => {
@@ -57,6 +108,14 @@ router.get('/', (req, res) => {
     if (req.query.city) filter.city = req.query.city;
 
     let leads = dataStore.getAll('leads', Object.keys(filter).length ? filter : null);
+
+    // Server-side sorting
+    const sortField = req.query.sort;    // e.g. 'quality', 'category', 'status', 'discovered'
+    const sortOrder = req.query.order;   // 'asc' or 'desc'
+
+    if (sortField && sortOrder) {
+      leads = sortLeads(leads, sortField, sortOrder);
+    }
 
     // Total count before pagination
     const total = leads.length;

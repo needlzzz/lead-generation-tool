@@ -76,6 +76,15 @@ async function loadData() {
     params.set('limit', PAGE_SIZE);
     if (currentCategoryFilter) params.set('category', currentCategoryFilter);
 
+    // Server-side sorting
+    if (qualitySortOrder) {
+      params.set('sort', 'quality');
+      params.set('order', qualitySortOrder);
+    } else if (discoverySortField && discoverySortOrder) {
+      params.set('sort', discoverySortField);
+      params.set('order', discoverySortOrder);
+    }
+
     const [leadsRes, dueRes, repliesRes] = await Promise.all([
       API.get(`/api/leads?${params.toString()}`),
       API.get('/api/leads/due-today'),
@@ -286,7 +295,8 @@ function toggleQualitySort() {
   if (qualitySortOrder === null) qualitySortOrder = 'desc'; // worst first (best prospects)
   else if (qualitySortOrder === 'desc') qualitySortOrder = 'asc';
   else qualitySortOrder = null;
-  renderDiscoveryTab();
+  currentPage = 1;
+  loadData();
 }
 
 function toggleDiscoverySort(field) {
@@ -298,7 +308,8 @@ function toggleDiscoverySort(field) {
     discoverySortOrder = 'asc';
   }
   qualitySortOrder = null;
-  renderDiscoveryTab();
+  currentPage = 1;
+  loadData();
 }
 
 function renderDiscoveryTab() {
@@ -321,34 +332,7 @@ function renderDiscoveryTab() {
     leads = leads.filter(l => l.email);
   }
 
-  // Sort by quality if active
-  if (qualitySortOrder) {
-    const qualityRank = { 'Poor': 1, 'Outdated': 2, 'Good': 3, 'None': 4 };
-    leads.sort((a, b) => {
-      const aRank = qualityRank[a.websiteQuality] || 5;
-      const bRank = qualityRank[b.websiteQuality] || 5;
-      return qualitySortOrder === 'desc' ? aRank - bRank : bRank - aRank;
-    });
-  }
-
-  // Sort by selected column
-  if (discoverySortField && discoverySortOrder) {
-    leads.sort((a, b) => {
-      let aVal, bVal;
-      if (discoverySortField === 'category') {
-        aVal = (a.category || '').toLowerCase();
-        bVal = (b.category || '').toLowerCase();
-      } else if (discoverySortField === 'status') {
-        aVal = (a.status || '').toLowerCase();
-        bVal = (b.status || '').toLowerCase();
-      } else if (discoverySortField === 'discovered') {
-        aVal = a.dateDiscovered || '';
-        bVal = b.dateDiscovered || '';
-      }
-      const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
-      return discoverySortOrder === 'asc' ? cmp : -cmp;
-    });
-  }
+  // Sorting is now server-side — no client-side sort needed
 
   if (leads.length === 0) {
     tbody.innerHTML = '';
