@@ -4,6 +4,55 @@ const { renderTemplate, sendEmail } = require('../lib/emailService');
 
 const router = express.Router();
 
+// Default templates (same as in settings route)
+const DEFAULT_TEMPLATES = {
+  email1: {
+    subject: 'Website [Business Name] – Potenzial entdeckt',
+    body: `[Greeting]
+
+Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
+
+Mir sind [Website-Probleme-Anzahl] Punkte aufgefallen, bei denen sich mit kleinen Anpassungen einiges bewegen lässt:
+
+[Website-Probleme]
+
+Diese Punkte klingen klein, können aber einen grossen Unterschied machen: Besucher, die sich gut abgeholt fühlen, werden viel eher zu echten Anfragen.
+
+Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusammengestellt, wie Ihre Website aussehen könnte:
+
+👉 [Preview-Link]
+
+[Preview-Disclaimer]
+
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
+
+Freundliche Grüsse
+[Dein Name]`
+  },
+  email2: {
+    subject: 'Nochmals kurz gemeldet – [Business Name]',
+    body: `Hallo [Name],
+
+kurzes Follow-up — wollte sichergehen, dass meine letzte Nachricht nicht untergegangen ist. Falls Sie gerade voll eingespannt sind, absolut verständlich.
+
+Falls Sie die Vorschau noch nicht gesehen haben:
+👉 [Preview-Link]
+
+Grüsse,
+[Dein Name]`
+  }
+};
+
+function getTemplates(settings) {
+  if (settings.templates && settings.templates.email1 && settings.templates.email2) {
+    return settings.templates;
+  }
+  return {
+    email1: { ...DEFAULT_TEMPLATES.email1, ...(settings.templates?.email1 || {}) },
+    email2: { ...DEFAULT_TEMPLATES.email2, ...(settings.templates?.email2 || {}) }
+  };
+}
+
 // POST /api/email/preview
 router.post('/preview', (req, res) => {
   const { leadId, emailType } = req.body;
@@ -19,8 +68,8 @@ router.post('/preview', (req, res) => {
   if (!lead.email) return res.status(400).json({ error: 'Lead has no email address' });
 
   const settings = dataStore.readSingleton('settings') || {};
-  const templates = settings.templates;
-  if (!templates || !templates[emailType]) {
+  const templates = getTemplates(settings);
+  if (!templates[emailType]) {
     return res.status(404).json({ error: `Template ${emailType} not configured in settings` });
   }
 
@@ -50,8 +99,8 @@ router.post('/send', async (req, res) => {
   if (!lead) return res.status(404).json({ error: 'Lead not found' });
   if (!lead.email) return res.status(400).json({ error: 'Lead has no email address' });
 
-  const templates = settings.templates;
-  if (!templates || !templates[emailType]) {
+  const templates = getTemplates(settings);
+  if (!templates[emailType]) {
     return res.status(404).json({ error: `Template ${emailType} not configured in settings` });
   }
 
