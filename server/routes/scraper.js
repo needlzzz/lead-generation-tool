@@ -185,6 +185,36 @@ router.post('/enrich-emails', async (req, res) => {
   res.end();
 });
 
+// GET /api/scraper/analyze-stats — pre-flight counts for analysis
+router.get('/analyze-stats', (req, res) => {
+  const leads = dataStore.getAll('leads');
+  const withWebsite = leads.filter(l => l.websiteUrl);
+  const alreadyAnalyzed = leads.filter(l => l.websiteAnalyzedAt);
+  const toAnalyze = leads.filter(l =>
+    l.websiteUrl && !l.websiteAnalyzedAt && (l.status === 'Discovered' || l.status === 'Reached Out')
+  );
+  const noWebsite = leads.filter(l => !l.websiteUrl);
+
+  // Estimate: ~1.5s effective throughput per lead with 4 workers
+  const estimatedSeconds = Math.ceil(toAnalyze.length * 1.5);
+  const estimatedHours = (estimatedSeconds / 3600).toFixed(1);
+
+  res.json({
+    total: leads.length,
+    withWebsite: withWebsite.length,
+    noWebsite: noWebsite.length,
+    alreadyAnalyzed: alreadyAnalyzed.length,
+    toAnalyze: toAnalyze.length,
+    estimate: {
+      seconds: estimatedSeconds,
+      hours: parseFloat(estimatedHours),
+      formatted: estimatedSeconds < 3600
+        ? `~${Math.ceil(estimatedSeconds / 60)} Minuten`
+        : `~${estimatedHours} Stunden`
+    }
+  });
+});
+
 // POST /api/scraper/analyze-websites (SSE — streams progress, parallel workers)
 router.post('/analyze-websites', async (req, res) => {
   const { leadIds } = req.body;

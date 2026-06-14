@@ -1473,7 +1473,28 @@ async function analyzeWebsites(selectedOnly = false) {
   }
 
   if (sendAllToServer) {
-    if (!confirm('Analyze all unanalyzed leads with websites? This runs in the background with 4 parallel workers.')) {
+    // Fetch pre-flight stats from server
+    try {
+      const stats = await API.get('/api/scraper/analyze-stats');
+      if (stats.toAnalyze === 0) {
+        showError('No unanalyzed leads with websites found.');
+        return;
+      }
+      const msg = [
+        `Website-Analyse starten?`,
+        ``,
+        `• Zu analysieren: ${stats.toAnalyze.toLocaleString()} Leads`,
+        `• Bereits analysiert: ${stats.alreadyAnalyzed.toLocaleString()} (werden übersprungen)`,
+        `• Ohne Website: ${stats.noWebsite.toLocaleString()} (werden übersprungen)`,
+        ``,
+        `Geschätzte Dauer: ${stats.estimate.formatted}`,
+        `(4 parallele Workers, ~1.5s pro Lead)`,
+        ``,
+        `Fortfahren?`
+      ].join('\n');
+      if (!confirm(msg)) return;
+    } catch (err) {
+      showError(err.message);
       return;
     }
   } else {
