@@ -81,6 +81,8 @@ async function loadData() {
     if (hasEmailOnly) params.set('hasEmail', '1');
     const hasPreviewOnly = document.getElementById('filterHasPreview')?.checked;
     if (hasPreviewOnly) params.set('hasPreview', '1');
+    const searchQuery = document.getElementById('searchLeads')?.value?.trim();
+    if (searchQuery) params.set('search', searchQuery);
 
     // Server-side sorting
     if (qualitySortOrder) {
@@ -929,6 +931,16 @@ function setupEventListeners() {
   document.getElementById('filterHasPreview').addEventListener('change', () => {
     currentPage = 1;
     loadData();
+  });
+
+  // Search field (debounced)
+  let searchTimer = null;
+  document.getElementById('searchLeads').addEventListener('input', () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      currentPage = 1;
+      loadData();
+    }, 300);
   });
 
   // City filter

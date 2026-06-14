@@ -116,6 +116,16 @@ router.get('/', (req, res) => {
     if (req.query.hasPreview === '1') {
       leads = leads.filter(l => l.previewUrl);
     }
+    if (req.query.search) {
+      const q = req.query.search.toLowerCase().trim();
+      leads = leads.filter(l =>
+        (l.businessName || '').toLowerCase().includes(q) ||
+        (l.address || '').toLowerCase().includes(q) ||
+        (l.email || '').toLowerCase().includes(q) ||
+        (l.city || '').toLowerCase().includes(q) ||
+        (l.phone || '').includes(q)
+      );
+    }
 
     // Server-side sorting
     const sortField = req.query.sort;    // e.g. 'quality', 'category', 'status', 'discovered'
