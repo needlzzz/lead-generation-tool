@@ -17,7 +17,8 @@ Ich hab mal skizziert, wie das moderner aussehen könnte:
 
 Falls euch das interessiert, meldet euch gern — ich erklär euch in 10 Minuten, was dahintersteckt.
 
-[Dein Name]`
+[Dein Name]
+Kaelint Webdesign`
   },
   email2: {
     subject: 'Re: Idee für [Business Name]',
@@ -28,7 +29,8 @@ wollte nur sichergehen, dass meine Nachricht nicht untergegangen ist. Die Vorsch
 
 Kein Druck — nur falls es doch passt.
 
-[Dein Name]`
+[Dein Name]
+Kaelint Webdesign`
   }
 };
 
