@@ -10,23 +10,21 @@ router.post('/preview', (req, res) => {
   if (!leadId || !emailType) {
     return res.status(400).json({ error: 'leadId and emailType are required' });
   }
-  if (!['email1', 'email2', 'email3'].includes(emailType)) {
-    return res.status(400).json({ error: 'emailType must be email1, email2, or email3' });
+  if (!['email1', 'email2'].includes(emailType)) {
+    return res.status(400).json({ error: 'emailType must be email1 or email2' });
   }
 
   const lead = dataStore.get('leads', leadId);
   if (!lead) return res.status(404).json({ error: 'Lead not found' });
   if (!lead.email) return res.status(400).json({ error: 'Lead has no email address' });
 
-  // Find category by name
-  const categories = dataStore.getAll('categories');
-  const category = categories.find(c => c.name === lead.category);
-  if (!category) return res.status(404).json({ error: `Category "${lead.category}" not found` });
-
-  const template = category.templates[emailType];
-  if (!template) return res.status(404).json({ error: `Template ${emailType} not found for category` });
-
   const settings = dataStore.readSingleton('settings') || {};
+  const templates = settings.templates;
+  if (!templates || !templates[emailType]) {
+    return res.status(404).json({ error: `Template ${emailType} not configured in settings` });
+  }
+
+  const template = templates[emailType];
   const rendered = renderTemplate(template, lead, settings);
 
   res.json({
@@ -52,13 +50,12 @@ router.post('/send', async (req, res) => {
   if (!lead) return res.status(404).json({ error: 'Lead not found' });
   if (!lead.email) return res.status(400).json({ error: 'Lead has no email address' });
 
-  const categories = dataStore.getAll('categories');
-  const category = categories.find(c => c.name === lead.category);
-  if (!category) return res.status(404).json({ error: `Category "${lead.category}" not found` });
+  const templates = settings.templates;
+  if (!templates || !templates[emailType]) {
+    return res.status(404).json({ error: `Template ${emailType} not configured in settings` });
+  }
 
-  const template = category.templates[emailType];
-  if (!template) return res.status(404).json({ error: `Template ${emailType} not found` });
-
+  const template = templates[emailType];
   const rendered = renderTemplate(template, lead, settings);
 
   // Use custom body/subject if provided (from user edits in the modal)
@@ -75,14 +72,12 @@ router.post('/send', async (req, res) => {
     if (emailType === 'email1') {
       lead.status = 'Reached Out';
       lead.dateEmail1Sent = today;
+      lead.activityLog = lead.activityLog || [];
       lead.activityLog.push({ date: now, action: 'Email 1 sent', details: `To: ${lead.email}` });
     } else if (emailType === 'email2') {
       lead.dateFollowUp1Sent = today;
-      lead.activityLog.push({ date: now, action: 'Follow-Up 1 sent', details: `To: ${lead.email}` });
-    } else if (emailType === 'email3') {
-      lead.dateFollowUp2Sent = today;
-      lead.calendlySent = true;
-      lead.activityLog.push({ date: now, action: 'Follow-Up 2 sent', details: `To: ${lead.email}, Calendly link included` });
+      lead.activityLog = lead.activityLog || [];
+      lead.activityLog.push({ date: now, action: 'Follow-Up sent', details: `To: ${lead.email}` });
     }
 
     dataStore.save('leads', lead);

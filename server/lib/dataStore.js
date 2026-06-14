@@ -3,6 +3,18 @@ const path = require('path');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
 
+// ---------------------------------------------------------------------------
+// In-memory cache — loaded once on first access, written back debounced
+// ---------------------------------------------------------------------------
+
+const cache = new Map();        // collection → Map<id, record>
+const singletonCache = new Map(); // collection → object
+const dirtyCollections = new Set();
+const dirtySingletons = new Set();
+
+let writeTimer = null;
+const WRITE_DELAY_MS = 2000; // Flush to disk every 2s (if dirty)
+
 function ensureDataDir() {
   if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -13,64 +25,34 @@ function getFilePath(collection) {
   return path.join(DATA_DIR, `${collection}.json`);
 }
 
-function readCollection(collection) {
+// ---------------------------------------------------------------------------
+// Disk I/O (only on startup + periodic flush)
+// ---------------------------------------------------------------------------
+
+function loadCollectionFromDisk(collection) {
   ensureDataDir();
   const filePath = getFilePath(collection);
   if (!fs.existsSync(filePath)) {
-    return [];
+    return new Map();
   }
   try {
     const raw = fs.readFileSync(filePath, 'utf-8');
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    const arr = Array.isArray(parsed) ? parsed : [];
+    const map = new Map();
+    for (const item of arr) {
+      if (item && item.id) {
+        map.set(item.id, item);
+      }
+    }
+    return map;
   } catch (err) {
-    console.error(`Error reading ${collection}.json:`, err.message);
-    return [];
+    console.error(`[dataStore] Error reading ${collection}.json:`, err.message);
+    return new Map();
   }
 }
 
-function writeCollection(collection, data) {
-  ensureDataDir();
-  const filePath = getFilePath(collection);
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
-}
-
-function getAll(collection, filter) {
-  const data = readCollection(collection);
-  if (!filter) return data;
-  return data.filter(item => {
-    return Object.entries(filter).every(([key, value]) => item[key] === value);
-  });
-}
-
-function get(collection, id) {
-  const data = readCollection(collection);
-  return data.find(item => item.id === id) || null;
-}
-
-function save(collection, record) {
-  const data = readCollection(collection);
-  const index = data.findIndex(item => item.id === record.id);
-  if (index >= 0) {
-    data[index] = record;
-  } else {
-    data.push(record);
-  }
-  writeCollection(collection, data);
-  return record;
-}
-
-function remove(collection, id) {
-  const data = readCollection(collection);
-  const index = data.findIndex(item => item.id === id);
-  if (index < 0) return false;
-  data.splice(index, 1);
-  writeCollection(collection, data);
-  return true;
-}
-
-// Read a single-object file (like settings.json)
-function readSingleton(collection) {
+function loadSingletonFromDisk(collection) {
   ensureDataDir();
   const filePath = getFilePath(collection);
   if (!fs.existsSync(filePath)) {
@@ -80,16 +62,167 @@ function readSingleton(collection) {
     const raw = fs.readFileSync(filePath, 'utf-8');
     return JSON.parse(raw);
   } catch (err) {
-    console.error(`Error reading ${collection}.json:`, err.message);
+    console.error(`[dataStore] Error reading ${collection}.json:`, err.message);
     return null;
   }
 }
 
-function writeSingleton(collection, data) {
+function writeCollectionToDisk(collection) {
   ensureDataDir();
   const filePath = getFilePath(collection);
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+  const map = cache.get(collection);
+  if (!map) return;
+  const arr = Array.from(map.values());
+  const tmpFile = filePath + '.tmp.' + Date.now();
+  fs.writeFileSync(tmpFile, JSON.stringify(arr, null, 2), 'utf-8');
+  fs.renameSync(tmpFile, filePath);
+}
+
+function writeSingletonToDisk(collection) {
+  ensureDataDir();
+  const filePath = getFilePath(collection);
+  const data = singletonCache.get(collection);
+  if (data === undefined) return;
+  const tmpFile = filePath + '.tmp.' + Date.now();
+  fs.writeFileSync(tmpFile, JSON.stringify(data, null, 2), 'utf-8');
+  fs.renameSync(tmpFile, filePath);
+}
+
+// ---------------------------------------------------------------------------
+// Debounced flush — batches all dirty writes into one flush cycle
+// ---------------------------------------------------------------------------
+
+function scheduleDiskFlush() {
+  if (writeTimer) return; // Already scheduled
+  writeTimer = setTimeout(() => {
+    writeTimer = null;
+    flushToDisk();
+  }, WRITE_DELAY_MS);
+  // Don't keep Node alive just for the flush timer
+  if (writeTimer.unref) writeTimer.unref();
+}
+
+function flushToDisk() {
+  for (const collection of dirtyCollections) {
+    try {
+      writeCollectionToDisk(collection);
+    } catch (err) {
+      console.error(`[dataStore] Failed to flush ${collection}:`, err.message);
+    }
+  }
+  dirtyCollections.clear();
+
+  for (const collection of dirtySingletons) {
+    try {
+      writeSingletonToDisk(collection);
+    } catch (err) {
+      console.error(`[dataStore] Failed to flush singleton ${collection}:`, err.message);
+    }
+  }
+  dirtySingletons.clear();
+}
+
+// Flush synchronously on process exit
+process.on('exit', () => {
+  if (dirtyCollections.size > 0 || dirtySingletons.size > 0) {
+    flushToDisk();
+  }
+});
+
+// Also flush on SIGINT/SIGTERM for graceful shutdown
+function gracefulShutdown() {
+  if (dirtyCollections.size > 0 || dirtySingletons.size > 0) {
+    flushToDisk();
+  }
+  process.exit(0);
+}
+process.on('SIGINT', gracefulShutdown);
+process.on('SIGTERM', gracefulShutdown);
+
+// ---------------------------------------------------------------------------
+// Cache accessors (lazy-load on first access)
+// ---------------------------------------------------------------------------
+
+function getCache(collection) {
+  if (!cache.has(collection)) {
+    cache.set(collection, loadCollectionFromDisk(collection));
+  }
+  return cache.get(collection);
+}
+
+// ---------------------------------------------------------------------------
+// Public API (same interface as before)
+// ---------------------------------------------------------------------------
+
+function getAll(collection, filter) {
+  const map = getCache(collection);
+  const data = Array.from(map.values());
+  if (!filter) return data;
+  return data.filter(item => {
+    return Object.entries(filter).every(([key, value]) => item[key] === value);
+  });
+}
+
+function get(collection, id) {
+  const map = getCache(collection);
+  return map.get(id) || null;
+}
+
+function save(collection, record) {
+  const map = getCache(collection);
+  map.set(record.id, record);
+  dirtyCollections.add(collection);
+  scheduleDiskFlush();
+  return record;
+}
+
+function remove(collection, id) {
+  const map = getCache(collection);
+  if (!map.has(id)) return false;
+  map.delete(id);
+  dirtyCollections.add(collection);
+  scheduleDiskFlush();
+  return true;
+}
+
+function readSingleton(collection) {
+  if (!singletonCache.has(collection)) {
+    singletonCache.set(collection, loadSingletonFromDisk(collection));
+  }
+  return singletonCache.get(collection);
+}
+
+function writeSingleton(collection, data) {
+  singletonCache.set(collection, data);
+  dirtySingletons.add(collection);
+  scheduleDiskFlush();
   return data;
 }
 
-module.exports = { getAll, get, save, remove, readSingleton, writeSingleton, readCollection, writeCollection, DATA_DIR };
+// Legacy compatibility — used by some tests
+function readCollection(collection) {
+  return getAll(collection);
+}
+
+function writeCollection(collection, data) {
+  const map = new Map();
+  for (const item of data) {
+    if (item && item.id) {
+      map.set(item.id, item);
+    }
+  }
+  cache.set(collection, map);
+  dirtyCollections.add(collection);
+  scheduleDiskFlush();
+}
+
+// Force immediate flush (useful for tests or explicit save points)
+function flush() {
+  if (writeTimer) {
+    clearTimeout(writeTimer);
+    writeTimer = null;
+  }
+  flushToDisk();
+}
+
+module.exports = { getAll, get, save, remove, readSingleton, writeSingleton, readCollection, writeCollection, flush, DATA_DIR };

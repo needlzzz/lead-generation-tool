@@ -11,6 +11,10 @@ let currentEmailContext = null; // { leadId, emailType }
 let qualitySortOrder = null; // null = no sort, 'asc' = best first, 'desc' = worst first
 let discoverySortField = null; // null, 'category', 'status', 'discovered'
 let discoverySortOrder = null; // null, 'asc', 'desc'
+let currentPage = 1;
+let totalPages = 1;
+let totalLeads = 0;
+const PAGE_SIZE = 100;
 
 // ============================================================
 // TOAST NOTIFICATIONS
@@ -65,13 +69,27 @@ async function checkFirstLaunch() {
 
 async function loadData() {
   try {
+    // Build query params for paginated leads
+    const params = new URLSearchParams();
+    params.set('page', currentPage);
+    params.set('limit', PAGE_SIZE);
+    if (currentCategoryFilter) params.set('category', currentCategoryFilter);
+
     const [leadsRes, dueRes, repliesRes] = await Promise.all([
-      API.get(`/api/leads${currentCategoryFilter ? `?category=${encodeURIComponent(currentCategoryFilter)}` : ''}`),
+      API.get(`/api/leads?${params.toString()}`),
       API.get('/api/leads/due-today'),
       API.get('/api/leads/check-replies')
     ]);
     allLeads = leadsRes.leads;
-    renderStatusBadges();
+    if (leadsRes.pagination) {
+      totalPages = leadsRes.pagination.totalPages;
+      totalLeads = leadsRes.pagination.total;
+    } else {
+      // Fallback for old response format
+      totalPages = 1;
+      totalLeads = allLeads.length;
+    }
+    renderPagination();
     renderCurrentTab();
     renderDashboardAlerts(dueRes, repliesRes);
   } catch (err) {
@@ -117,6 +135,7 @@ function setupTabs() {
       tab.classList.add('active');
       document.getElementById(`settings-${tab.dataset.settingsTab}`).classList.add('active');
       if (tab.dataset.settingsTab === 'categories') renderCategoriesList();
+      if (tab.dataset.settingsTab === 'templates') loadTemplatesForm();
     });
   });
 }
@@ -129,6 +148,43 @@ function renderCurrentTab() {
     case 'clients': renderClientsTab(); break;
     case 'scrapelog': renderScrapeLogTab(); break;
   }
+}
+
+// ============================================================
+// PAGINATION
+// ============================================================
+
+function renderPagination() {
+  let container = document.getElementById('paginationControls');
+  if (!container) {
+    // Create pagination container after the discovery table
+    container = document.createElement('div');
+    container.id = 'paginationControls';
+    container.className = 'pagination-controls';
+    const tableWrap = document.querySelector('#panel-discovery .table-wrap');
+    if (tableWrap) tableWrap.after(container);
+  }
+
+  if (totalPages <= 1) {
+    container.innerHTML = `<span class="pagination-info">${totalLeads} leads</span>`;
+    return;
+  }
+
+  const prevDisabled = currentPage <= 1 ? 'disabled' : '';
+  const nextDisabled = currentPage >= totalPages ? 'disabled' : '';
+
+  container.innerHTML = `
+    <button class="btn btn-sm" ${prevDisabled} onclick="goToPage(1)" title="First">⏮</button>
+    <button class="btn btn-sm" ${prevDisabled} onclick="goToPage(${currentPage - 1})">← Prev</button>
+    <span class="pagination-info">Page ${currentPage} / ${totalPages} (${totalLeads} leads)</span>
+    <button class="btn btn-sm" ${nextDisabled} onclick="goToPage(${currentPage + 1})">Next →</button>
+    <button class="btn btn-sm" ${nextDisabled} onclick="goToPage(${totalPages})" title="Last">⏭</button>
+  `;
+}
+
+function goToPage(page) {
+  currentPage = Math.max(1, Math.min(page, totalPages));
+  loadData();
 }
 
 // ============================================================
@@ -196,12 +252,12 @@ function renderDashboardAlerts(dueData, repliesData) {
   // Follow-ups
   let fuHtml = '';
   dueData.followUp1Due.forEach(l => {
-    fuHtml += `<div class="alert-item"><span class="alert-info"><strong>${esc(l.businessName)}</strong> — Follow-Up 1 due</span>
-      <button class="btn btn-sm btn-primary" onclick="previewEmail('${l.id}','email2')">Send FU1</button></div>`;
+    fuHtml += `<div class="alert-item"><span class="alert-info"><strong>${esc(l.businessName)}</strong> — Follow-Up due</span>
+      <button class="btn btn-sm btn-primary" onclick="previewEmail('${l.id}','email2')">Send FU</button></div>`;
   });
   dueData.followUp2Due.forEach(l => {
-    fuHtml += `<div class="alert-item"><span class="alert-info"><strong>${esc(l.businessName)}</strong> — Follow-Up 2 due</span>
-      <button class="btn btn-sm btn-primary" onclick="previewEmail('${l.id}','email3')">Send FU2</button></div>`;
+    fuHtml += `<div class="alert-item"><span class="alert-info"><strong>${esc(l.businessName)}</strong> — 2nd Follow-Up due</span>
+      <button class="btn btn-sm btn-primary" onclick="previewEmail('${l.id}','email2')">Send FU</button></div>`;
   });
   dueData.markColdDue.forEach(l => {
     fuHtml += `<div class="alert-item overdue"><span class="alert-info"><strong>${esc(l.businessName)}</strong> — Mark as cold?</span>
@@ -252,16 +308,7 @@ function renderDiscoveryTab() {
   let leads = allLeads.filter(l => l.status === 'Discovered' || l.status === 'Lost');
   if (currentCityFilter) {
     leads = leads.filter(l => {
-      // Match explicit city field (new leads)
       if (l.city) return l.city === currentCityFilter;
-      // Fallback for older leads: check activity log for scraper city
-      if (l.activityLog && l.activityLog.length > 0) {
-        const firstEntry = l.activityLog[0];
-        if (firstEntry.details && firstEntry.details.includes(' in ')) {
-          return firstEntry.details.includes(`in ${currentCityFilter}`);
-        }
-      }
-      // Last resort: check address
       if (l.address) return l.address.toLowerCase().includes(currentCityFilter.toLowerCase());
       return false;
     });
@@ -323,14 +370,10 @@ function renderDiscoveryTab() {
       <td>${l.dateDiscovered || ''}</td>
       <td onclick="event.stopPropagation()">
         <div class="actions">
-          ${l.websiteAnalyzedAt && !l.previewUrl && (l.status === 'Discovered' || l.status === 'Reached Out')
-            ? `<button class="btn btn-sm" onclick="startPreviewGeneration('${l.id}')" title="Generate Preview">Preview</button>` : ''}
-          ${l.previewUrl
-            ? `<button class="btn btn-sm" onclick="window.open('${esc(l.previewUrl)}', '_blank')" title="View Preview">View</button>` : ''}
-          ${l.status === 'Discovered' && l.email && l.websiteQuality !== 'Not a Fit'
-            ? `<button class="btn btn-sm btn-primary" onclick="previewEmail('${l.id}','email1')">Email 1</button>` : ''}
-          ${l.status === 'Discovered'
-            ? `<button class="btn btn-sm" onclick="doTransition('${l.id}','mark-not-a-fit')">✖</button>` : ''}
+          <button class="btn btn-sm" onclick="startPreviewGeneration('${l.id}')" title="Generate Preview" ${l.websiteAnalyzedAt && !l.previewUrl && (l.status === 'Discovered' || l.status === 'Reached Out') ? '' : 'disabled'}>Preview</button>
+          <button class="btn btn-sm" onclick="window.open('${esc(l.previewUrl || '')}', '_blank')" title="View Preview" ${l.previewUrl ? '' : 'disabled'}>View</button>
+          <button class="btn btn-sm btn-primary" onclick="previewEmail('${l.id}','email1')" ${l.status === 'Discovered' && l.email && l.websiteQuality !== 'Not a Fit' ? '' : 'disabled'}>Email 1</button>
+          <button class="btn btn-sm" onclick="doTransition('${l.id}','mark-not-a-fit')" ${l.status === 'Discovered' ? '' : 'disabled'}>✖</button>
           <button class="btn btn-sm" onclick="editLead('${l.id}')">✏️</button>
           <button class="btn btn-sm btn-danger" onclick="deleteLead('${l.id}')">Del</button>
         </div>
@@ -376,8 +419,7 @@ function renderOutreachTab() {
       <td>${lastAct}</td>
       <td onclick="event.stopPropagation()">
         <div class="actions">
-          ${l.status === 'Reached Out'
-            ? `<button class="btn btn-sm" onclick="openReplyModal('${l.id}')">📝 Reply</button>` : ''}
+          <button class="btn btn-sm" onclick="openReplyModal('${l.id}')" ${l.status === 'Reached Out' ? '' : 'disabled'}>📝 Reply</button>
         </div>
       </td>
     </tr>`;
@@ -410,8 +452,7 @@ function renderRepliesTab() {
       <td>${esc(l.notes || '')}</td>
       <td onclick="event.stopPropagation()">
         <div class="actions">
-          ${l.status === 'Replied'
-            ? `<button class="btn btn-sm btn-primary" onclick="openMeetingModal('${l.id}')">📅 Meeting</button>` : ''}
+          <button class="btn btn-sm btn-primary" onclick="openMeetingModal('${l.id}')" ${l.status === 'Replied' ? '' : 'disabled'}>📅 Meeting</button>
         </div>
       </td>
     </tr>
@@ -445,10 +486,8 @@ function renderClientsTab() {
       <td>${esc(l.notes || '')}</td>
       <td onclick="event.stopPropagation()">
         <div class="actions">
-          ${l.status === 'Meeting Scheduled' ? `
-            <button class="btn btn-sm btn-primary" onclick="openDecisionModal('${l.id}','mark-won')">✅ Won</button>
-            <button class="btn btn-sm btn-danger" onclick="openDecisionModal('${l.id}','mark-lost')">❌ Lost</button>
-          ` : ''}
+          <button class="btn btn-sm btn-primary" onclick="openDecisionModal('${l.id}','mark-won')" ${l.status === 'Meeting Scheduled' ? '' : 'disabled'}>✅ Won</button>
+          <button class="btn btn-sm btn-danger" onclick="openDecisionModal('${l.id}','mark-lost')" ${l.status === 'Meeting Scheduled' ? '' : 'disabled'}>❌ Lost</button>
         </div>
       </td>
     </tr>
@@ -547,6 +586,7 @@ function setupEventListeners() {
   // Category filter
   document.getElementById('categoryFilter').addEventListener('change', (e) => {
     currentCategoryFilter = e.target.value;
+    currentPage = 1;
     loadData();
   });
 
@@ -642,6 +682,12 @@ function setupEventListeners() {
   });
   document.getElementById('btnTestSMTP').addEventListener('click', testSMTP);
   document.getElementById('btnSendTestEmail').addEventListener('click', sendTestEmail);
+
+  // Templates form
+  document.getElementById('formSettingsTemplates').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    await saveTemplates();
+  });
 
   // Category management
   document.getElementById('btnAddCategory').addEventListener('click', () => {
@@ -742,7 +788,7 @@ async function previewEmail(leadId, emailType) {
     document.getElementById('emailBodyEdit').classList.add('hidden');
     document.getElementById('emailBody').classList.remove('hidden');
     document.getElementById('btnEditEmail').textContent = 'Edit';
-    const typeLabels = { email1: 'Email 1 — Cold Outreach', email2: 'Follow-Up 1', email3: 'Follow-Up 2' };
+    const typeLabels = { email1: 'Email 1 — Cold Outreach', email2: 'Email 2 — Follow-Up' };
     document.getElementById('emailPreviewTitle').textContent = typeLabels[emailType] || 'Email';
     currentEmailContext = { leadId, emailType };
     openModal('modalEmail');
@@ -869,8 +915,15 @@ async function saveDecision() {
 // ============================================================
 
 function showActivityLog(leadId) {
-  const lead = allLeads.find(l => l.id === leadId);
-  if (!lead) return;
+  // Fetch full lead details (includes activityLog, websiteIssues, etc.)
+  API.get(`/api/leads/${leadId}`).then(({ lead }) => {
+    renderActivityModal(lead);
+  }).catch(err => {
+    showError(err.message);
+  });
+}
+
+function renderActivityModal(lead) {
   document.getElementById('activityTitle').textContent = `${lead.businessName} — Activity Log`;
 
   // Website findings section
@@ -1664,6 +1717,43 @@ async function sendTestEmail() {
 }
 
 // ============================================================
+// EMAIL TEMPLATES
+// ============================================================
+
+async function loadTemplatesForm() {
+  try {
+    const { settings } = await API.get('/api/settings');
+    const tpl = settings.templates || {};
+    document.getElementById('tplE1Subject').value = tpl.email1?.subject || '';
+    document.getElementById('tplE1Body').value = tpl.email1?.body || '';
+    document.getElementById('tplE2Subject').value = tpl.email2?.subject || '';
+    document.getElementById('tplE2Body').value = tpl.email2?.body || '';
+  } catch (err) {
+    showError(err.message);
+  }
+}
+
+async function saveTemplates() {
+  try {
+    await API.put('/api/settings', {
+      templates: {
+        email1: {
+          subject: document.getElementById('tplE1Subject').value,
+          body: document.getElementById('tplE1Body').value
+        },
+        email2: {
+          subject: document.getElementById('tplE2Subject').value,
+          body: document.getElementById('tplE2Body').value
+        }
+      }
+    });
+    showToast('success', 'Email templates saved.');
+  } catch (err) {
+    showError(err.message);
+  }
+}
+
+// ============================================================
 // CATEGORY MANAGEMENT
 // ============================================================
 
@@ -1678,7 +1768,7 @@ function renderCategoriesList() {
           <button class="btn btn-sm btn-danger" onclick="deleteCategory('${c.id}')">Del</button>
         </div>
       </div>
-      <div class="category-card-meta">Search term: ${esc(c.searchTerm)} · Tone: ${c.tone === 'formal' ? 'Formal (Sie)' : 'Casual (Du)'}</div>
+      <div class="category-card-meta">Search term: ${esc(c.searchTerm)}</div>
     </div>
   `).join('') || '<p style="padding:20px;color:#999">No categories found.</p>';
 }
@@ -1689,13 +1779,6 @@ function editCategory(id) {
   document.getElementById('catEditId').value = cat.id;
   document.getElementById('catName').value = cat.name;
   document.getElementById('catSearchTerm').value = cat.searchTerm;
-  document.getElementById('catTone').value = cat.tone;
-  document.getElementById('catE1Subject').value = cat.templates?.email1?.subject || '';
-  document.getElementById('catE1Body').value = cat.templates?.email1?.body || '';
-  document.getElementById('catE2Subject').value = cat.templates?.email2?.subject || '';
-  document.getElementById('catE2Body').value = cat.templates?.email2?.body || '';
-  document.getElementById('catE3Subject').value = cat.templates?.email3?.subject || '';
-  document.getElementById('catE3Body').value = cat.templates?.email3?.body || '';
   document.getElementById('modalCategoryTitle').textContent = 'Edit Category';
   openModal('modalCategory');
 }
@@ -1704,13 +1787,7 @@ async function saveCategory() {
   const id = document.getElementById('catEditId').value;
   const data = {
     name: document.getElementById('catName').value,
-    searchTerm: document.getElementById('catSearchTerm').value,
-    tone: document.getElementById('catTone').value,
-    templates: {
-      email1: { subject: document.getElementById('catE1Subject').value, body: document.getElementById('catE1Body').value },
-      email2: { subject: document.getElementById('catE2Subject').value, body: document.getElementById('catE2Body').value },
-      email3: { subject: document.getElementById('catE3Subject').value, body: document.getElementById('catE3Body').value }
-    }
+    searchTerm: document.getElementById('catSearchTerm').value
   };
 
   try {

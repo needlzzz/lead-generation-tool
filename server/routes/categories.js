@@ -31,20 +31,14 @@ router.get('/:id', (req, res) => {
 
 // POST /api/categories
 router.post('/', (req, res) => {
-  const { name, searchTerm, tone, templates } = req.body;
+  const { name, searchTerm } = req.body;
   if (!name) return res.status(400).json({ error: 'name is required' });
   if (!searchTerm) return res.status(400).json({ error: 'searchTerm is required' });
 
   const category = {
     id: uuidv4(),
     name,
-    searchTerm,
-    tone: tone || 'casual',
-    templates: templates || {
-      email1: { subject: '', body: '' },
-      email2: { subject: '', body: '' },
-      email3: { subject: '', body: '' }
-    }
+    searchTerm
   };
 
   dataStore.save('categories', category);
@@ -58,8 +52,6 @@ router.put('/:id', (req, res) => {
 
   if (req.body.name !== undefined) category.name = req.body.name;
   if (req.body.searchTerm !== undefined) category.searchTerm = req.body.searchTerm;
-  if (req.body.tone !== undefined) category.tone = req.body.tone;
-  if (req.body.templates !== undefined) category.templates = req.body.templates;
 
   dataStore.save('categories', category);
   res.json({ category });

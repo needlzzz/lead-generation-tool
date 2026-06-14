@@ -5,47 +5,146 @@ const { validateTransition, getDueToday, checkDuplicate } = require('../lib/pipe
 
 const router = express.Router();
 
-// GET /api/leads — list all leads, optionally filtered
+// ---------------------------------------------------------------------------
+// Lightweight projection — strip heavy fields for list responses
+// ---------------------------------------------------------------------------
+
+function projectLead(lead) {
+  return {
+    id: lead.id,
+    businessName: lead.businessName,
+    category: lead.category,
+    city: lead.city || '',
+    address: lead.address || '',
+    phone: lead.phone || '',
+    email: lead.email || '',
+    websiteUrl: lead.websiteUrl || '',
+    websiteQuality: lead.websiteQuality || 'None',
+    websiteScore: lead.websiteScore != null ? lead.websiteScore : null,
+    websiteAnalyzedAt: lead.websiteAnalyzedAt || null,
+    contactPerson: lead.contactPerson || '',
+    status: lead.status,
+    dateDiscovered: lead.dateDiscovered || null,
+    dateEmail1Sent: lead.dateEmail1Sent || null,
+    dateFollowUp1Sent: lead.dateFollowUp1Sent || null,
+    dateFollowUp2Sent: lead.dateFollowUp2Sent || null,
+    replyDate: lead.replyDate || null,
+    replySentiment: lead.replySentiment || null,
+    calendlySent: lead.calendlySent || false,
+    meetingDate: lead.meetingDate || null,
+    decision: lead.decision || null,
+    startDate: lead.startDate || null,
+    notes: lead.notes || '',
+    previewUrl: lead.previewUrl || null,
+    previewExpiresAt: lead.previewExpiresAt || null,
+    googleRating: lead.googleRating || null,
+    emailBounced: lead.emailBounced || false
+  };
+  // Deliberately omits: activityLog, websiteIssues, websiteComplexity,
+  // websiteTechStack, websiteSecurityGrade, websiteOpportunityScore,
+  // websiteLoadTime, previewScreenshotPath, previewGeneratedAt
+}
+
+// ---------------------------------------------------------------------------
+// GET /api/leads — paginated, filtered, lightweight
+// ---------------------------------------------------------------------------
+
 router.get('/', (req, res) => {
   try {
     const filter = {};
     if (req.query.category) filter.category = req.query.category;
     if (req.query.status) filter.status = req.query.status;
-    const leads = dataStore.getAll('leads', Object.keys(filter).length ? filter : null);
-    res.json({ leads });
+    if (req.query.city) filter.city = req.query.city;
+
+    let leads = dataStore.getAll('leads', Object.keys(filter).length ? filter : null);
+
+    // Total count before pagination
+    const total = leads.length;
+
+    // Pagination (default: page 1, limit 100)
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(500, Math.max(1, parseInt(req.query.limit) || 100));
+    const offset = (page - 1) * limit;
+
+    leads = leads.slice(offset, offset + limit);
+
+    // Return lightweight projections
+    res.json({
+      leads: leads.map(projectLead),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (err) {
     res.status(500).json({ error: 'Failed to read leads' });
   }
 });
 
-// GET /api/leads/due-today — leads with follow-ups due
+// ---------------------------------------------------------------------------
+// GET /api/leads/counts — fast status counts without sending lead data
+// ---------------------------------------------------------------------------
+
+router.get('/counts', (req, res) => {
+  try {
+    const leads = dataStore.getAll('leads');
+    const counts = {};
+    for (const lead of leads) {
+      counts[lead.status] = (counts[lead.status] || 0) + 1;
+    }
+    res.json({ counts, total: leads.length });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to compute counts' });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// GET /api/leads/due-today — leads with follow-ups due (limited response)
+// ---------------------------------------------------------------------------
+
 router.get('/due-today', (req, res) => {
   try {
     const leads = dataStore.getAll('leads');
     const today = new Date().toISOString().split('T')[0];
     const due = getDueToday(leads, today);
-    res.json(due);
+
+    // Project each array in the result to lightweight fields
+    const projectDue = (arr) => arr.map(l => ({
+      id: l.id,
+      businessName: l.businessName,
+      email: l.email,
+      status: l.status
+    }));
+
+    res.json({
+      followUp1Due: projectDue(due.followUp1Due || []),
+      followUp2Due: projectDue(due.followUp2Due || []),
+      markColdDue: projectDue(due.markColdDue || [])
+    });
   } catch (err) {
     res.status(500).json({ error: 'Failed to compute due follow-ups' });
   }
 });
 
-// GET /api/leads/check-replies — leads in outreach stages for inbox checking
+// ---------------------------------------------------------------------------
+// GET /api/leads/check-replies — limited
+// ---------------------------------------------------------------------------
+
 router.get('/check-replies', (req, res) => {
   try {
     const leads = dataStore.getAll('leads');
     const outreachLeads = leads
       .filter(l => l.status === 'Reached Out' && l.email)
       .sort((a, b) => (a.dateEmail1Sent || '').localeCompare(b.dateEmail1Sent || ''))
+      .slice(0, 50) // Only first 50 — no need to show all
       .map(l => ({
         id: l.id,
         businessName: l.businessName,
         email: l.email,
         status: l.status,
-        dateEmail1Sent: l.dateEmail1Sent,
-        lastActivityDate: l.activityLog && l.activityLog.length
-          ? l.activityLog[l.activityLog.length - 1].date
-          : l.dateDiscovered
+        dateEmail1Sent: l.dateEmail1Sent
       }));
     res.json({ leads: outreachLeads });
   } catch (err) {
@@ -53,14 +152,20 @@ router.get('/check-replies', (req, res) => {
   }
 });
 
-// GET /api/leads/:id — single lead
+// ---------------------------------------------------------------------------
+// GET /api/leads/:id — full lead with all fields
+// ---------------------------------------------------------------------------
+
 router.get('/:id', (req, res) => {
   const lead = dataStore.get('leads', req.params.id);
   if (!lead) return res.status(404).json({ error: 'Lead not found' });
   res.json({ lead });
 });
 
-// POST /api/leads — create a new lead
+// ---------------------------------------------------------------------------
+// POST /api/leads — create
+// ---------------------------------------------------------------------------
+
 router.post('/', (req, res) => {
   const { businessName, category, city, address, phone, email, websiteUrl, websiteQuality, contactPerson } = req.body;
 
@@ -100,14 +205,17 @@ router.post('/', (req, res) => {
 
   dataStore.save('leads', lead);
 
-  const response = { lead };
+  const response = { lead: projectLead(lead) };
   if (duplicateWarnings.length > 0) {
     response.duplicateWarning = duplicateWarnings[0];
   }
   res.status(201).json(response);
 });
 
-// PATCH /api/leads/:id — update lead fields
+// ---------------------------------------------------------------------------
+// PATCH /api/leads/:id — update
+// ---------------------------------------------------------------------------
+
 router.patch('/:id', (req, res) => {
   const lead = dataStore.get('leads', req.params.id);
   if (!lead) return res.status(404).json({ error: 'Lead not found' });
@@ -123,13 +231,17 @@ router.patch('/:id', (req, res) => {
   }
 
   const now = new Date().toISOString();
+  lead.activityLog = lead.activityLog || [];
   lead.activityLog.push({ date: now, action: 'Lead updated', details: `Fields updated: ${Object.keys(req.body).join(', ')}` });
 
   dataStore.save('leads', lead);
-  res.json({ lead });
+  res.json({ lead: projectLead(lead) });
 });
 
+// ---------------------------------------------------------------------------
 // POST /api/leads/:id/transition — pipeline status transition
+// ---------------------------------------------------------------------------
+
 router.post('/:id/transition', (req, res) => {
   const lead = dataStore.get('leads', req.params.id);
   if (!lead) return res.status(404).json({ error: 'Lead not found' });
@@ -142,6 +254,8 @@ router.post('/:id/transition', (req, res) => {
 
   const now = new Date().toISOString();
   const today = now.split('T')[0];
+
+  lead.activityLog = lead.activityLog || [];
 
   switch (action) {
     case 'send-email-1':
@@ -216,10 +330,13 @@ router.post('/:id/transition', (req, res) => {
   }
 
   dataStore.save('leads', lead);
-  res.json({ lead });
+  res.json({ lead: projectLead(lead) });
 });
 
+// ---------------------------------------------------------------------------
 // DELETE /api/leads/:id
+// ---------------------------------------------------------------------------
+
 router.delete('/:id', (req, res) => {
   const removed = dataStore.remove('leads', req.params.id);
   if (!removed) return res.status(404).json({ error: 'Lead not found' });

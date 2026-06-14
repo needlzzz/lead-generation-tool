@@ -185,9 +185,13 @@ router.post('/enrich-emails', async (req, res) => {
   res.end();
 });
 
-// POST /api/scraper/analyze-websites (SSE — streams progress)
+// POST /api/scraper/analyze-websites (SSE — streams progress, parallel workers)
 router.post('/analyze-websites', async (req, res) => {
   const { leadIds } = req.body;
+
+  // Configurable concurrency (4 workers by default — sweet spot for memory vs speed)
+  const CONCURRENCY = 4;
+  const DELAY_MS = 500; // Reduced from 1500–2500ms since we hit different domains
 
   // Set up SSE headers
   res.setHeader('Content-Type', 'text/event-stream');
@@ -196,7 +200,11 @@ router.post('/analyze-websites', async (req, res) => {
   res.flushHeaders();
 
   function sendEvent(data) {
-    res.write(`data: ${JSON.stringify(data)}\n\n`);
+    try {
+      res.write(`data: ${JSON.stringify(data)}\n\n`);
+    } catch (e) {
+      // Client disconnected
+    }
   }
 
   // Get leads to analyze — either specific IDs or all discovered leads with a website
@@ -205,7 +213,7 @@ router.post('/analyze-websites', async (req, res) => {
     leads = leadIds.map(id => dataStore.get('leads', id)).filter(l => l && l.websiteUrl);
   } else {
     leads = dataStore.getAll('leads').filter(l =>
-      l.websiteUrl && (l.status === 'Discovered' || l.status === 'Reached Out')
+      l.websiteUrl && !l.websiteAnalyzedAt && (l.status === 'Discovered' || l.status === 'Reached Out')
     );
   }
 
@@ -215,7 +223,7 @@ router.post('/analyze-websites', async (req, res) => {
     return;
   }
 
-  sendEvent({ type: 'start', total: leads.length });
+  sendEvent({ type: 'start', total: leads.length, concurrency: CONCURRENCY });
 
   let chromium;
   try {
@@ -230,28 +238,30 @@ router.post('/analyze-websites', async (req, res) => {
   try {
     browser = await chromium.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
     });
 
-    const context = await browser.newContext({
-      locale: 'de-CH',
-      viewport: { width: 1280, height: 800 },
-      userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-    });
-
-    const page = await context.newPage();
-    page.setDefaultTimeout(20000);
+    // Create multiple pages for parallel processing
+    const pages = [];
+    for (let i = 0; i < CONCURRENCY; i++) {
+      const context = await browser.newContext({
+        locale: 'de-CH',
+        viewport: { width: 1280, height: 800 },
+        userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      });
+      const page = await context.newPage();
+      page.setDefaultTimeout(20000);
+      pages.push(page);
+    }
 
     const now = new Date().toISOString();
     let analyzedCount = 0;
+    let processedCount = 0;
 
-    for (let i = 0; i < leads.length; i++) {
-      const lead = leads[i];
-      sendEvent({ type: 'progress', current: i + 1, total: leads.length, businessName: lead.businessName });
-
+    // Worker function — processes one lead at a time from the shared queue
+    async function processLead(page, lead) {
       try {
         const analysisOptions = {};
-        // Pass Google rating if available on the lead (from scraper)
         if (lead.googleRating) analysisOptions.googleRating = lead.googleRating;
 
         const result = await analyzeWebsite(lead.websiteUrl, page, analysisOptions);
@@ -274,7 +284,6 @@ router.post('/analyze-websites', async (req, res) => {
 
         lead.activityLog = lead.activityLog || [];
 
-        // Build detailed activity log entry
         const techInfo = result.techStack && result.techStack.cms
           ? `, CMS: ${result.techStack.cms}${result.techStack.cmsVersion ? ' ' + result.techStack.cmsVersion : ''}`
           : '';
@@ -295,25 +304,41 @@ router.post('/analyze-websites', async (req, res) => {
 
         sendEvent({
           type: 'result',
+          current: processedCount,
+          total: leads.length,
           leadId: lead.id,
           businessName: lead.businessName,
           quality: result.quality,
           score: result.score,
-          issues: result.issues,
-          loadTimeMs: result.loadTimeMs,
-          techStack: result.techStack,
-          securityGrade: result.securityHeaders ? result.securityHeaders.grade : null,
           opportunityScore: result.opportunityScore
         });
       } catch (err) {
         sendEvent({ type: 'error-single', leadId: lead.id, businessName: lead.businessName, error: err.message });
       }
+    }
 
-      // Polite delay between requests
-      if (i < leads.length - 1) {
-        await page.waitForTimeout(1500 + Math.random() * 1000);
+    // Process leads with a worker pool pattern
+    let queueIndex = 0;
+
+    async function worker(page) {
+      while (queueIndex < leads.length) {
+        const idx = queueIndex++;
+        const lead = leads[idx];
+        processedCount++;
+
+        sendEvent({ type: 'progress', current: processedCount, total: leads.length, businessName: lead.businessName });
+
+        await processLead(page, lead);
+
+        // Brief delay between requests (500ms — safe since each worker hits different domains)
+        if (queueIndex < leads.length) {
+          await new Promise(resolve => setTimeout(resolve, DELAY_MS));
+        }
       }
     }
+
+    // Launch all workers in parallel
+    await Promise.all(pages.map(page => worker(page)));
 
     sendEvent({ type: 'done', analyzed: analyzedCount, total: leads.length });
   } catch (err) {

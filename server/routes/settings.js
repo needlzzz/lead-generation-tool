@@ -66,10 +66,49 @@ function validateBatchSettings(batch) {
   return errors;
 }
 
+const DEFAULT_TEMPLATES = {
+  email1: {
+    subject: 'Website [Business Name] – Potenzial entdeckt',
+    body: `[Greeting]
+
+Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
+
+Mir sind [Website-Probleme-Anzahl] Punkte aufgefallen, bei denen sich mit kleinen Anpassungen einiges bewegen lässt:
+
+[Website-Probleme]
+
+Diese Punkte klingen klein, können aber einen grossen Unterschied machen: Besucher, die sich gut abgeholt fühlen, werden viel eher zu echten Anfragen.
+
+Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusammengestellt, wie Ihre Website aussehen könnte:
+
+👉 [Preview-Link]
+
+[Preview-Disclaimer]
+
+Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
+
+Freundliche Grüsse
+[Dein Name]`
+  },
+  email2: {
+    subject: 'Nochmals kurz gemeldet – [Business Name]',
+    body: `Hallo [Name],
+
+kurzes Follow-up — wollte sichergehen, dass meine letzte Nachricht nicht untergegangen ist. Falls Sie gerade voll eingespannt sind, absolut verständlich.
+
+Falls Sie die Vorschau noch nicht gesehen haben:
+👉 [Preview-Link]
+
+Grüsse,
+[Dein Name]`
+  }
+};
+
 const DEFAULT_SETTINGS = {
   userName: '',
   calendlyLink: '',
   previewSiteRepoPath: '/Users/tabkamac/private/dev/git/kaelint-website-business',
+  templates: DEFAULT_TEMPLATES,
   smtp: {
     host: '',
     port: 587,
@@ -108,6 +147,10 @@ router.get('/', (req, res) => {
     settings = {
       ...DEFAULT_SETTINGS,
       ...settings,
+      templates: {
+        email1: { ...DEFAULT_TEMPLATES.email1, ...(settings.templates?.email1 || {}) },
+        email2: { ...DEFAULT_TEMPLATES.email2, ...(settings.templates?.email2 || {}) }
+      },
       smtp: {
         ...DEFAULT_SETTINGS.smtp,
         ...storedSmtp,
@@ -131,7 +174,7 @@ router.get('/', (req, res) => {
 
 // PUT /api/settings
 router.put('/', (req, res) => {
-  const { userName, calendlyLink, previewSiteRepoPath, smtp, batch } = req.body;
+  const { userName, calendlyLink, previewSiteRepoPath, templates, smtp, batch } = req.body;
 
   // Validate batch settings if provided
   if (batch && typeof batch === 'object') {
@@ -148,10 +191,16 @@ router.put('/', (req, res) => {
 
   const incomingBrevo = smtp && smtp.brevo ? smtp.brevo : {};
 
+  const existingTemplates = existing.templates || DEFAULT_TEMPLATES;
+
   const settings = {
     userName: userName !== undefined ? userName : existing.userName,
     calendlyLink: calendlyLink !== undefined ? calendlyLink : existing.calendlyLink,
     previewSiteRepoPath: previewSiteRepoPath !== undefined ? previewSiteRepoPath : (existing.previewSiteRepoPath || DEFAULT_SETTINGS.previewSiteRepoPath),
+    templates: {
+      email1: templates && templates.email1 ? { ...existingTemplates.email1, ...templates.email1 } : existingTemplates.email1,
+      email2: templates && templates.email2 ? { ...existingTemplates.email2, ...templates.email2 } : existingTemplates.email2
+    },
     smtp: {
       host: smtp && smtp.host !== undefined ? smtp.host : existingSmtp.host,
       port: smtp && smtp.port !== undefined ? smtp.port : existingSmtp.port,

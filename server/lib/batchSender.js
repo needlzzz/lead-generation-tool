@@ -133,9 +133,10 @@ function isTransientError(err) {
 // Core processing loop
 // ---------------------------------------------------------------------------
 
-async function processQueue(settings, categories) {
+async function processQueue(settings) {
   const brevoConfig = settings.smtp && settings.smtp.brevo;
   const { sendDelayMin, sendDelayMax } = settings.batch;
+  const templates = settings.templates || {};
 
   for (let i = 0; i < state.queue.length; i++) {
     // (a) Check stop flag
@@ -178,20 +179,19 @@ async function processQueue(settings, categories) {
       continue;
     }
 
-    // (d) Render email template
-    const category = categories.find(c => c.name === lead.category);
-    if (!category || !category.templates || !category.templates[item.emailType]) {
+    // (d) Render email template from global settings
+    const template = templates[item.emailType];
+    if (!template) {
       state.failed.push({
         leadId: item.leadId,
         businessName: lead.businessName || '',
         errorType: 'template_missing',
-        error: `Template ${item.emailType} not found for category "${lead.category}"`
+        error: `Template ${item.emailType} not found in settings`
       });
       persistState();
       continue;
     }
 
-    const template = category.templates[item.emailType];
     const rendered = renderTemplate(template, lead, settings);
 
     // (e) Send email via Brevo (with 30s timeouts)
@@ -220,10 +220,6 @@ async function processQueue(settings, categories) {
           break;
         case 'email2':
           lead.dateFollowUp1Sent = today;
-          break;
-        case 'email3':
-          lead.dateFollowUp2Sent = today;
-          lead.calendlySent = true;
           break;
       }
 
@@ -321,10 +317,9 @@ function waitForCondition(condition) {
  * Kicks off an async loop in the background and returns immediately.
  *
  * @param {Array} queue - Array of { leadId, emailType } objects
- * @param {object} settings - App settings (with batch + smtp.brevo)
- * @param {Array} categories - Category objects with templates
+ * @param {object} settings - App settings (with batch + smtp.brevo + templates)
  */
-function start(queue, settings, categories) {
+function start(queue, settings) {
   if (running) {
     throw new Error('Batch sender is already running');
   }
@@ -344,7 +339,7 @@ function start(queue, settings, categories) {
   persistState();
 
   // Non-blocking — fire and forget
-  processQueue(settings, categories).catch(err => {
+  processQueue(settings).catch(err => {
     state.status = 'complete';
     state.lastUpdatedAt = new Date().toISOString();
     running = false;
@@ -373,9 +368,8 @@ function stop() {
  * Filters queue against completed+failed and continues.
  *
  * @param {object} settings - App settings
- * @param {Array} categories - Category objects with templates
  */
-function resume(settings, categories) {
+function resume(settings) {
   if (running) {
     throw new Error('Batch sender is already running');
   }
@@ -412,7 +406,7 @@ function resume(settings, categories) {
   state.status = 'sending';
   persistState();
 
-  processQueue(settings, categories).catch(err => {
+  processQueue(settings).catch(err => {
     state.status = 'complete';
     state.lastUpdatedAt = new Date().toISOString();
     running = false;
@@ -483,7 +477,7 @@ function daysSince(dateStr, today) {
 
 /**
  * Build auto-eligibility queue from all leads.
- * Priority: email3 → email2 → email1
+ * Priority: email2 → email1
  * Excludes: leads without email, leads with emailBounced=true
  *
  * @param {Array} leads - All leads from dataStore
@@ -494,16 +488,7 @@ function buildAutoQueue(leads, today) {
   if (!today) today = new Date().toISOString().slice(0, 10);
   const queue = [];
 
-  // Priority 1: Follow-up 2 due (most time-sensitive)
-  for (const lead of leads) {
-    if (lead.status === 'Reached Out' && lead.dateFollowUp1Sent &&
-        !lead.dateFollowUp2Sent && !lead.emailBounced && lead.email &&
-        daysSince(lead.dateFollowUp1Sent, today) >= 3) {
-      queue.push({ leadId: lead.id, emailType: 'email3' });
-    }
-  }
-
-  // Priority 2: Follow-up 1 due
+  // Priority 1: Follow-up due (most time-sensitive)
   for (const lead of leads) {
     if (lead.status === 'Reached Out' && lead.dateEmail1Sent &&
         !lead.dateFollowUp1Sent && !lead.emailBounced && lead.email &&
@@ -512,7 +497,7 @@ function buildAutoQueue(leads, today) {
     }
   }
 
-  // Priority 3: New cold outreach (lowest priority)
+  // Priority 2: New cold outreach (lowest priority)
   for (const lead of leads) {
     if (lead.status === 'Discovered' && lead.previewUrl &&
         !lead.emailBounced && lead.email) {
@@ -528,7 +513,7 @@ function buildAutoQueue(leads, today) {
  * Applies the same eligibility rules as buildAutoQueue but filtered to one type.
  *
  * @param {Array} leads - All leads from dataStore
- * @param {string} emailType - One of: 'email1', 'email2', 'email3'
+ * @param {string} emailType - One of: 'email1', 'email2'
  * @param {string} [today] - Current date as YYYY-MM-DD (optional, defaults to today)
  * @returns {Array} Array of { leadId, emailType } for eligible leads
  */
@@ -549,12 +534,6 @@ function buildTypedQueue(leads, emailType, today) {
         if (lead.status === 'Reached Out' && lead.dateEmail1Sent &&
             !lead.dateFollowUp1Sent && daysSince(lead.dateEmail1Sent, today) >= 3) {
           queue.push({ leadId: lead.id, emailType: 'email2' });
-        }
-        break;
-      case 'email3':
-        if (lead.status === 'Reached Out' && lead.dateFollowUp1Sent &&
-            !lead.dateFollowUp2Sent && daysSince(lead.dateFollowUp1Sent, today) >= 3) {
-          queue.push({ leadId: lead.id, emailType: 'email3' });
         }
         break;
     }

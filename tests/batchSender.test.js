@@ -58,6 +58,10 @@ const defaultSettings = {
     sendWindowEnd: '17:00',
     sendWindowTimezone: 'Europe/Zurich'
   },
+  templates: {
+    email1: { subject: 'Subject 1', body: 'Body 1' },
+    email2: { subject: 'Subject 2', body: 'Body 2' }
+  },
   smtp: {
     brevo: {
       host: 'smtp-relay.brevo.com',
@@ -69,16 +73,9 @@ const defaultSettings = {
   }
 };
 
-// Default categories with templates
+// Default categories (templates no longer needed here)
 const defaultCategories = [
-  {
-    name: 'Coiffeur',
-    templates: {
-      email1: { subject: 'Subject 1', body: 'Body 1' },
-      email2: { subject: 'Subject 2', body: 'Body 2' },
-      email3: { subject: 'Subject 3', body: 'Body 3' }
-    }
-  }
+  { name: 'Coiffeur', searchTerm: 'Coiffeur Friseur' }
 ];
 
 // Helper: create a mock sendMail function
@@ -192,8 +189,7 @@ describe('batchSender success flow', () => {
 
     batchSender.start(
       [{ leadId: 'lead-1', emailType: 'email2' }],
-      defaultSettings,
-      defaultCategories
+      defaultSettings
     );
 
     await jest.advanceTimersByTimeAsync(5000);
@@ -201,29 +197,6 @@ describe('batchSender success flow', () => {
     expect(dataStore.save).toHaveBeenCalled();
     const savedLead = dataStore.save.mock.calls[0][1];
     expect(savedLead.dateFollowUp1Sent).toBeDefined();
-  });
-
-  test('updates lead status correctly for email3', async () => {
-    const lead = makeLead({
-      id: 'lead-1',
-      status: 'Reached Out',
-      dateFollowUp1Sent: '2026-06-08'
-    });
-    dataStore.get.mockReturnValue(lead);
-    createMockTransport();
-
-    batchSender.start(
-      [{ leadId: 'lead-1', emailType: 'email3' }],
-      defaultSettings,
-      defaultCategories
-    );
-
-    await jest.advanceTimersByTimeAsync(5000);
-
-    expect(dataStore.save).toHaveBeenCalled();
-    const savedLead = dataStore.save.mock.calls[0][1];
-    expect(savedLead.dateFollowUp2Sent).toBeDefined();
-    expect(savedLead.calendlySent).toBe(true);
   });
 
   test('increments quota after successful send', async () => {
@@ -702,7 +675,7 @@ describe('batchSender transient error handling (4xx)', () => {
 // --- Auto-Queue Builder Priority Ordering ---
 
 describe('batchSender buildAutoQueue priority ordering', () => {
-  test('orders email3 before email2 before email1', () => {
+  test('orders email2 before email1', () => {
     const today = '2026-06-14';
 
     const leads = [
@@ -720,26 +693,16 @@ describe('batchSender buildAutoQueue priority ordering', () => {
         dateEmail1Sent: '2026-06-10',
         dateFollowUp1Sent: null,
         email: 'b@test.com'
-      }),
-      // Eligible for email3 (Reached Out + dateFollowUp1Sent 3+ days ago + no followup2)
-      makeLead({
-        id: 'lead-email3',
-        status: 'Reached Out',
-        dateFollowUp1Sent: '2026-06-10',
-        dateFollowUp2Sent: null,
-        email: 'c@test.com'
       })
     ];
 
     const queue = batchSender.buildAutoQueue(leads, today);
 
-    expect(queue.length).toBe(3);
-    // email3 first (highest priority)
-    expect(queue[0]).toEqual({ leadId: 'lead-email3', emailType: 'email3' });
-    // email2 second
-    expect(queue[1]).toEqual({ leadId: 'lead-email2', emailType: 'email2' });
+    expect(queue.length).toBe(2);
+    // email2 first (higher priority)
+    expect(queue[0]).toEqual({ leadId: 'lead-email2', emailType: 'email2' });
     // email1 last (lowest priority)
-    expect(queue[2]).toEqual({ leadId: 'lead-email1', emailType: 'email1' });
+    expect(queue[1]).toEqual({ leadId: 'lead-email1', emailType: 'email1' });
   });
 
   test('excludes leads without email', () => {
@@ -789,21 +752,6 @@ describe('batchSender buildAutoQueue priority ordering', () => {
     const queue = batchSender.buildAutoQueue(leads, '2026-06-14');
     expect(queue).toHaveLength(0);
   });
-
-  test('email3 requires 3+ days since followup1', () => {
-    const leads = [
-      makeLead({
-        id: 'lead-1',
-        status: 'Reached Out',
-        dateFollowUp1Sent: '2026-06-12', // Only 2 days ago
-        dateFollowUp2Sent: null,
-        email: 'a@test.com'
-      })
-    ];
-
-    const queue = batchSender.buildAutoQueue(leads, '2026-06-14');
-    expect(queue).toHaveLength(0);
-  });
 });
 
 // --- buildTypedQueue ---
@@ -834,22 +782,6 @@ describe('batchSender buildTypedQueue', () => {
     const queue = batchSender.buildTypedQueue(leads, 'email2', '2026-06-14');
     expect(queue).toHaveLength(1);
     expect(queue[0]).toEqual({ leadId: 'l1', emailType: 'email2' });
-  });
-
-  test('builds email3 queue (Reached Out + dateFollowUp1Sent 3+ days)', () => {
-    const leads = [
-      makeLead({
-        id: 'l1',
-        status: 'Reached Out',
-        dateFollowUp1Sent: '2026-06-10',
-        dateFollowUp2Sent: null,
-        email: 'a@test.com'
-      })
-    ];
-
-    const queue = batchSender.buildTypedQueue(leads, 'email3', '2026-06-14');
-    expect(queue).toHaveLength(1);
-    expect(queue[0]).toEqual({ leadId: 'l1', emailType: 'email3' });
   });
 
   test('excludes bounced leads from typed queue', () => {

@@ -63,6 +63,10 @@ const completeSettings = {
     sendWindowEnd: '17:00',
     sendWindowTimezone: 'Europe/Zurich'
   },
+  templates: {
+    email1: { subject: 'Subject 1', body: 'Body 1' },
+    email2: { subject: 'Subject 2', body: 'Body 2' }
+  },
   smtp: {
     brevo: {
       host: 'smtp-relay.brevo.com',

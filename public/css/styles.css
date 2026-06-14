@@ -1052,3 +1052,25 @@ form {
   font-weight: 600;
   background: var(--color-bg);
 }
+
+/* Pagination */
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 0;
+}
+
+.pagination-info {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  padding: 0 8px;
+}
+
+/* Disabled action buttons */
+.actions .btn[disabled] {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}

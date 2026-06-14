@@ -142,12 +142,16 @@ router.post('/send-emails', (req, res) => {
     });
   }
 
-  const categories = dataStore.getAll('categories');
+  // Validate templates exist
+  const templates = settings.templates;
+  if (!templates || !templates.email1 || !templates.email2) {
+    return res.status(400).json({ error: 'Email templates not configured in settings' });
+  }
 
   // Resume mode
   if (resumeFlag === true) {
     try {
-      batchSender.resume(settings, categories);
+      batchSender.resume(settings);
       return res.status(202).json({ status: 'sending', resumed: true });
     } catch (err) {
       return res.status(400).json({ error: err.message });
@@ -185,7 +189,7 @@ router.post('/send-emails', (req, res) => {
   }
 
   // Start background processing
-  batchSender.start(queue, settings, categories);
+  batchSender.start(queue, settings);
   return res.status(202).json({ status: 'sending', totalQueued: queue.length });
 });
 

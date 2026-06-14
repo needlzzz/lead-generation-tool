@@ -377,7 +377,8 @@
         <div class="settings-tabs">
           <button class="settings-tab active" data-settings-tab="personal">Personal</button>
           <button class="settings-tab" data-settings-tab="smtp">SMTP</button>
-          <button class="settings-tab" data-settings-tab="categories">Categories & Templates</button>
+          <button class="settings-tab" data-settings-tab="templates">Email Templates</button>
+          <button class="settings-tab" data-settings-tab="categories">Categories</button>
         </div>
         <div class="settings-panel active" id="settings-personal">
           <form id="formSettingsPersonal">
@@ -437,6 +438,32 @@
             <div id="smtpSendTestResult" class="smtp-test-result hidden"></div>
           </form>
         </div>
+        <div class="settings-panel" id="settings-templates">
+          <form id="formSettingsTemplates">
+            <p class="hint">Placeholders: [Greeting], [Name], [Business Name], [CALENDLY-LINK], [Dein Name], [Website-Probleme], [Website-Probleme-Anzahl], [Preview-Link], [Preview-Disclaimer], [Preview-Ablauf]</p>
+            <h3>Email 1 — Cold Outreach</h3>
+            <div class="form-row">
+              <label for="tplE1Subject">Subject</label>
+              <input type="text" id="tplE1Subject">
+            </div>
+            <div class="form-row">
+              <label for="tplE1Body">Body</label>
+              <textarea id="tplE1Body" rows="12"></textarea>
+            </div>
+            <h3>Email 2 — Follow-Up</h3>
+            <div class="form-row">
+              <label for="tplE2Subject">Subject</label>
+              <input type="text" id="tplE2Subject">
+            </div>
+            <div class="form-row">
+              <label for="tplE2Body">Body</label>
+              <textarea id="tplE2Body" rows="8"></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Save Templates</button>
+            </div>
+          </form>
+        </div>
         <div class="settings-panel" id="settings-categories">
           <div class="panel-toolbar">
             <button class="btn btn-primary" id="btnAddCategory">+ New Category</button>
@@ -448,7 +475,7 @@
 
     <!-- Category Editor Modal -->
     <div class="modal-overlay hidden" id="modalCategory">
-      <div class="modal modal-wide">
+      <div class="modal">
         <div class="modal-header">
           <h2 id="modalCategoryTitle">New Category</h2>
           <button class="modal-close" onclick="closeModal('modalCategory')">&times;</button>
@@ -461,42 +488,7 @@
           </div>
           <div class="form-row">
             <label for="catSearchTerm">Google Maps Search Term *</label>
-            <input type="text" id="catSearchTerm" required placeholder="e.g. Fitnessstudio Zürich">
-          </div>
-          <div class="form-row">
-            <label for="catTone">Tone</label>
-            <select id="catTone">
-              <option value="casual">Casual (Du)</option>
-              <option value="formal">Formal (Sie)</option>
-            </select>
-          </div>
-          <p class="hint">Placeholders: [Name], [Business Name], [CALENDLY-LINK], [Dein Name]</p>
-          <h3>Email 1 — Cold Outreach</h3>
-          <div class="form-row">
-            <label for="catE1Subject">Subject</label>
-            <input type="text" id="catE1Subject">
-          </div>
-          <div class="form-row">
-            <label for="catE1Body">Body</label>
-            <textarea id="catE1Body" rows="8"></textarea>
-          </div>
-          <h3>Email 2 — Follow-Up 1 (Day 3)</h3>
-          <div class="form-row">
-            <label for="catE2Subject">Subject</label>
-            <input type="text" id="catE2Subject">
-          </div>
-          <div class="form-row">
-            <label for="catE2Body">Body</label>
-            <textarea id="catE2Body" rows="6"></textarea>
-          </div>
-          <h3>Email 3 — Follow-Up 2 (Day 6)</h3>
-          <div class="form-row">
-            <label for="catE3Subject">Subject</label>
-            <input type="text" id="catE3Subject">
-          </div>
-          <div class="form-row">
-            <label for="catE3Body">Body</label>
-            <textarea id="catE3Body" rows="6"></textarea>
+            <input type="text" id="catSearchTerm" required placeholder="e.g. Fitnessstudio">
           </div>
           <div class="form-actions">
             <button type="button" class="btn" onclick="closeModal('modalCategory')">Cancel</button>
