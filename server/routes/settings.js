@@ -68,38 +68,27 @@ function validateBatchSettings(batch) {
 
 const DEFAULT_TEMPLATES = {
   email1: {
-    subject: 'Website [Business Name] – Potenzial entdeckt',
-    body: `[Greeting]
+    subject: 'Idee für [Business Name]',
+    body: `Sali [Name],
 
-Ich habe mir Ihre Website angeschaut und möchte mit Ihnen ein paar meiner Beobachtungen teilen — nicht um zu kritisieren, sondern weil ich glaube, dass da noch echtes Potenzial schlummert!
+kurzer Hinweis: Eurer Website fehlen ein paar Basics, die heute Standard sind — das kostet euch wahrscheinlich Anfragen.
 
-Mir sind [Website-Probleme-Anzahl] Punkte aufgefallen, bei denen sich mit kleinen Anpassungen einiges bewegen lässt:
-
-[Website-Probleme]
-
-Diese Punkte klingen klein, können aber einen grossen Unterschied machen: Besucher, die sich gut abgeholt fühlen, werden viel eher zu echten Anfragen.
-
-Damit Sie sich das besser vorstellen können, habe ich eine kleine Vorschau zusammengestellt, wie Ihre Website aussehen könnte:
-
+Ich hab mal skizziert, wie das moderner aussehen könnte:
 👉 [Preview-Link]
 
-[Preview-Disclaimer]
+Falls euch das interessiert, meldet euch gern — ich erklär euch in 10 Minuten, was dahintersteckt.
 
-Ich würde mich freuen, wenn Sie einen Blick darauf werfen. Falls Sie die Anpassungen in Erwägung ziehen sollten, stehe ich Ihnen mit meinen Webdesign-Services gerne zur Verfügung.
-
-Freundliche Grüsse
 [Dein Name]`
   },
   email2: {
-    subject: 'Nochmals kurz gemeldet – [Business Name]',
-    body: `Hallo [Name],
+    subject: 'Re: Idee für [Business Name]',
+    body: `Sali [Name],
 
-kurzes Follow-up — wollte sichergehen, dass meine letzte Nachricht nicht untergegangen ist. Falls Sie gerade voll eingespannt sind, absolut verständlich.
-
-Falls Sie die Vorschau noch nicht gesehen haben:
+wollte nur sichergehen, dass meine Nachricht nicht untergegangen ist. Die Vorschau ist noch online:
 👉 [Preview-Link]
 
-Grüsse,
+Kein Druck — nur falls es doch passt.
+
 [Dein Name]`
   }
 };
