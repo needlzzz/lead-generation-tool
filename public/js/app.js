@@ -1457,49 +1457,34 @@ async function analyzeWebsites(selectedOnly = false) {
   const catFilter = document.getElementById('categoryFilter').value;
 
   let leadsToAnalyze;
+  let sendAllToServer = false;
 
   if (selectedOnly) {
     // Analyze only selected leads (allows re-analysis)
     const selectedIds = getSelectedLeadIds();
     leadsToAnalyze = allLeads.filter(l => selectedIds.includes(l.id) && l.websiteUrl);
+    if (leadsToAnalyze.length === 0) {
+      showError('No selected leads with websites to analyze.');
+      return;
+    }
   } else {
-    // Bulk analyze: leads with a website that haven't been analyzed yet
-    leadsToAnalyze = allLeads.filter(l =>
-      l.websiteUrl && !l.websiteAnalyzedAt && (l.status === 'Discovered' || l.status === 'Reached Out')
-    );
-
-    // Apply category filter if set
-    if (catFilter) {
-      leadsToAnalyze = leadsToAnalyze.filter(l => l.category === catFilter);
-    }
-
-    // Apply city filter if set
-    if (citySelect !== 'all') {
-      leadsToAnalyze = leadsToAnalyze.filter(l => {
-        if (l.city) return l.city === citySelect;
-        if (l.activityLog && l.activityLog[0]?.details) {
-          return l.activityLog[0].details.includes(`in ${citySelect}`);
-        }
-        return false;
-      });
-    }
+    // Bulk analyze: let the server find all unanalyzed leads (not limited to current page)
+    sendAllToServer = true;
   }
 
-  if (leadsToAnalyze.length === 0) {
-    showError(selectedOnly
-      ? 'No selected leads with websites to analyze.'
-      : 'No unanalyzed leads with websites (for current filter).');
-    return;
-  }
-
-  const reAnalyzeCount = leadsToAnalyze.filter(l => l.websiteAnalyzedAt).length;
-  const freshCount = leadsToAnalyze.length - reAnalyzeCount;
-  const desc = reAnalyzeCount > 0
-    ? `${leadsToAnalyze.length} websites (${freshCount} new, ${reAnalyzeCount} re-analysis)`
-    : `${leadsToAnalyze.length} websites`;
-
-  if (!confirm(`Analyze ${desc}? This runs in the background.`)) {
-    return;
+  if (sendAllToServer) {
+    if (!confirm('Analyze all unanalyzed leads with websites? This runs in the background with 4 parallel workers.')) {
+      return;
+    }
+  } else {
+    const reAnalyzeCount = leadsToAnalyze.filter(l => l.websiteAnalyzedAt).length;
+    const freshCount = leadsToAnalyze.length - reAnalyzeCount;
+    const desc = reAnalyzeCount > 0
+      ? `${leadsToAnalyze.length} websites (${freshCount} new, ${reAnalyzeCount} re-analysis)`
+      : `${leadsToAnalyze.length} websites`;
+    if (!confirm(`Analyze ${desc}? This runs in the background.`)) {
+      return;
+    }
   }
 
   // Reuse the enrichment progress bar
@@ -1510,17 +1495,21 @@ async function analyzeWebsites(selectedOnly = false) {
   bar.classList.remove('hidden');
   text.textContent = 'Starting website analysis...';
   fill.style.width = '0%';
-  count.textContent = `0/${leadsToAnalyze.length}`;
+  count.textContent = '';
 
   const btn = document.getElementById('btnAnalyzeWebsites');
   btn.disabled = true;
   btn.textContent = '⏳ Analyzing...';
 
   try {
+    const requestBody = sendAllToServer
+      ? {}
+      : { leadIds: leadsToAnalyze.map(l => l.id) };
+
     const response = await fetch('/api/scraper/analyze-websites', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ leadIds: leadsToAnalyze.map(l => l.id) })
+      body: JSON.stringify(requestBody)
     });
 
     const reader = response.body.getReader();
