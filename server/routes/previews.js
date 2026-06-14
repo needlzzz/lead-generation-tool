@@ -104,4 +104,37 @@ router.get('/:leadId', (req, res) => {
   res.json(preview);
 });
 
+// POST /api/previews/deploy — deploy all built previews to Cloudflare Pages
+router.post('/deploy', async (req, res) => {
+  const settings = dataStore.readSingleton('settings') || {};
+  const previewSiteRepoPath = settings.previewSiteRepoPath;
+
+  if (!previewSiteRepoPath) {
+    return res.status(400).json({ error: 'previewSiteRepoPath not configured in settings' });
+  }
+
+  try {
+    const { execSync } = require('child_process');
+    execSync('node scripts/deploy-previews.mjs', {
+      cwd: previewSiteRepoPath,
+      timeout: 300000,
+      stdio: ['pipe', 'pipe', 'pipe'],
+      env: { ...process.env, NODE_TLS_REJECT_UNAUTHORIZED: '0' }
+    });
+
+    // Update all "built" entries to "deployed"
+    const entries = registry.getAllEntries();
+    for (const entry of entries) {
+      if (entry.status === 'built') {
+        registry.updateStatus(entry.slug, 'deployed');
+      }
+    }
+
+    res.json({ success: true, message: 'Deploy complete' });
+  } catch (err) {
+    const errorMsg = err.stderr ? err.stderr.toString().slice(0, 500) : err.message;
+    res.status(500).json({ error: `Deploy failed: ${errorMsg}` });
+  }
+});
+
 module.exports = router;

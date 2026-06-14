@@ -259,6 +259,23 @@ async function renderPreviewsTab() {
   }
 }
 
+async function deployPreviews() {
+  const btn = document.getElementById('btnDeployPreviews');
+  btn.disabled = true;
+  btn.textContent = '⏳ Deploying...';
+
+  try {
+    const result = await API.post('/api/previews/deploy', {});
+    showToast('success', result.message || 'Deploy complete');
+    await renderPreviewsTab();
+  } catch (err) {
+    showError(`Deploy failed: ${err.message}`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Deploy Previews';
+  }
+}
+
 // ============================================================
 // STATUS BADGES
 // ============================================================
@@ -1022,6 +1039,9 @@ function setupEventListeners() {
   document.getElementById('btnBatchEmails').addEventListener('click', startBatchEmails);
   document.getElementById('btnBatchEmailsResume').addEventListener('click', resumeBatchEmails);
   document.getElementById('btnBatchEmailsStop').addEventListener('click', stopBatchEmails);
+
+  // Deploy previews
+  document.getElementById('btnDeployPreviews').addEventListener('click', deployPreviews);
 }
 
 // ============================================================
