@@ -54,6 +54,7 @@
     <nav class="tabs" aria-label="Main navigation">
       <div role="tablist">
         <button class="tab active" role="tab" aria-selected="true" data-tab="discovery">Discovery</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="previews">Previews</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="outreach">Outreach Pipeline</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="replies">Replies &amp; Meetings</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="clients">Client Tracker</button>
@@ -125,6 +126,29 @@
         <div id="emptyDiscovery" class="empty-state hidden">
           No leads discovered yet. Use "New Lead", "CSV Import", or "Auto-Discover" to get started.
         </div>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="panel-previews">
+      <div class="panel-toolbar">
+        <span id="previewCounts" class="preview-counts"></span>
+      </div>
+      <div class="table-wrap">
+        <table id="tablePreviews">
+          <thead>
+            <tr>
+              <th>Business Name</th>
+              <th>Category</th>
+              <th>City</th>
+              <th>Status</th>
+              <th>Preview URL</th>
+              <th>Created</th>
+              <th>Expires</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div id="emptyPreviews" class="empty-state hidden">No previews generated yet.</div>
       </div>
     </section>
 

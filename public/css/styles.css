@@ -1157,3 +1157,10 @@ form {
 .batch-progress-line.success { color: var(--color-success); }
 .batch-progress-line.error { color: var(--color-danger); }
 .batch-progress-line.info { color: var(--color-text-secondary); }
+
+/* Preview counts */
+.preview-counts {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

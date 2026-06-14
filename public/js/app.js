@@ -157,6 +157,7 @@ function setupTabs() {
 function renderCurrentTab() {
   switch (currentTab) {
     case 'discovery': renderDiscoveryTab(); break;
+    case 'previews': renderPreviewsTab(); break;
     case 'outreach': renderOutreachTab(); break;
     case 'replies': renderRepliesTab(); break;
     case 'clients': renderClientsTab(); break;
@@ -200,6 +201,60 @@ function renderPagination() {
 function goToPage(page) {
   currentPage = Math.max(1, Math.min(page, totalPages));
   loadData();
+}
+
+// ============================================================
+// PREVIEWS TAB
+// ============================================================
+
+async function renderPreviewsTab() {
+  const tbody = document.querySelector('#tablePreviews tbody');
+  const empty = document.getElementById('emptyPreviews');
+  const countsEl = document.getElementById('previewCounts');
+
+  try {
+    const { previews, counts, total } = await API.get('/api/previews/list');
+
+    // Show counts summary
+    countsEl.innerHTML = `
+      <span class="badge status-client-won">${counts.deployed || 0} deployed</span>
+      <span class="badge status-reached-out">${counts.built || 0} built</span>
+      <span class="badge status-no-response">${counts.expired || 0} expired</span>
+      <span style="color:var(--color-text-secondary);margin-left:8px">${total} total</span>
+    `;
+
+    if (previews.length === 0) {
+      tbody.innerHTML = '';
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+
+    tbody.innerHTML = previews.map(p => {
+      const statusClass = p.status === 'deployed' ? 'status-client-won' : p.status === 'built' ? 'status-reached-out' : 'status-no-response';
+      const expiresStr = p.expiresAt ? new Date(p.expiresAt).toLocaleDateString('de-CH') : '—';
+      const createdStr = p.createdAt ? new Date(p.createdAt).toLocaleDateString('de-CH') : '—';
+      const daysLeft = p.expiresAt ? Math.max(0, Math.ceil((new Date(p.expiresAt) - new Date()) / 86400000)) : null;
+      const expiryBadge = daysLeft !== null && daysLeft <= 7 && p.status !== 'expired'
+        ? `<span style="color:var(--color-danger);font-size:0.75rem"> (${daysLeft}d left)</span>` : '';
+
+      return `
+        <tr>
+          <td>${esc(p.businessName)}</td>
+          <td>${esc(p.category)}</td>
+          <td>${esc(p.city)}</td>
+          <td><span class="status-pill ${statusClass}">${p.status}</span></td>
+          <td>${p.status === 'deployed' ? `<a href="${esc(p.previewUrl)}" target="_blank">Open ↗</a>` : '—'}</td>
+          <td>${createdStr}</td>
+          <td>${expiresStr}${expiryBadge}</td>
+        </tr>
+      `;
+    }).join('');
+  } catch (err) {
+    countsEl.innerHTML = '';
+    tbody.innerHTML = '';
+    empty.classList.remove('hidden');
+  }
 }
 
 // ============================================================

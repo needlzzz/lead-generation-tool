@@ -5,6 +5,46 @@ const { generatePreview } = require('../lib/previewGenerator');
 
 const router = express.Router();
 
+// GET /api/previews/list — all previews with lead info and status
+router.get('/list', (req, res) => {
+  try {
+    const entries = registry.getAllEntries();
+    const now = new Date();
+
+    const previews = entries.map(entry => {
+      const lead = dataStore.get('leads', entry.leadId);
+      const isExpired = entry.expiresAt && new Date(entry.expiresAt) < now;
+      const effectiveStatus = isExpired ? 'expired' : entry.status;
+
+      return {
+        slug: entry.slug,
+        leadId: entry.leadId,
+        businessName: lead ? lead.businessName : '(unknown)',
+        category: lead ? lead.category : '',
+        city: lead ? (lead.city || '') : '',
+        previewUrl: entry.previewUrl || `https://preview.kaelint.ch/${entry.slug}/`,
+        status: effectiveStatus,
+        createdAt: entry.createdAt || null,
+        expiresAt: entry.expiresAt || null,
+        niche: entry.niche || ''
+      };
+    });
+
+    // Sort: deployed first, then built, then expired
+    const statusOrder = { deployed: 0, built: 1, expired: 2 };
+    previews.sort((a, b) => (statusOrder[a.status] || 3) - (statusOrder[b.status] || 3));
+
+    const counts = { deployed: 0, built: 0, expired: 0 };
+    for (const p of previews) {
+      counts[p.status] = (counts[p.status] || 0) + 1;
+    }
+
+    res.json({ previews, counts, total: previews.length });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to list previews' });
+  }
+});
+
 // POST /api/previews/generate — SSE endpoint
 router.post('/generate', async (req, res) => {
   const { leadId } = req.body;
