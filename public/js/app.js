@@ -503,79 +503,46 @@ async function renderScrapeLogTab() {
   const container = document.getElementById('scrapeLogMatrix');
   const empty = document.getElementById('emptyScrapeLog');
 
-  // Always fetch ALL leads (unfiltered) so the matrix shows every category
-  let leads = allLeads;
-  if (currentCategoryFilter) {
-    try {
-      const res = await API.get('/api/leads');
-      leads = res.leads;
-    } catch (err) {
-      // Fall back to filtered allLeads if fetch fails
+  try {
+    const data = await API.get('/api/leads/scrape-matrix');
+    const { matrix, cities, categories } = data;
+
+    if (categories.length === 0) {
+      container.innerHTML = '';
+      empty.classList.remove('hidden');
+      return;
     }
-  }
+    empty.classList.add('hidden');
 
-  // Build map of category+city → { lastDate, count }
-  const scrapeMap = {};
-  const allCities = new Set();
-  const allCats = new Set();
-
-  for (const lead of leads) {
-    let city = lead.city;
-    if (!city && lead.activityLog && lead.activityLog[0]?.details) {
-      const match = lead.activityLog[0].details.match(/in (.+)$/);
-      if (match) city = match[1];
+    // Build matrix table
+    let html = '<table class="scrape-matrix"><thead><tr><th>Category</th>';
+    for (const city of cities) {
+      html += `<th class="matrix-city">${esc(city)}</th>`;
     }
-    if (!city) continue; // Skip leads without a city for the matrix
-    const cat = lead.category || '(keine)';
-    const key = `${cat}::${city}`;
+    html += '<th>Total</th></tr></thead><tbody>';
 
-    allCities.add(city);
-    allCats.add(cat);
-
-    if (!scrapeMap[key]) {
-      scrapeMap[key] = { lastDate: lead.dateDiscovered, count: 0 };
+    for (const cat of categories) {
+      let rowTotal = 0;
+      html += `<tr><td class="matrix-cat">${esc(cat)}</td>`;
+      for (const city of cities) {
+        const key = `${cat}::${city}`;
+        const cell = matrix[key];
+        if (cell) {
+          rowTotal += cell.count;
+          html += `<td class="matrix-cell matrix-cell--has" title="${esc(cat)} in ${esc(city)}: ${cell.count} leads (${cell.lastDate || '?'})">${cell.count}</td>`;
+        } else {
+          html += `<td class="matrix-cell matrix-cell--empty">—</td>`;
+        }
+      }
+      html += `<td class="matrix-total">${rowTotal}</td></tr>`;
     }
-    scrapeMap[key].count++;
-    if (lead.dateDiscovered && (!scrapeMap[key].lastDate || lead.dateDiscovered > scrapeMap[key].lastDate)) {
-      scrapeMap[key].lastDate = lead.dateDiscovered;
-    }
-  }
 
-  if (allCats.size === 0) {
+    html += '</tbody></table>';
+    container.innerHTML = html;
+  } catch (err) {
     container.innerHTML = '';
     empty.classList.remove('hidden');
-    return;
   }
-  empty.classList.add('hidden');
-
-  const cities = [...allCities].sort((a, b) => a.localeCompare(b, 'de'));
-  const categories = [...allCats].sort((a, b) => a.localeCompare(b, 'de'));
-
-  // Build matrix table
-  let html = '<table class="scrape-matrix"><thead><tr><th>Category</th>';
-  for (const city of cities) {
-    html += `<th class="matrix-city">${esc(city)}</th>`;
-  }
-  html += '<th>Total</th></tr></thead><tbody>';
-
-  for (const cat of categories) {
-    let rowTotal = 0;
-    html += `<tr><td class="matrix-cat">${esc(cat)}</td>`;
-    for (const city of cities) {
-      const key = `${cat}::${city}`;
-      const data = scrapeMap[key];
-      if (data) {
-        rowTotal += data.count;
-        html += `<td class="matrix-cell matrix-cell--has" title="${esc(cat)} in ${esc(city)}: ${data.count} leads (${data.lastDate || '?'})">${data.count}</td>`;
-      } else {
-        html += `<td class="matrix-cell matrix-cell--empty">—</td>`;
-      }
-    }
-    html += `<td class="matrix-total">${rowTotal}</td></tr>`;
-  }
-
-  html += '</tbody></table>';
-  container.innerHTML = html;
 }
 
 // ============================================================

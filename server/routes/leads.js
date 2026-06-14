@@ -101,6 +101,45 @@ router.get('/counts', (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// GET /api/leads/scrape-matrix — aggregated category × city counts (for scrape log)
+// ---------------------------------------------------------------------------
+
+router.get('/scrape-matrix', (req, res) => {
+  try {
+    const leads = dataStore.getAll('leads');
+    const scrapeMap = {};  // "category::city" → { count, lastDate }
+    const allCities = new Set();
+    const allCats = new Set();
+
+    for (const lead of leads) {
+      const city = lead.city;
+      if (!city) continue;
+      const cat = lead.category || '(keine)';
+      const key = `${cat}::${city}`;
+
+      allCities.add(city);
+      allCats.add(cat);
+
+      if (!scrapeMap[key]) {
+        scrapeMap[key] = { count: 0, lastDate: lead.dateDiscovered || null };
+      }
+      scrapeMap[key].count++;
+      if (lead.dateDiscovered && (!scrapeMap[key].lastDate || lead.dateDiscovered > scrapeMap[key].lastDate)) {
+        scrapeMap[key].lastDate = lead.dateDiscovered;
+      }
+    }
+
+    res.json({
+      matrix: scrapeMap,
+      cities: [...allCities].sort((a, b) => a.localeCompare(b, 'de')),
+      categories: [...allCats].sort((a, b) => a.localeCompare(b, 'de'))
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to compute scrape matrix' });
+  }
+});
+
+// ---------------------------------------------------------------------------
 // GET /api/leads/due-today — leads with follow-ups due (limited response)
 // ---------------------------------------------------------------------------
 
