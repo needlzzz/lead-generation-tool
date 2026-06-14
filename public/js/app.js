@@ -1557,7 +1557,7 @@ async function analyzeWebsites(selectedOnly = false) {
               count.textContent = `${event.current}/${event.total}`;
             } else if (event.type === 'result') {
               analyzedCount++;
-              count.textContent = `${event.current || analyzedCount}/${leadsToAnalyze.length} (${event.quality}: ${event.score}/100)`;
+              count.textContent = `${event.current || analyzedCount}/${event.total || '?'} (${event.quality}: ${event.score}/100)`;
             } else if (event.type === 'done') {
               bar.classList.add('hidden');
               alert(`Done! Analyzed ${event.analyzed} websites.`);
