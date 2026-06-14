@@ -195,12 +195,12 @@ describe('Existing placeholders regression', () => {
     expect(result.body).toBe('Liebe Anna Schmidt');
   });
 
-  test('[Name] falls back to "Team von {businessName}" when contactPerson is missing', () => {
+  test('[Name] falls back to businessName when contactPerson is missing', () => {
     const lead = makeLead({ contactPerson: null, businessName: 'Salon Bella' });
     const template = makeTemplate('[Name]', '[Name]');
     const result = renderTemplate(template, lead, makeSettings());
 
-    expect(result.subject).toBe('Team von Salon Bella');
+    expect(result.subject).toBe('Salon Bella');
   });
 
   test('[Business Name] resolves correctly', () => {

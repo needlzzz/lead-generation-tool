@@ -24,7 +24,7 @@ function formatGermanDate(isoDateString) {
 function renderTemplate(template, lead, settings) {
   const contactName = lead.contactPerson
     ? lead.contactPerson
-    : `Team von ${lead.businessName}`;
+    : lead.businessName;
 
   // Personalized greeting — use last name if contact person is known, otherwise plain
   let greeting = 'Guten Tag';

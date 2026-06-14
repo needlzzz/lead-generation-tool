@@ -69,9 +69,9 @@ function validateBatchSettings(batch) {
 const DEFAULT_TEMPLATES = {
   email1: {
     subject: 'Idee für [Business Name]',
-    body: `Sali [Name],
+    body: `Sali [Business Name],
 
-kurzer Hinweis: Eurer Website fehlen ein paar Basics, die heute Standard sind — das kostet euch wahrscheinlich Anfragen.
+kurzer Hinweis: Bei eurer Website sind mir ein paar Sachen aufgefallen — unter anderem [Website-Probleme-Kurz]. Das sind Punkte, die euch wahrscheinlich Anfragen kosten.
 
 Ich hab mal skizziert, wie das moderner aussehen könnte:
 👉 [Preview-Link]
@@ -82,7 +82,7 @@ Falls euch das interessiert, meldet euch gern — ich erklär euch in 10 Minuten
   },
   email2: {
     subject: 'Re: Idee für [Business Name]',
-    body: `Sali [Name],
+    body: `Sali [Business Name],
 
 wollte nur sichergehen, dass meine Nachricht nicht untergegangen ist. Die Vorschau ist noch online:
 👉 [Preview-Link]
