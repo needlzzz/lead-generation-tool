@@ -331,7 +331,7 @@ function generateConfig(lead, slug) {
     secondaryColor: secondary,
     accentColor: accent,
     fontFamily,
-    logoPath: 'logo.svg',
+    logoPath: 'logo.jpg',
     ctaTarget: '#contactForm',
     tagline: { de: resolveTemplate(preset.tagline, lead) },
     aboutText: { de: resolveTemplate(preset.aboutText, lead) },

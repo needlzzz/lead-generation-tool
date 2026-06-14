@@ -118,7 +118,7 @@ describe('generateConfig — niche presets', () => {
     expect(config.languages).toEqual(['de']);
 
     // Logo path
-    expect(config.logoPath).toBe('logo.svg');
+    expect(config.logoPath).toBe('logo.jpg');
 
     // CTA target
     expect(config.ctaTarget).toBe('#contactForm');
