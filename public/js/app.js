@@ -629,6 +629,7 @@ function setupEventListeners() {
   document.getElementById('btnEnrichEmails').addEventListener('click', enrichEmails);
   document.getElementById('btnAnalyzeWebsites').addEventListener('click', () => analyzeWebsites(false));
   document.getElementById('btnAnalyzeSelected').addEventListener('click', () => analyzeWebsites(true));
+  document.getElementById('btnPreviewSelected').addEventListener('click', generatePreviewsForSelected);
   document.getElementById('selectAllDiscovery').addEventListener('change', (e) => {
     document.querySelectorAll('.lead-select').forEach(cb => { cb.checked = e.target.checked; });
     updateSelectionUI();
@@ -1169,6 +1170,108 @@ function retryPreviewGeneration(leadId) {
 }
 
 // ============================================================
+// BATCH PREVIEW GENERATION (selected leads)
+// ============================================================
+
+async function generatePreviewsForSelected() {
+  const selectedIds = getSelectedLeadIds();
+  if (selectedIds.length === 0) {
+    showError('No leads selected.');
+    return;
+  }
+
+  if (!confirm(`Generate previews for ${selectedIds.length} selected lead(s)? This may take a while.`)) {
+    return;
+  }
+
+  const bar = document.getElementById('enrichmentBar');
+  const text = document.getElementById('enrichmentText');
+  const fill = document.getElementById('enrichmentFill');
+  const count = document.getElementById('enrichmentCount');
+  bar.classList.remove('hidden');
+  text.textContent = 'Starting batch preview generation...';
+  fill.style.width = '0%';
+  count.textContent = '';
+
+  const btn = document.getElementById('btnPreviewSelected');
+  btn.disabled = true;
+  btn.textContent = '⏳ Generating...';
+
+  try {
+    const response = await fetch('/api/batch/generate-previews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ leadIds: selectedIds })
+    });
+
+    if (!response.ok && !response.headers.get('content-type')?.includes('text/event-stream')) {
+      const err = await response.json().catch(() => ({ error: response.statusText }));
+      throw new Error(err.error || 'Generation failed');
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let completed = 0;
+    let failed = 0;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      let currentEventType = 'progress';
+      for (const line of lines) {
+        if (line.startsWith('event: ')) {
+          currentEventType = line.slice(7).trim();
+        } else if (line.startsWith('data: ')) {
+          try {
+            const data = JSON.parse(line.slice(6));
+            if (currentEventType === 'build_complete' || data.step === 'build_complete') {
+              completed++;
+              const pct = Math.round((completed / selectedIds.length) * 100);
+              fill.style.width = `${pct}%`;
+              count.textContent = `${completed}/${selectedIds.length} built`;
+            } else if (currentEventType === 'build_failed' || data.step === 'build_failed') {
+              failed++;
+              count.textContent = `${completed}/${selectedIds.length} built, ${failed} failed`;
+            } else if (currentEventType === 'progress' || data.step) {
+              text.textContent = data.message || data.step || 'Processing...';
+            } else if (currentEventType === 'complete' || data.step === 'deploy_complete') {
+              bar.classList.add('hidden');
+              showToast('success', `Previews generated: ${completed} built, ${failed} failed.`);
+              await loadData();
+            } else if (currentEventType === 'error') {
+              throw new Error(data.message || 'Generation failed');
+            }
+          } catch (parseErr) {
+            if (parseErr.message && !parseErr.message.includes('Unexpected end of JSON input')) {
+              throw parseErr;
+            }
+          }
+        }
+      }
+    }
+
+    bar.classList.add('hidden');
+    if (completed > 0 || failed > 0) {
+      showToast('success', `Done: ${completed} previews built, ${failed} failed.`);
+    }
+    await loadData();
+  } catch (err) {
+    bar.classList.add('hidden');
+    showError(`Preview generation error: ${err.message}`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Preview Selected';
+    btn.classList.add('hidden');
+  }
+}
+
+// ============================================================
 // SCRAPER
 // ============================================================
 
@@ -1438,12 +1541,21 @@ function getSelectedLeadIds() {
 function updateSelectionUI() {
   const selectedIds = getSelectedLeadIds();
   const btnAnalyzeSelected = document.getElementById('btnAnalyzeSelected');
+  const btnPreviewSelected = document.getElementById('btnPreviewSelected');
   if (btnAnalyzeSelected) {
     if (selectedIds.length > 0) {
       btnAnalyzeSelected.classList.remove('hidden');
       btnAnalyzeSelected.textContent = `Analyze Selected (${selectedIds.length})`;
     } else {
       btnAnalyzeSelected.classList.add('hidden');
+    }
+  }
+  if (btnPreviewSelected) {
+    if (selectedIds.length > 0) {
+      btnPreviewSelected.classList.remove('hidden');
+      btnPreviewSelected.textContent = `Preview Selected (${selectedIds.length})`;
+    } else {
+      btnPreviewSelected.classList.add('hidden');
     }
   }
 }
