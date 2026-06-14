@@ -79,6 +79,8 @@ async function loadData() {
     // Server-side filters
     const hasEmailOnly = document.getElementById('filterHasEmail')?.checked;
     if (hasEmailOnly) params.set('hasEmail', '1');
+    const hasPreviewOnly = document.getElementById('filterHasPreview')?.checked;
+    if (hasPreviewOnly) params.set('hasPreview', '1');
 
     // Server-side sorting
     if (qualitySortOrder) {
@@ -902,6 +904,12 @@ function setupEventListeners() {
 
   // Has-email filter
   document.getElementById('filterHasEmail').addEventListener('change', () => {
+    currentPage = 1;
+    loadData();
+  });
+
+  // Has-preview filter
+  document.getElementById('filterHasPreview').addEventListener('change', () => {
     currentPage = 1;
     loadData();
   });

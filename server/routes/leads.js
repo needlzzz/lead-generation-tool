@@ -113,6 +113,9 @@ router.get('/', (req, res) => {
     if (req.query.hasEmail === '1') {
       leads = leads.filter(l => l.email);
     }
+    if (req.query.hasPreview === '1') {
+      leads = leads.filter(l => l.previewUrl);
+    }
 
     // Server-side sorting
     const sortField = req.query.sort;    // e.g. 'quality', 'category', 'status', 'discovered'
