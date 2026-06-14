@@ -109,6 +109,11 @@ router.get('/', (req, res) => {
 
     let leads = dataStore.getAll('leads', Object.keys(filter).length ? filter : null);
 
+    // Additional filters (not field-equality based)
+    if (req.query.hasEmail === '1') {
+      leads = leads.filter(l => l.email);
+    }
+
     // Server-side sorting
     const sortField = req.query.sort;    // e.g. 'quality', 'category', 'status', 'discovered'
     const sortOrder = req.query.order;   // 'asc' or 'desc'

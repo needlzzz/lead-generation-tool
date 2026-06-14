@@ -8,7 +8,7 @@ let currentTab = 'discovery';
 let currentCategoryFilter = '';
 let currentCityFilter = '';
 let currentEmailContext = null; // { leadId, emailType }
-let qualitySortOrder = null; // null = no sort, 'asc' = best first, 'desc' = worst first
+let qualitySortOrder = 'desc'; // default: Poor first (best prospects)
 let discoverySortField = null; // null, 'category', 'status', 'discovered'
 let discoverySortOrder = null; // null, 'asc', 'desc'
 let currentPage = 1;
@@ -75,6 +75,10 @@ async function loadData() {
     params.set('page', currentPage);
     params.set('limit', PAGE_SIZE);
     if (currentCategoryFilter) params.set('category', currentCategoryFilter);
+
+    // Server-side filters
+    const hasEmailOnly = document.getElementById('filterHasEmail')?.checked;
+    if (hasEmailOnly) params.set('hasEmail', '1');
 
     // Server-side sorting
     if (qualitySortOrder) {
@@ -574,12 +578,14 @@ function setupEventListeners() {
 
   // No-website filter
   document.getElementById('filterNoWebsite').addEventListener('change', () => {
-    renderDiscoveryTab();
+    currentPage = 1;
+    loadData();
   });
 
   // Has-email filter
   document.getElementById('filterHasEmail').addEventListener('change', () => {
-    renderDiscoveryTab();
+    currentPage = 1;
+    loadData();
   });
 
   // City filter
