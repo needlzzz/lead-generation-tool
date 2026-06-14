@@ -14,6 +14,7 @@ let discoverySortOrder = null; // null, 'asc', 'desc'
 let currentPage = 1;
 let totalPages = 1;
 let totalLeads = 0;
+let scrapeLogSortOrder = null; // null = alphabetical, 'asc' = lowest first, 'desc' = highest first
 const PAGE_SIZE = 100;
 
 // ============================================================
@@ -514,27 +515,48 @@ async function renderScrapeLogTab() {
     }
     empty.classList.add('hidden');
 
+    // Compute row totals for sorting
+    const rowTotals = {};
+    for (const cat of categories) {
+      let total = 0;
+      for (const city of cities) {
+        const cell = matrix[`${cat}::${city}`];
+        if (cell) total += cell.count;
+      }
+      rowTotals[cat] = total;
+    }
+
+    // Sort categories
+    let sortedCategories = [...categories];
+    if (scrapeLogSortOrder === 'asc') {
+      sortedCategories.sort((a, b) => rowTotals[a] - rowTotals[b]);
+    } else if (scrapeLogSortOrder === 'desc') {
+      sortedCategories.sort((a, b) => rowTotals[b] - rowTotals[a]);
+    }
+    // else: keep alphabetical (default from server)
+
+    const sortIndicator = scrapeLogSortOrder === 'asc' ? ' ▲' : scrapeLogSortOrder === 'desc' ? ' ▼' : ' ⇅';
+
     // Build matrix table
     let html = '<table class="scrape-matrix"><thead><tr><th>Category</th>';
     for (const city of cities) {
       html += `<th class="matrix-city">${esc(city)}</th>`;
     }
-    html += '<th>Total</th></tr></thead><tbody>';
+    html += `<th style="cursor:pointer" onclick="toggleScrapeLogSort()" title="Click to sort">Total${sortIndicator}</th></tr></thead><tbody>`;
 
-    for (const cat of categories) {
-      let rowTotal = 0;
+    for (const cat of sortedCategories) {
+      const total = rowTotals[cat];
       html += `<tr><td class="matrix-cat">${esc(cat)}</td>`;
       for (const city of cities) {
         const key = `${cat}::${city}`;
         const cell = matrix[key];
         if (cell) {
-          rowTotal += cell.count;
           html += `<td class="matrix-cell matrix-cell--has" title="${esc(cat)} in ${esc(city)}: ${cell.count} leads (${cell.lastDate || '?'})">${cell.count}</td>`;
         } else {
           html += `<td class="matrix-cell matrix-cell--empty">—</td>`;
         }
       }
-      html += `<td class="matrix-total">${rowTotal}</td></tr>`;
+      html += `<td class="matrix-total">${total}</td></tr>`;
     }
 
     html += '</tbody></table>';
@@ -543,6 +565,13 @@ async function renderScrapeLogTab() {
     container.innerHTML = '';
     empty.classList.remove('hidden');
   }
+}
+
+function toggleScrapeLogSort() {
+  if (scrapeLogSortOrder === null) scrapeLogSortOrder = 'desc';
+  else if (scrapeLogSortOrder === 'desc') scrapeLogSortOrder = 'asc';
+  else scrapeLogSortOrder = null;
+  renderScrapeLogTab();
 }
 
 // ============================================================
