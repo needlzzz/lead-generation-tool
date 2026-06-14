@@ -15,6 +15,8 @@ kurzer Hinweis: Bei eurer Website sind mir ein paar Sachen aufgefallen — unter
 Ich hab mal skizziert, wie das moderner aussehen könnte:
 👉 [Preview-Link]
 
+[Preview-Disclaimer]
+
 Falls euch das interessiert, meldet euch gern — ich erklär euch in 10 Minuten, was dahintersteckt.
 
 [Dein Name]
