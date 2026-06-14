@@ -295,6 +295,8 @@ function toggleQualitySort() {
   if (qualitySortOrder === null) qualitySortOrder = 'desc'; // worst first (best prospects)
   else if (qualitySortOrder === 'desc') qualitySortOrder = 'asc';
   else qualitySortOrder = null;
+  const th = document.getElementById('thQuality');
+  if (th) th.textContent = 'Quality ' + (qualitySortOrder === 'asc' ? '▲' : qualitySortOrder === 'desc' ? '▼' : '⇅');
   currentPage = 1;
   loadData();
 }
