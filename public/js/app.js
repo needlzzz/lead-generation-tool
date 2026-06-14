@@ -160,6 +160,7 @@ function renderCurrentTab() {
     case 'outreach': renderOutreachTab(); break;
     case 'replies': renderRepliesTab(); break;
     case 'clients': renderClientsTab(); break;
+    case 'batch': renderBatchTab(); break;
     case 'scrapelog': renderScrapeLogTab(); break;
   }
 }
@@ -487,6 +488,268 @@ function renderClientsTab() {
 
 
 // ============================================================
+// BATCH OPERATIONS TAB
+// ============================================================
+
+let batchPreviewPolling = null;
+let batchEmailPolling = null;
+
+async function renderBatchTab() {
+  await refreshBatchPreviewStatus();
+  await refreshBatchEmailStatus();
+}
+
+async function refreshBatchPreviewStatus() {
+  const container = document.getElementById('batchPreviewStatus');
+  const btnResume = document.getElementById('btnBatchPreviewsResume');
+  try {
+    const data = await API.get('/api/batch/preview-status');
+    const completed = data.completed ? data.completed.length : 0;
+    const failed = data.failed ? data.failed.length : 0;
+    const queued = data.queue ? data.queue.length : 0;
+    const statusClass = data.status === 'complete' ? 'complete' : data.status === 'running' ? 'running' : data.status === 'failed' ? 'failed' : '';
+
+    container.innerHTML = `
+      <div class="batch-status-row"><span class="batch-status-label">Status:</span> <span class="batch-status-value ${statusClass}">${data.status || 'idle'}</span></div>
+      <div class="batch-status-row"><span class="batch-status-label">Queued:</span> <span class="batch-status-value">${queued}</span></div>
+      <div class="batch-status-row"><span class="batch-status-label">Completed:</span> <span class="batch-status-value">${completed}</span></div>
+      <div class="batch-status-row"><span class="batch-status-label">Failed:</span> <span class="batch-status-value">${failed}</span></div>
+      ${data.summary ? `<div class="batch-status-row"><span class="batch-status-label">Duration:</span> <span class="batch-status-value">${Math.round(data.summary.durationSeconds / 60)} min</span></div>` : ''}
+    `;
+
+    btnResume.disabled = !(data.status === 'running' || data.status === 'deploying');
+  } catch (err) {
+    container.innerHTML = `<span style="color:var(--color-text-muted)">No batch preview data yet.</span>`;
+    btnResume.disabled = true;
+  }
+}
+
+async function refreshBatchEmailStatus() {
+  const container = document.getElementById('batchEmailStatus');
+  const btnResume = document.getElementById('btnBatchEmailsResume');
+  const btnStop = document.getElementById('btnBatchEmailsStop');
+  try {
+    const data = await API.get('/api/batch/send-status');
+    const statusClass = data.status === 'complete' ? 'complete' : data.status === 'sending' ? 'running' : data.status.startsWith('paused') ? 'paused' : data.status === 'stopping' ? 'paused' : '';
+    const isActive = ['sending', 'paused_quota', 'paused_window'].includes(data.status);
+
+    container.innerHTML = `
+      <div class="batch-status-row"><span class="batch-status-label">Status:</span> <span class="batch-status-value ${statusClass}">${data.status || 'idle'}</span></div>
+      <div class="batch-status-row"><span class="batch-status-label">Queued:</span> <span class="batch-status-value">${data.totalQueued || 0}</span></div>
+      <div class="batch-status-row"><span class="batch-status-label">Completed:</span> <span class="batch-status-value">${data.completed || 0}</span></div>
+      <div class="batch-status-row"><span class="batch-status-label">Failed:</span> <span class="batch-status-value">${data.failed || 0}</span></div>
+      <div class="batch-status-row"><span class="batch-status-label">Quota today:</span> <span class="batch-status-value">${data.dailyQuotaUsed || 0} / ${data.dailyQuotaLimit || 250}</span></div>
+      <div class="batch-status-row"><span class="batch-status-label">Send window:</span> <span class="batch-status-value">${data.sendWindowStatus || '—'}</span></div>
+      ${data.pauseReason ? `<div class="batch-status-row"><span class="batch-status-label">Paused:</span> <span class="batch-status-value paused">${data.pauseReason === 'quota_reached' ? 'Daily quota reached' : 'Outside send window'}</span></div>` : ''}
+    `;
+
+    btnResume.disabled = !(['paused_quota', 'paused_window', 'complete'].includes(data.status));
+    btnStop.disabled = !isActive;
+  } catch (err) {
+    container.innerHTML = `<span style="color:var(--color-text-muted)">No batch email data yet.</span>`;
+    btnResume.disabled = true;
+    btnStop.disabled = true;
+  }
+}
+
+function appendBatchLog(msg, type = 'info') {
+  const container = document.getElementById('batchProgress');
+  // Remove idle message if present
+  const idle = container.querySelector('.batch-progress-idle');
+  if (idle) idle.remove();
+
+  const line = document.createElement('div');
+  line.className = `batch-progress-line ${type}`;
+  line.textContent = msg;
+  container.appendChild(line);
+  container.scrollTop = container.scrollHeight;
+}
+
+async function startBatchPreviews() {
+  const btn = document.getElementById('btnBatchPreviews');
+  btn.disabled = true;
+  btn.textContent = '⏳ Running...';
+
+  appendBatchLog('Starting batch preview generation...', 'info');
+
+  try {
+    const response = await fetch('/api/batch/generate-previews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+
+    if (!response.ok && !response.headers.get('content-type')?.includes('text/event-stream')) {
+      const err = await response.json().catch(() => ({ error: response.statusText }));
+      throw new Error(err.error || 'Failed to start');
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          try {
+            const data = JSON.parse(line.slice(6));
+            if (data.status === 'deploy_complete') {
+              appendBatchLog(`✅ Deploy complete: ${data.completed} previews deployed`, 'success');
+            } else if (data.status === 'deploy_failed') {
+              appendBatchLog(`❌ Deploy failed: ${data.message}`, 'error');
+            } else if (data.status === 'complete' || data.status === 'built') {
+              appendBatchLog(`✓ ${data.message || 'Built'} (${data.completed}/${data.total})`, 'success');
+            } else if (data.status === 'failed') {
+              appendBatchLog(`✗ ${data.message || 'Failed'}`, 'error');
+            } else if (data.status === 'skipped') {
+              appendBatchLog(`⏭ Skipped (${data.completed}/${data.total})`, 'info');
+            } else if (data.message) {
+              appendBatchLog(data.message, 'info');
+            }
+          } catch (e) {}
+        }
+      }
+    }
+
+    await refreshBatchPreviewStatus();
+  } catch (err) {
+    appendBatchLog(`❌ Error: ${err.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Generate All Previews';
+  }
+}
+
+async function resumeBatchPreviews() {
+  const btn = document.getElementById('btnBatchPreviewsResume');
+  btn.disabled = true;
+  appendBatchLog('Resuming batch preview generation...', 'info');
+
+  try {
+    const response = await fetch('/api/batch/generate-previews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ resume: true })
+    });
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          try {
+            const data = JSON.parse(line.slice(6));
+            if (data.message) appendBatchLog(data.message, data.status === 'failed' ? 'error' : 'info');
+          } catch (e) {}
+        }
+      }
+    }
+
+    await refreshBatchPreviewStatus();
+  } catch (err) {
+    appendBatchLog(`❌ Resume error: ${err.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function startBatchEmails() {
+  const btn = document.getElementById('btnBatchEmails');
+  const btnStop = document.getElementById('btnBatchEmailsStop');
+  btn.disabled = true;
+  btn.textContent = '⏳ Running...';
+  btnStop.disabled = false;
+
+  appendBatchLog('Starting batch email send...', 'info');
+
+  try {
+    const result = await API.post('/api/batch/send-emails', { emailType: 'auto' });
+    if (result.status === 'complete' && result.count === 0) {
+      appendBatchLog('No eligible leads to email.', 'info');
+    } else {
+      appendBatchLog(`Queued ${result.totalQueued} emails. Sending in background...`, 'success');
+      // Start polling for status
+      startEmailPolling();
+    }
+  } catch (err) {
+    appendBatchLog(`❌ Error: ${err.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Start Batch Send';
+  }
+}
+
+async function resumeBatchEmails() {
+  const btn = document.getElementById('btnBatchEmailsResume');
+  const btnStop = document.getElementById('btnBatchEmailsStop');
+  btn.disabled = true;
+  btnStop.disabled = false;
+
+  appendBatchLog('Resuming batch email send...', 'info');
+
+  try {
+    const result = await API.post('/api/batch/send-emails', { resume: true });
+    appendBatchLog(`Resumed. Status: ${result.status}`, 'success');
+    startEmailPolling();
+  } catch (err) {
+    appendBatchLog(`❌ Resume error: ${err.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function stopBatchEmails() {
+  const btnStop = document.getElementById('btnBatchEmailsStop');
+  btnStop.disabled = true;
+  appendBatchLog('Stopping batch send (finishing current email)...', 'info');
+
+  try {
+    const result = await API.post('/api/batch/send-stop', {});
+    appendBatchLog(`Stopped. Completed: ${result.completed}, Failed: ${result.failed}`, 'info');
+    stopEmailPolling();
+    await refreshBatchEmailStatus();
+  } catch (err) {
+    appendBatchLog(`❌ Stop error: ${err.message}`, 'error');
+  }
+}
+
+function startEmailPolling() {
+  stopEmailPolling();
+  batchEmailPolling = setInterval(async () => {
+    try {
+      const data = await API.get('/api/batch/send-status');
+      await refreshBatchEmailStatus();
+
+      if (data.status === 'complete' || data.status === 'idle') {
+        appendBatchLog(`✅ Batch send complete. Sent: ${data.completed}, Failed: ${data.failed}`, 'success');
+        stopEmailPolling();
+      }
+    } catch (e) {}
+  }, 5000);
+}
+
+function stopEmailPolling() {
+  if (batchEmailPolling) {
+    clearInterval(batchEmailPolling);
+    batchEmailPolling = null;
+  }
+}
+
+// ============================================================
 // SCRAPE LOG TAB
 // ============================================================
 
@@ -689,6 +952,13 @@ function setupEventListeners() {
     e.preventDefault();
     await saveCategory();
   });
+
+  // Batch operations
+  document.getElementById('btnBatchPreviews').addEventListener('click', startBatchPreviews);
+  document.getElementById('btnBatchPreviewsResume').addEventListener('click', resumeBatchPreviews);
+  document.getElementById('btnBatchEmails').addEventListener('click', startBatchEmails);
+  document.getElementById('btnBatchEmailsResume').addEventListener('click', resumeBatchEmails);
+  document.getElementById('btnBatchEmailsStop').addEventListener('click', stopBatchEmails);
 }
 
 // ============================================================

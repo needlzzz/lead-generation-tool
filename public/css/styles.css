@@ -1074,3 +1074,86 @@ form {
   cursor: not-allowed;
   pointer-events: none;
 }
+
+/* Batch Operations Panel */
+.batch-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 16px 0;
+}
+
+.batch-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.batch-section h3 {
+  margin: 0 0 8px 0;
+  font-size: 1rem;
+}
+
+.batch-desc {
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  margin: 0 0 12px 0;
+}
+
+.batch-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.batch-status {
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.batch-status-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 4px 0;
+}
+
+.batch-status-label {
+  color: var(--color-text-secondary);
+  min-width: 120px;
+}
+
+.batch-status-value {
+  font-weight: 500;
+}
+
+.batch-status-value.running { color: var(--color-primary); }
+.batch-status-value.complete { color: var(--color-success); }
+.batch-status-value.paused { color: var(--color-warning); }
+.batch-status-value.failed { color: var(--color-danger); }
+
+.batch-progress {
+  min-height: 100px;
+  max-height: 300px;
+  overflow-y: auto;
+  font-family: monospace;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  padding: 12px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+}
+
+.batch-progress-idle {
+  color: var(--color-text-muted);
+}
+
+.batch-progress-line {
+  padding: 2px 0;
+}
+
+.batch-progress-line.success { color: var(--color-success); }
+.batch-progress-line.error { color: var(--color-danger); }
+.batch-progress-line.info { color: var(--color-text-secondary); }

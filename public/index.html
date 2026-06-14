@@ -57,6 +57,7 @@
         <button class="tab" role="tab" aria-selected="false" data-tab="outreach">Outreach Pipeline</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="replies">Replies &amp; Meetings</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="clients">Client Tracker</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="batch">Batch Operations</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="scrapelog">Scrape Log</button>
       </div>
     </nav>
@@ -199,6 +200,36 @@
         </table>
         <div id="emptyClients" class="empty-state hidden">
           No clients yet. Leads appear here after a meeting is scheduled.
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="panel-batch">
+      <div class="batch-panel">
+        <div class="batch-section">
+          <h3>Preview Generation</h3>
+          <p class="batch-desc">Build preview sites for all analyzed leads that don't have a preview yet.</p>
+          <div class="batch-actions">
+            <button class="btn btn-primary" id="btnBatchPreviews">Generate All Previews</button>
+            <button class="btn" id="btnBatchPreviewsResume" disabled>Resume</button>
+          </div>
+          <div id="batchPreviewStatus" class="batch-status"></div>
+        </div>
+        <div class="batch-section">
+          <h3>Email Sending</h3>
+          <p class="batch-desc">Send cold outreach and follow-ups to all eligible leads via Brevo SMTP.</p>
+          <div class="batch-actions">
+            <button class="btn btn-primary" id="btnBatchEmails">Start Batch Send</button>
+            <button class="btn" id="btnBatchEmailsResume" disabled>Resume</button>
+            <button class="btn btn-danger" id="btnBatchEmailsStop" disabled>Stop</button>
+          </div>
+          <div id="batchEmailStatus" class="batch-status"></div>
+        </div>
+        <div class="batch-section">
+          <h3>Live Progress</h3>
+          <div id="batchProgress" class="batch-progress">
+            <div class="batch-progress-idle">No batch operation running. Start one above.</div>
+          </div>
         </div>
       </div>
     </section>
