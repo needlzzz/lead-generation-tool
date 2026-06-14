@@ -1216,22 +1216,34 @@ async function generatePreviewsForSelected() {
         } else if (line.startsWith('data: ')) {
           try {
             const data = JSON.parse(line.slice(6));
-            if (currentEventType === 'build_complete' || data.step === 'build_complete') {
+
+            if (data.status === 'deploy_complete') {
+              bar.classList.add('hidden');
+              showToast('success', `Previews deployed: ${completed} built, ${failed} failed.`);
+              await loadData();
+            } else if (data.status === 'deploy_failed') {
+              bar.classList.add('hidden');
+              showError(`Deploy fehlgeschlagen: ${data.message}`);
+            } else if (data.status === 'complete' || data.status === 'built') {
               completed++;
               const pct = Math.round((completed / selectedIds.length) * 100);
               fill.style.width = `${pct}%`;
               count.textContent = `${completed}/${selectedIds.length} built`;
-            } else if (currentEventType === 'build_failed' || data.step === 'build_failed') {
+              text.textContent = data.message || 'Built';
+            } else if (data.status === 'failed') {
               failed++;
               count.textContent = `${completed}/${selectedIds.length} built, ${failed} failed`;
-            } else if (currentEventType === 'progress' || data.step) {
-              text.textContent = data.message || data.step || 'Processing...';
-            } else if (currentEventType === 'complete' || data.step === 'deploy_complete') {
-              bar.classList.add('hidden');
-              showToast('success', `Previews generated: ${completed} built, ${failed} failed.`);
-              await loadData();
+              text.textContent = data.message || 'Failed';
+            } else if (data.status === 'skipped') {
+              completed++;
+              const pct = Math.round((completed / selectedIds.length) * 100);
+              fill.style.width = `${pct}%`;
+              count.textContent = `${completed}/${selectedIds.length} (incl. skipped)`;
             } else if (currentEventType === 'error') {
               throw new Error(data.message || 'Generation failed');
+            } else {
+              // General progress
+              text.textContent = data.message || 'Processing...';
             }
           } catch (parseErr) {
             if (parseErr.message && !parseErr.message.includes('Unexpected end of JSON input')) {
