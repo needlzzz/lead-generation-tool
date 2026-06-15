@@ -143,7 +143,14 @@ process.on('SIGTERM', gracefulShutdown);
 // Cache accessors (lazy-load on first access)
 // ---------------------------------------------------------------------------
 
+// Collections managed by other modules (previewRegistry) — dataStore must not touch these
+const PROTECTED_COLLECTIONS = new Set(['previews']);
+
 function getCache(collection) {
+  if (PROTECTED_COLLECTIONS.has(collection)) {
+    console.warn(`[dataStore] WARNING: attempted access to protected collection "${collection}" — use its own module instead`);
+    return new Map();
+  }
   if (!cache.has(collection)) {
     cache.set(collection, loadCollectionFromDisk(collection));
   }
