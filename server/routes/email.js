@@ -24,9 +24,11 @@ Ich hab mal einen Entwurf erstellt, wie eure Webseite moderner aussehen könnte:
 
 Falls Ihr euch für ein Re-Design interessiert, meldet euch gerne bei mir.
 
+Für mehr Informationen zum Angebot, besuche meine Webseite:
+👉 https://kaelint.ch
+
 Marc Kaelin
-Kaelint Webdesign
-https://kaelint.ch`
+Kaelint Webdesign`
   },
   email2: {
     subject: 'Re: Idee für [Business Name]',
@@ -37,9 +39,11 @@ wollte nur sichergehen, dass meine Nachricht nicht untergegangen ist. Die Vorsch
 
 Kein Druck — nur falls es doch passt.
 
+Für mehr Informationen zum Angebot, besuche meine Webseite:
+👉 https://kaelint.ch
+
 Marc Kaelin
-Kaelint Webdesign
-https://kaelint.ch`
+Kaelint Webdesign`
   }
 };
 
