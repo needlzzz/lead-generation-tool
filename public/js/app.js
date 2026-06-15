@@ -2231,11 +2231,11 @@ async function saveSettingsSMTP() {
   try {
     await API.put('/api/settings', {
       smtp: {
-        host: document.getElementById('smtpHost').value,
+        host: document.getElementById('smtpHost').value.trim(),
         port: parseInt(document.getElementById('smtpPort').value) || 587,
-        username: document.getElementById('smtpUsername').value,
-        password: document.getElementById('smtpPassword').value,
-        fromAddress: document.getElementById('smtpFrom').value,
+        username: document.getElementById('smtpUsername').value.trim(),
+        password: document.getElementById('smtpPassword').value.trim(),
+        fromAddress: document.getElementById('smtpFrom').value.trim(),
         useProxy: document.getElementById('smtpUseProxy').checked,
         maxPersonalEmailsPerDay: parseInt(document.getElementById('smtpMaxPerDay').value) || 20
       }
