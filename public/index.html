@@ -457,12 +457,13 @@
         </div>
         <div class="settings-panel" id="settings-smtp">
           <form id="formSettingsSMTP">
+            <h3 style="margin-top:0">Personal SMTP (manual sends)</h3>
             <div class="form-row">
-              <label for="smtpHost">SMTP Host</label>
-              <input type="text" id="smtpHost" placeholder="smtp.gmail.com">
+              <label for="smtpHost">Host</label>
+              <input type="text" id="smtpHost" placeholder="smtp.infomaniak.com">
             </div>
             <div class="form-row">
-              <label for="smtpPort">SMTP Port</label>
+              <label for="smtpPort">Port</label>
               <input type="number" id="smtpPort" value="587">
             </div>
             <div class="form-row">
@@ -480,19 +481,19 @@
             <div class="form-row">
               <label for="smtpProxy">
                 <input type="checkbox" id="smtpUseProxy" style="margin-right: 6px;">
-                Use corporate proxy (http://aproxy.corproot.net:8080)
+                Use corporate proxy
               </label>
             </div>
             <div class="form-row">
-              <label for="smtpMaxPerDay">Daily send limit (personal)</label>
+              <label for="smtpMaxPerDay">Daily limit</label>
               <input type="number" id="smtpMaxPerDay" min="1" max="200" value="20" style="width:80px">
             </div>
             <div class="form-actions">
-              <button type="button" class="btn" id="btnTestSMTP">🔌 Test Connection</button>
+              <button type="button" class="btn" id="btnTestSMTP">🔌 Test</button>
               <button type="submit" class="btn btn-primary">Save</button>
             </div>
             <div id="smtpTestResult" class="smtp-test-result hidden"></div>
-            <div class="form-row" style="margin-top: 16px; border-top: 1px solid #eee; padding-top: 16px;">
+            <div class="form-row" style="margin-top: 12px; border-top: 1px solid #eee; padding-top: 12px;">
               <label for="smtpTestRecipient">Send Test Email To</label>
               <div style="display: flex; gap: 8px;">
                 <input type="email" id="smtpTestRecipient" placeholder="your@email.com" style="flex:1;">
@@ -500,6 +501,31 @@
               </div>
             </div>
             <div id="smtpSendTestResult" class="smtp-test-result hidden"></div>
+
+            <h3 style="margin-top:24px; padding-top:16px; border-top: 2px solid var(--color-border);">Brevo SMTP (batch sends)</h3>
+            <div class="form-row">
+              <label for="brevoHost">Host</label>
+              <input type="text" id="brevoHost" placeholder="smtp-relay.brevo.com">
+            </div>
+            <div class="form-row">
+              <label for="brevoPort">Port</label>
+              <input type="number" id="brevoPort" value="587">
+            </div>
+            <div class="form-row">
+              <label for="brevoUsername">Username (login email)</label>
+              <input type="text" id="brevoUsername">
+            </div>
+            <div class="form-row">
+              <label for="brevoPassword">SMTP Key</label>
+              <input type="password" id="brevoPassword">
+            </div>
+            <div class="form-row">
+              <label for="brevoFrom">From Address (verified sender)</label>
+              <input type="email" id="brevoFrom">
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="btnSaveBrevo">Save Brevo</button>
+            </div>
           </form>
         </div>
         <div class="settings-panel" id="settings-templates">

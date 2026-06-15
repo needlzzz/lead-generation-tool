@@ -1046,6 +1046,7 @@ function setupEventListeners() {
   });
   document.getElementById('btnTestSMTP').addEventListener('click', testSMTP);
   document.getElementById('btnSendTestEmail').addEventListener('click', sendTestEmail);
+  document.getElementById('btnSaveBrevo').addEventListener('click', saveBrevoSettings);
 
   // Templates form
   document.getElementById('formSettingsTemplates').addEventListener('submit', async (e) => {
@@ -2203,6 +2204,12 @@ async function loadSettingsForm() {
     document.getElementById('smtpFrom').value = settings.smtp?.fromAddress || '';
     document.getElementById('smtpUseProxy').checked = !!settings.smtp?.useProxy;
     document.getElementById('smtpMaxPerDay').value = settings.smtp?.maxPersonalEmailsPerDay || 20;
+    // Brevo fields
+    document.getElementById('brevoHost').value = settings.smtp?.brevo?.host || 'smtp-relay.brevo.com';
+    document.getElementById('brevoPort').value = settings.smtp?.brevo?.port || 587;
+    document.getElementById('brevoUsername').value = settings.smtp?.brevo?.username || '';
+    document.getElementById('brevoPassword').value = settings.smtp?.brevo?.password || '';
+    document.getElementById('brevoFrom').value = settings.smtp?.brevo?.fromAddress || '';
   } catch (err) {
     showError(err.message);
   }
@@ -2234,6 +2241,25 @@ async function saveSettingsSMTP() {
       }
     });
     alert('SMTP settings saved.');
+  } catch (err) {
+    showError(err.message);
+  }
+}
+
+async function saveBrevoSettings() {
+  try {
+    await API.put('/api/settings', {
+      smtp: {
+        brevo: {
+          host: document.getElementById('brevoHost').value,
+          port: parseInt(document.getElementById('brevoPort').value) || 587,
+          username: document.getElementById('brevoUsername').value,
+          password: document.getElementById('brevoPassword').value,
+          fromAddress: document.getElementById('brevoFrom').value
+        }
+      }
+    });
+    alert('Brevo SMTP settings saved.');
   } catch (err) {
     showError(err.message);
   }
