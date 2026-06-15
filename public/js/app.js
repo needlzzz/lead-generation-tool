@@ -1710,6 +1710,7 @@ async function emailSelectedLeads() {
 
   let sent = 0;
   let failed = 0;
+  let lastError = '';
 
   for (let i = 0; i < willSend; i++) {
     const lead = eligible[i];
@@ -1717,8 +1718,14 @@ async function emailSelectedLeads() {
       await API.post('/api/email/send', { leadId: lead.id, emailType: 'email1' });
       sent++;
     } catch (err) {
-      if (err.message && err.message.includes('limit reached')) break; // Stop on quota
       failed++;
+      lastError = err.message || 'Unknown error';
+      if (err.message && err.message.includes('limit reached')) break;
+      // On network/connection errors, stop immediately and warn
+      if (err.message && (err.message.includes('ECONNREFUSED') || err.message.includes('ETIMEDOUT') || err.message.includes('ENOTFOUND') || err.message.includes('getaddrinfo') || err.message.includes('network') || err.message.includes('authentication failed'))) {
+        showError(`❌ Sending stopped after ${sent} sent, ${failed} failed.\n\nError: ${lastError}\n\nTip: Check your network/VPN connection and SMTP credentials.`);
+        break;
+      }
     }
   }
 
@@ -1726,7 +1733,13 @@ async function emailSelectedLeads() {
   btn.textContent = 'Email Selected';
   btn.classList.add('hidden');
 
-  showToast('success', `Sent: ${sent}, Failed: ${failed}`);
+  if (failed > 0 && sent === 0) {
+    showError(`❌ All emails failed. Error: ${lastError}\n\nCheck: VPN disconnected? SMTP credentials correct?`);
+  } else if (failed > 0) {
+    showToast('warning', `Sent: ${sent}, Failed: ${failed}. Last error: ${lastError}`);
+  } else {
+    showToast('success', `Sent: ${sent} emails successfully.`);
+  }
   await loadData();
 }
 
