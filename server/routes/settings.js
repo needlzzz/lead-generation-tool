@@ -71,16 +71,20 @@ const DEFAULT_TEMPLATES = {
     subject: 'Idee für [Business Name]',
     body: `Sali [Business Name],
 
-kurzer Hinweis: Bei eurer Website sind mir ein paar Sachen aufgefallen — unter anderem [Website-Probleme-Kurz]. Das sind Punkte, die euch wahrscheinlich Anfragen kosten.
+ich bin Marc Kaelin von Kaelint Webdesign und ich habe mir eure Webseite näher angeschaut. Dabei sind mir folgende Punkte aufgefallen:
 
-Ich hab mal skizziert, wie das moderner aussehen könnte:
+[Website-Probleme]
+
+Das sind Punkte, die bei eurer Kundschaft evtl. Verunsicherung auslösen könnten.
+
+Ich hab mal einen Entwurf erstellt, wie eure Webseite moderner aussehen könnte:
 👉 [Preview-Link]
 
 [Preview-Disclaimer]
 
-Falls euch das interessiert, meldet euch gern — ich erklär euch in 10 Minuten, was dahintersteckt.
+Falls Ihr euch für ein Re-Design interessiert, meldet euch gerne bei mir.
 
-[Dein Name]
+Marc Kaelin
 Kaelint Webdesign`
   },
   email2: {
@@ -92,7 +96,7 @@ wollte nur sichergehen, dass meine Nachricht nicht untergegangen ist. Die Vorsch
 
 Kein Druck — nur falls es doch passt.
 
-[Dein Name]
+Marc Kaelin
 Kaelint Webdesign`
   }
 };
