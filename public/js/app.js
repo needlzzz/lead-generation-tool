@@ -400,7 +400,7 @@ function renderDiscoveryTab() {
   const empty = document.getElementById('emptyDiscovery');
   const noWebsiteOnly = document.getElementById('filterNoWebsite').checked;
   const hasEmailOnly = document.getElementById('filterHasEmail').checked;
-  let leads = allLeads.filter(l => l.status === 'Discovered' || l.status === 'Lost');
+  let leads = allLeads;
   if (currentCityFilter) {
     leads = leads.filter(l => {
       if (l.city) return l.city === currentCityFilter;
