@@ -199,9 +199,13 @@ async function processQueue(settings) {
       const transport = createBrevoTransport(brevoConfig);
       await transport.sendMail({
         from: brevoConfig.fromAddress,
+        replyTo: brevoConfig.fromAddress,
         to: lead.email,
         subject: rendered.subject,
         text: rendered.body,
+        headers: {
+          'X-Mailer': undefined
+        },
         connectionTimeout: 30000,
         greetingTimeout: 30000,
         socketTimeout: 30000

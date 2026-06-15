@@ -154,9 +154,13 @@ async function sendEmail(smtpConfig, fromAddress, to, subject, body) {
   const transport = createTransport(smtpConfig);
   const result = await transport.sendMail({
     from: fromAddress,
+    replyTo: fromAddress,
     to: to,
     subject: subject,
-    text: body
+    text: body,
+    headers: {
+      'X-Mailer': undefined // suppress Nodemailer's default X-Mailer header
+    }
   });
   return result;
 }
