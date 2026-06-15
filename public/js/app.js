@@ -459,107 +459,126 @@ function renderDiscoveryTab() {
 // OUTREACH TAB
 // ============================================================
 
-function renderOutreachTab() {
+async function renderOutreachTab() {
   const tbody = document.querySelector('#tableOutreach tbody');
   const empty = document.getElementById('emptyOutreach');
-  const leads = allLeads.filter(l => ['Reached Out', 'No Response'].includes(l.status));
 
-  if (leads.length === 0) {
+  try {
+    const { leads } = await API.get('/api/leads?status=Reached+Out&limit=200&page=1');
+    const { leads: noResponseLeads } = await API.get('/api/leads?status=No+Response&limit=200&page=1');
+    const allOutreach = [...leads, ...noResponseLeads];
+
+    if (allOutreach.length === 0) {
+      tbody.innerHTML = '';
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+
+    tbody.innerHTML = allOutreach.map(l => `
+      <tr class="clickable" onclick="showActivityLog('${l.id}')">
+        <td>${esc(l.businessName)}</td>
+        <td>${esc(l.category)}</td>
+        <td>${esc(l.email)}</td>
+        <td><span class="status-pill ${statusClass(l.status)}">${statusLabel(l.status)}</span></td>
+        <td>${l.dateEmail1Sent || '—'}</td>
+        <td>${l.dateFollowUp1Sent || '—'}</td>
+        <td>${l.dateFollowUp2Sent || '—'}</td>
+        <td></td>
+        <td onclick="event.stopPropagation()">
+          <div class="actions">
+            <button class="btn btn-sm" onclick="openReplyModal('${l.id}')" ${l.status === 'Reached Out' ? '' : 'disabled'}>📝 Reply</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  } catch (err) {
     tbody.innerHTML = '';
     empty.classList.remove('hidden');
-    return;
   }
-  empty.classList.add('hidden');
-
-  tbody.innerHTML = leads.map(l => {
-    const lastAct = l.activityLog && l.activityLog.length
-      ? l.activityLog[l.activityLog.length - 1].date.split('T')[0]
-      : '';
-    return `
-    <tr class="clickable" onclick="showActivityLog('${l.id}')">
-      <td>${esc(l.businessName)}</td>
-      <td>${esc(l.category)}</td>
-      <td>${esc(l.email)}</td>
-      <td><span class="status-pill ${statusClass(l.status)}">${statusLabel(l.status)}</span></td>
-      <td>${l.dateEmail1Sent || '—'}</td>
-      <td>${l.dateFollowUp1Sent || '—'}</td>
-      <td>${l.dateFollowUp2Sent || '—'}</td>
-      <td>${lastAct}</td>
-      <td onclick="event.stopPropagation()">
-        <div class="actions">
-          <button class="btn btn-sm" onclick="openReplyModal('${l.id}')" ${l.status === 'Reached Out' ? '' : 'disabled'}>📝 Reply</button>
-        </div>
-      </td>
-    </tr>`;
-  }).join('');
 }
 
 // ============================================================
 // REPLIES & MEETINGS TAB
 // ============================================================
 
-function renderRepliesTab() {
+async function renderRepliesTab() {
   const tbody = document.querySelector('#tableReplies tbody');
   const empty = document.getElementById('emptyReplies');
-  const leads = allLeads.filter(l => ['Replied', 'Meeting Scheduled'].includes(l.status));
 
-  if (leads.length === 0) {
+  try {
+    const { leads: replied } = await API.get('/api/leads?status=Replied&limit=200&page=1');
+    const { leads: meeting } = await API.get('/api/leads?status=Meeting+Scheduled&limit=200&page=1');
+    const leads = [...replied, ...meeting];
+
+    if (leads.length === 0) {
+      tbody.innerHTML = '';
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+
+    tbody.innerHTML = leads.map(l => `
+      <tr class="clickable" onclick="showActivityLog('${l.id}')">
+        <td>${esc(l.businessName)}</td>
+        <td>${l.replyDate || '—'}</td>
+        <td>${l.replySentiment || '—'}</td>
+        <td>${l.calendlySent ? 'Yes' : 'No'}</td>
+        <td>${l.meetingDate || '—'}</td>
+        <td>${esc(l.notes || '')}</td>
+        <td onclick="event.stopPropagation()">
+          <div class="actions">
+            <button class="btn btn-sm btn-primary" onclick="openMeetingModal('${l.id}')" ${l.status === 'Replied' ? '' : 'disabled'}>📅 Meeting</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  } catch (err) {
     tbody.innerHTML = '';
     empty.classList.remove('hidden');
-    return;
   }
-  empty.classList.add('hidden');
-
-  tbody.innerHTML = leads.map(l => `
-    <tr class="clickable" onclick="showActivityLog('${l.id}')">
-      <td>${esc(l.businessName)}</td>
-      <td>${l.replyDate || '—'}</td>
-      <td>${l.replySentiment || '—'}</td>
-      <td>${l.calendlySent ? 'Yes' : 'No'}</td>
-      <td>${l.meetingDate || '—'}</td>
-      <td>${esc(l.notes || '')}</td>
-      <td onclick="event.stopPropagation()">
-        <div class="actions">
-          <button class="btn btn-sm btn-primary" onclick="openMeetingModal('${l.id}')" ${l.status === 'Replied' ? '' : 'disabled'}>📅 Meeting</button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
 }
 
 // ============================================================
 // CLIENT TRACKER TAB
 // ============================================================
 
-function renderClientsTab() {
+async function renderClientsTab() {
   const tbody = document.querySelector('#tableClients tbody');
   const empty = document.getElementById('emptyClients');
-  const leads = allLeads.filter(l =>
-    ['Meeting Scheduled', 'Client Won', 'Lost'].includes(l.status) && l.meetingDate
-  );
 
-  if (leads.length === 0) {
+  try {
+    const { leads: meetingLeads } = await API.get('/api/leads?status=Meeting+Scheduled&limit=200&page=1');
+    const { leads: wonLeads } = await API.get('/api/leads?status=Client+Won&limit=200&page=1');
+    const { leads: lostLeads } = await API.get('/api/leads?status=Lost&limit=200&page=1');
+    const leads = [...meetingLeads, ...wonLeads, ...lostLeads].filter(l => l.meetingDate);
+
+    if (leads.length === 0) {
+      tbody.innerHTML = '';
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+
+    tbody.innerHTML = leads.map(l => `
+      <tr class="clickable" onclick="showActivityLog('${l.id}')">
+        <td>${esc(l.businessName)}</td>
+        <td>${l.meetingDate || '—'}</td>
+        <td><span class="status-pill ${statusClass(l.status)}">${l.decision || statusLabel(l.status)}</span></td>
+        <td>${l.startDate || '—'}</td>
+        <td>${esc(l.notes || '')}</td>
+        <td onclick="event.stopPropagation()">
+          <div class="actions">
+            <button class="btn btn-sm btn-primary" onclick="openDecisionModal('${l.id}','mark-won')" ${l.status === 'Meeting Scheduled' ? '' : 'disabled'}>✅ Won</button>
+            <button class="btn btn-sm btn-danger" onclick="openDecisionModal('${l.id}','mark-lost')" ${l.status === 'Meeting Scheduled' ? '' : 'disabled'}>❌ Lost</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  } catch (err) {
     tbody.innerHTML = '';
     empty.classList.remove('hidden');
-    return;
   }
-  empty.classList.add('hidden');
-
-  tbody.innerHTML = leads.map(l => `
-    <tr class="clickable" onclick="showActivityLog('${l.id}')">
-      <td>${esc(l.businessName)}</td>
-      <td>${l.meetingDate || '—'}</td>
-      <td><span class="status-pill ${statusClass(l.status)}">${l.decision || statusLabel(l.status)}</span></td>
-      <td>${l.startDate || '—'}</td>
-      <td>${esc(l.notes || '')}</td>
-      <td onclick="event.stopPropagation()">
-        <div class="actions">
-          <button class="btn btn-sm btn-primary" onclick="openDecisionModal('${l.id}','mark-won')" ${l.status === 'Meeting Scheduled' ? '' : 'disabled'}>✅ Won</button>
-          <button class="btn btn-sm btn-danger" onclick="openDecisionModal('${l.id}','mark-lost')" ${l.status === 'Meeting Scheduled' ? '' : 'disabled'}>❌ Lost</button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
 }
 
 
