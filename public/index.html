@@ -483,6 +483,10 @@
                 Use corporate proxy (http://aproxy.corproot.net:8080)
               </label>
             </div>
+            <div class="form-row">
+              <label for="smtpMaxPerDay">Daily send limit (personal)</label>
+              <input type="number" id="smtpMaxPerDay" min="1" max="200" value="20" style="width:80px">
+            </div>
             <div class="form-actions">
               <button type="button" class="btn" id="btnTestSMTP">🔌 Test Connection</button>
               <button type="submit" class="btn btn-primary">Save</button>

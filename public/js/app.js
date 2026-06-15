@@ -1661,9 +1661,26 @@ async function emailSelectedLeads() {
     return;
   }
 
-  const msg = noEmail > 0
-    ? `Send Email 1 to ${eligible.length} lead(s)? (${noEmail} skipped — no email or wrong status)`
-    : `Send Email 1 to ${eligible.length} lead(s)?`;
+  // Check personal quota
+  let quota;
+  try {
+    quota = await API.get('/api/email/quota');
+  } catch (e) {
+    quota = { count: 0, remaining: 20, maxPerDay: 20 };
+  }
+
+  if (quota.remaining === 0) {
+    showError(`Daily personal email limit reached (${quota.count}/${quota.maxPerDay}). Try again tomorrow or use Batch Send.`);
+    return;
+  }
+
+  const willSend = Math.min(eligible.length, quota.remaining);
+  const willSkipQuota = eligible.length - willSend;
+
+  let msg = `Send Email 1 to ${willSend} lead(s)?`;
+  if (noEmail > 0) msg += `\n${noEmail} skipped (no email or wrong status)`;
+  if (willSkipQuota > 0) msg += `\n${willSkipQuota} won't be sent (daily limit: ${quota.maxPerDay})`;
+  msg += `\n\nPersonal quota: ${quota.count}/${quota.maxPerDay} used today`;
 
   if (!confirm(msg)) return;
 
@@ -1674,11 +1691,13 @@ async function emailSelectedLeads() {
   let sent = 0;
   let failed = 0;
 
-  for (const lead of eligible) {
+  for (let i = 0; i < willSend; i++) {
+    const lead = eligible[i];
     try {
       await API.post('/api/email/send', { leadId: lead.id, emailType: 'email1' });
       sent++;
     } catch (err) {
+      if (err.message && err.message.includes('limit reached')) break; // Stop on quota
       failed++;
     }
   }
@@ -2164,6 +2183,7 @@ async function loadSettingsForm() {
     document.getElementById('smtpPassword').value = settings.smtp?.password || '';
     document.getElementById('smtpFrom').value = settings.smtp?.fromAddress || '';
     document.getElementById('smtpUseProxy').checked = !!settings.smtp?.useProxy;
+    document.getElementById('smtpMaxPerDay').value = settings.smtp?.maxPersonalEmailsPerDay || 20;
   } catch (err) {
     showError(err.message);
   }
@@ -2190,7 +2210,8 @@ async function saveSettingsSMTP() {
         username: document.getElementById('smtpUsername').value,
         password: document.getElementById('smtpPassword').value,
         fromAddress: document.getElementById('smtpFrom').value,
-        useProxy: document.getElementById('smtpUseProxy').checked
+        useProxy: document.getElementById('smtpUseProxy').checked,
+        maxPersonalEmailsPerDay: parseInt(document.getElementById('smtpMaxPerDay').value) || 20
       }
     });
     alert('SMTP settings saved.');

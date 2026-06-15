@@ -1,6 +1,7 @@
 const express = require('express');
 const dataStore = require('../lib/dataStore');
 const { renderTemplate, sendEmail } = require('../lib/emailService');
+const personalQuota = require('../lib/personalQuotaTracker');
 
 const router = express.Router();
 
@@ -92,6 +93,15 @@ router.post('/send', async (req, res) => {
     return res.status(400).json({ error: 'SMTP not configured. Please configure in Settings.' });
   }
 
+  // Check personal daily quota
+  const maxPersonal = settings.smtp.maxPersonalEmailsPerDay || 20;
+  if (!personalQuota.canSend(maxPersonal)) {
+    const { count } = personalQuota.getCount(maxPersonal);
+    return res.status(429).json({
+      error: `Daily personal email limit reached (${count}/${maxPersonal}). Try again tomorrow or use Batch Send via Brevo.`
+    });
+  }
+
   const lead = dataStore.get('leads', leadId);
   if (!lead) return res.status(404).json({ error: 'Lead not found' });
   if (!lead.email) return res.status(400).json({ error: 'Lead has no email address' });
@@ -110,6 +120,9 @@ router.post('/send', async (req, res) => {
 
   try {
     await sendEmail(settings.smtp, settings.smtp.fromAddress, lead.email, finalSubject, finalBody);
+
+    // Increment personal quota counter
+    personalQuota.increment();
 
     // Execute the corresponding pipeline transition
     const now = new Date().toISOString();
@@ -131,6 +144,14 @@ router.post('/send', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: `Failed to send email: ${err.message}` });
   }
+});
+
+// GET /api/email/quota — personal SMTP daily quota status
+router.get('/quota', (req, res) => {
+  const settings = dataStore.readSingleton('settings') || {};
+  const maxPersonal = (settings.smtp && settings.smtp.maxPersonalEmailsPerDay) || 20;
+  const quota = personalQuota.getCount(maxPersonal);
+  res.json(quota);
 });
 
 module.exports = router;

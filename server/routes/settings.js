@@ -113,6 +113,7 @@ const DEFAULT_SETTINGS = {
     password: '',
     fromAddress: '',
     useProxy: false,
+    maxPersonalEmailsPerDay: 20,
     brevo: {
       host: 'smtp-relay.brevo.com',
       port: 587,
@@ -207,6 +208,7 @@ router.put('/', (req, res) => {
         : existingSmtp.password,
       fromAddress: smtp && smtp.fromAddress !== undefined ? smtp.fromAddress : existingSmtp.fromAddress,
       useProxy: smtp && smtp.useProxy !== undefined ? smtp.useProxy : (existingSmtp.useProxy || false),
+      maxPersonalEmailsPerDay: smtp && smtp.maxPersonalEmailsPerDay !== undefined ? smtp.maxPersonalEmailsPerDay : (existingSmtp.maxPersonalEmailsPerDay || 20),
       brevo: {
         host: incomingBrevo.host !== undefined ? incomingBrevo.host : existingBrevo.host,
         port: incomingBrevo.port !== undefined ? incomingBrevo.port : existingBrevo.port,
