@@ -38,18 +38,6 @@
       <!-- Status badges removed — counts visible via tabs -->
     </header>
 
-    <!-- Dashboard Alerts -->
-    <div id="dashboardAlerts" class="dashboard-alerts hidden">
-      <div id="followUpsDue" class="alert-section hidden">
-        <h3>📋 Follow-Ups Due</h3>
-        <div id="followUpsList"></div>
-      </div>
-      <div id="checkReplies" class="alert-section hidden">
-        <h3>📬 Check Replies</h3>
-        <div id="repliesList"></div>
-      </div>
-    </div>
-
     <!-- Tabs -->
     <nav class="tabs" aria-label="Main navigation">
       <div role="tablist">
@@ -65,15 +53,12 @@
 
     <!-- Tab Panels -->
     <section class="tab-panel active" id="panel-discovery">
-      <div class="panel-toolbar">
-        <input type="text" id="searchLeads" placeholder="Search..." style="width:180px;padding:6px 10px;border-radius:4px;border:1px solid var(--color-border);font-size:0.85rem">
-        <button class="btn btn-primary" id="btnAddLead" style="font-size:1rem;padding:8px 20px">New Lead</button>
-        <button class="btn btn-primary" id="btnImportCSV" style="font-size:1rem;padding:8px 20px">Import CSV</button>
-        <input type="file" id="csvFileInput" accept=".csv" class="hidden">
+      <div class="panel-toolbar panel-toolbar--filters">
+        <input type="text" id="searchLeads" placeholder="Search..." class="search-input">
         <select id="categoryFilter" class="category-filter">
           <option value="">All Categories</option>
         </select>
-        <select id="scraperCityFilter" class="category-filter" title="Filter by city / Scraper geolocation">
+        <select id="scraperCityFilter" class="category-filter" title="Filter by city">
           <option value="all">All Cities</option>
           <option value="Aarau">Aarau</option>
           <option value="Baden">Baden</option>
@@ -96,15 +81,21 @@
           <option value="Zug">Zug</option>
           <option value="Zürich">Zürich</option>
         </select>
-        <button class="btn" id="btnDiscoverLeads" title="Requires Playwright/Chromium">🔍 Discover</button>
-        <button class="btn" id="btnEnrichEmails" title="Find emails via local.ch">Enrich Emails</button>
-        <button class="btn" id="btnAnalyzeWebsites" title="Analyze website quality">Analyze</button>
-        <button class="btn btn-primary hidden" id="btnAnalyzeSelected" title="Analyze selected leads">Analyze Selected</button>
-        <button class="btn hidden" id="btnPreviewSelected" title="Generate previews for selected leads">Preview Selected</button>
-        <button class="btn btn-primary hidden" id="btnEmailSelected" title="Send Email 1 to selected leads">Email Selected</button>
-        <label style="display:flex;align-items:center;gap:4px;font-size:0.85rem;cursor:pointer"><input type="checkbox" id="filterNoWebsite"> No website only</label>
-        <label style="display:flex;align-items:center;gap:4px;font-size:0.85rem;cursor:pointer"><input type="checkbox" id="filterHasEmail" checked> Has email</label>
-        <label style="display:flex;align-items:center;gap:4px;font-size:0.85rem;cursor:pointer"><input type="checkbox" id="filterHasPreview"> Has preview</label>
+        <label class="filter-checkbox"><input type="checkbox" id="filterHasEmail" checked> Has email</label>
+        <label class="filter-checkbox"><input type="checkbox" id="filterHasPreview"> Has preview</label>
+        <label class="filter-checkbox"><input type="checkbox" id="filterNoWebsite"> No website</label>
+      </div>
+      <div class="panel-toolbar panel-toolbar--actions">
+        <button class="btn" id="btnDiscoverLeads">🔍 Discover</button>
+        <button class="btn" id="btnEnrichEmails">Enrich Emails</button>
+        <button class="btn" id="btnAnalyzeWebsites">Analyze</button>
+        <button class="btn btn-primary hidden" id="btnAnalyzeSelected">Analyze Selected</button>
+        <button class="btn hidden" id="btnPreviewSelected">Preview Selected</button>
+        <button class="btn btn-primary hidden" id="btnEmailSelected">Email Selected</button>
+        <span class="toolbar-spacer"></span>
+        <button class="btn" id="btnAddLead">+ Lead</button>
+        <button class="btn" id="btnImportCSV">Import CSV</button>
+        <input type="file" id="csvFileInput" accept=".csv" class="hidden">
         <button class="btn" id="btnExportDiscovery">Export</button>
       </div>
       <div class="table-wrap">
@@ -157,6 +148,16 @@
     </section>
 
     <section class="tab-panel" id="panel-outreach">
+      <div id="outreachAlerts" class="outreach-alerts hidden">
+        <div id="followUpsDue" class="alert-section hidden">
+          <h4>📋 Follow-Ups Due</h4>
+          <div id="followUpsList"></div>
+        </div>
+        <div id="checkReplies" class="alert-section hidden">
+          <h4>📬 Check Replies</h4>
+          <div id="repliesList"></div>
+        </div>
+      </div>
       <div class="panel-toolbar">
         <button class="btn" id="btnExportOutreach">Export</button>
       </div>

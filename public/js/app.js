@@ -327,11 +327,13 @@ function statusLabel(status) {
 // ============================================================
 
 function renderDashboardAlerts(dueData, repliesData) {
-  const alertsContainer = document.getElementById('dashboardAlerts');
+  const alertsContainer = document.getElementById('outreachAlerts');
   const fuSection = document.getElementById('followUpsDue');
   const fuList = document.getElementById('followUpsList');
   const replySection = document.getElementById('checkReplies');
   const replyList = document.getElementById('repliesList');
+
+  if (!alertsContainer) return;
 
   const hasFU = dueData.followUp1Due.length + dueData.followUp2Due.length + dueData.markColdDue.length > 0;
   const hasReplies = repliesData.leads.length > 0;
