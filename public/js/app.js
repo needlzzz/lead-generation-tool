@@ -977,6 +977,7 @@ function setupEventListeners() {
   document.getElementById('btnAnalyzeWebsites').addEventListener('click', () => analyzeWebsites(false));
   document.getElementById('btnAnalyzeSelected').addEventListener('click', () => analyzeWebsites(true));
   document.getElementById('btnPreviewSelected').addEventListener('click', generatePreviewsForSelected);
+  document.getElementById('btnEmailSelected').addEventListener('click', emailSelectedLeads);
   document.getElementById('selectAllDiscovery').addEventListener('change', (e) => {
     document.querySelectorAll('.lead-select').forEach(cb => { cb.checked = e.target.checked; });
     updateSelectionUI();
@@ -1641,6 +1642,56 @@ async function generatePreviewsForSelected() {
 }
 
 // ============================================================
+// EMAIL SELECTED LEADS
+// ============================================================
+
+async function emailSelectedLeads() {
+  const selectedIds = getSelectedLeadIds();
+  if (selectedIds.length === 0) {
+    showError('No leads selected.');
+    return;
+  }
+
+  // Filter to only leads with email
+  const eligible = allLeads.filter(l => selectedIds.includes(l.id) && l.email && l.status === 'Discovered');
+  const noEmail = selectedIds.length - eligible.length;
+
+  if (eligible.length === 0) {
+    showError('None of the selected leads have an email address or are in "Discovered" status.');
+    return;
+  }
+
+  const msg = noEmail > 0
+    ? `Send Email 1 to ${eligible.length} lead(s)? (${noEmail} skipped — no email or wrong status)`
+    : `Send Email 1 to ${eligible.length} lead(s)?`;
+
+  if (!confirm(msg)) return;
+
+  const btn = document.getElementById('btnEmailSelected');
+  btn.disabled = true;
+  btn.textContent = '⏳ Sending...';
+
+  let sent = 0;
+  let failed = 0;
+
+  for (const lead of eligible) {
+    try {
+      await API.post('/api/email/send', { leadId: lead.id, emailType: 'email1' });
+      sent++;
+    } catch (err) {
+      failed++;
+    }
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Email Selected';
+  btn.classList.add('hidden');
+
+  showToast('success', `Sent: ${sent}, Failed: ${failed}`);
+  await loadData();
+}
+
+// ============================================================
 // SCRAPER
 // ============================================================
 
@@ -1911,6 +1962,7 @@ function updateSelectionUI() {
   const selectedIds = getSelectedLeadIds();
   const btnAnalyzeSelected = document.getElementById('btnAnalyzeSelected');
   const btnPreviewSelected = document.getElementById('btnPreviewSelected');
+  const btnEmailSelected = document.getElementById('btnEmailSelected');
   if (btnAnalyzeSelected) {
     if (selectedIds.length > 0) {
       btnAnalyzeSelected.classList.remove('hidden');
@@ -1925,6 +1977,14 @@ function updateSelectionUI() {
       btnPreviewSelected.textContent = `Preview Selected (${selectedIds.length})`;
     } else {
       btnPreviewSelected.classList.add('hidden');
+    }
+  }
+  if (btnEmailSelected) {
+    if (selectedIds.length > 0) {
+      btnEmailSelected.classList.remove('hidden');
+      btnEmailSelected.textContent = `Email Selected (${selectedIds.length})`;
+    } else {
+      btnEmailSelected.classList.add('hidden');
     }
   }
 }
