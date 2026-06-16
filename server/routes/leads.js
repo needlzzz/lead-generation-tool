@@ -447,6 +447,16 @@ router.post('/:id/transition', (req, res) => {
       lead.activityLog.push({ date: now, action: 'Marked as Not a Fit', details: 'Website is modern/functional' });
       break;
 
+    case 'revert-to-reached-out':
+      lead.status = result.nextStatus;
+      lead.activityLog.push({ date: now, action: 'Reverted to Reached Out', details: 'Undid No Response — back in outreach pipeline' });
+      break;
+
+    case 'revert-to-discovered':
+      lead.status = result.nextStatus;
+      lead.activityLog.push({ date: now, action: 'Reverted to Discovered', details: 'Undid Lost — back in discovery pool' });
+      break;
+
     default:
       return res.status(400).json({ error: `Unknown action: ${action}` });
   }
