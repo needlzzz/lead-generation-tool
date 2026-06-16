@@ -17,10 +17,14 @@ const TRANSITIONS = {
     'mark-won': 'Client Won',
     'mark-lost': 'Lost'
   },
-  // Terminal statuses — no transitions out
-  'No Response': {},
+  // Terminal statuses — allow revert
+  'No Response': {
+    'revert-to-reached-out': 'Reached Out'
+  },
   'Client Won': {},
-  'Lost': {}
+  'Lost': {
+    'revert-to-discovered': 'Discovered'
+  }
 };
 
 function validateTransition(currentStatus, action) {

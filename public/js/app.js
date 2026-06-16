@@ -532,6 +532,7 @@ async function renderOutreachTab() {
           <div class="actions">
             ${l.status === 'Reached Out' ? `<button class="btn btn-sm btn-primary" onclick="openReplyModal('${l.id}')">📝 Reply</button>` : ''}
             ${l.status === 'Reached Out' ? `<button class="btn btn-sm" onclick="doTransition('${l.id}','mark-no-response')">❄️</button>` : ''}
+            ${l.status === 'No Response' ? `<button class="btn btn-sm" onclick="doTransition('${l.id}','revert-to-reached-out')">↩ Undo</button>` : ''}
           </div>
         </td>
       </tr>
