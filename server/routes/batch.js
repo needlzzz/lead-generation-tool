@@ -21,7 +21,7 @@ function getSettings() {
 // POST /generate-previews (SSE stream)
 // ---------------------------------------------------------------------------
 router.post('/generate-previews', async (req, res) => {
-  const { leadIds, resume, category, limit } = req.body || {};
+  const { leadIds, resume, category, limit, skipDeploy } = req.body || {};
   const settings = getSettings();
 
   // SSE event sender
@@ -104,7 +104,7 @@ router.post('/generate-previews', async (req, res) => {
   }
 
   try {
-    await batchPreviewGenerator.start(validIds, settings, sendEvent);
+    await batchPreviewGenerator.start(validIds, settings, sendEvent, { skipDeploy: !!skipDeploy });
   } catch (err) {
     sendEvent('error', { message: err.message });
   }

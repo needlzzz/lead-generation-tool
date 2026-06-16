@@ -451,8 +451,10 @@ async function deployAll(settings, sendEvent) {
  * @param {string[]} leadIds - Array of lead IDs to process
  * @param {object} settings - Settings object (must include previewSiteRepoPath, batch.previewConcurrency)
  * @param {Function} sendEvent - SSE callback: sendEvent(eventType, data)
+ * @param {object} [options] - Additional options
+ * @param {boolean} [options.skipDeploy] - If true, skip the deploy step after building
  */
-async function start(leadIds, settings, sendEvent) {
+async function start(leadIds, settings, sendEvent, options = {}) {
   if (running) {
     throw new Error('Batch preview generation is already running');
   }
@@ -481,8 +483,21 @@ async function start(leadIds, settings, sendEvent) {
     // Process queue with concurrency
     await processQueue([...leadIds], concurrency, settings, sendEvent);
 
-    // Single deploy at end (Requirement 1.8)
-    await deployAll(settings, sendEvent);
+    // Deploy at end unless skipDeploy is set
+    if (!options.skipDeploy) {
+      await deployAll(settings, sendEvent);
+    } else {
+      currentState.status = 'complete';
+      persistState(currentState);
+      sendEvent('progress', {
+        leadId: null,
+        status: 'complete',
+        message: `Build abgeschlossen (ohne Deploy): ${currentState.completed.length} Previews gebaut`,
+        completed: currentState.completed.length,
+        failed: currentState.failed.length,
+        total
+      });
+    }
   } catch (err) {
     currentState.status = 'failed';
     persistState(currentState);

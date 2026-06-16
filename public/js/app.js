@@ -894,21 +894,22 @@ async function startBatchReanalysis() {
   }
 }
 
-async function startBatchPreviews() {
-  const btn = document.getElementById('btnBatchPreviews');
+async function startBatchPreviews(skipDeploy = false) {
+  const btn = skipDeploy ? document.getElementById('btnBatchPreviews') : document.getElementById('btnBatchPreviewsBuildDeploy');
   const category = document.getElementById('batchPreviewCategory')?.value || '';
   const limit = parseInt(document.getElementById('batchPreviewLimit')?.value) || 50;
 
   btn.disabled = true;
   btn.textContent = '⏳ Running...';
 
-  appendBatchLog(`Starting batch preview generation (${category || 'all categories'}, limit: ${limit})...`, 'info');
+  const mode = skipDeploy ? 'build only' : 'build + deploy';
+  appendBatchLog(`Starting batch preview generation (${category || 'all categories'}, limit: ${limit}, ${mode})...`, 'info');
 
   try {
     const response = await fetch('/api/batch/generate-previews', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ category: category || undefined, limit })
+      body: JSON.stringify({ category: category || undefined, limit, skipDeploy })
     });
 
     if (!response.ok && !response.headers.get('content-type')?.includes('text/event-stream')) {
@@ -955,7 +956,7 @@ async function startBatchPreviews() {
     appendBatchLog(`❌ Error: ${err.message}`, 'error');
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Generate Previews';
+    btn.textContent = skipDeploy ? 'Build Only' : 'Build + Deploy';
     await refreshBatchPreviewStatus();
   }
 }
@@ -1319,7 +1320,8 @@ function setupEventListeners() {
   // Batch operations
   document.getElementById('btnBatchAnalyze').addEventListener('click', startBatchAnalysis);
   document.getElementById('btnBatchReanalyze').addEventListener('click', startBatchReanalysis);
-  document.getElementById('btnBatchPreviews').addEventListener('click', startBatchPreviews);
+  document.getElementById('btnBatchPreviews').addEventListener('click', () => startBatchPreviews(true));
+  document.getElementById('btnBatchPreviewsBuildDeploy').addEventListener('click', () => startBatchPreviews(false));
   document.getElementById('btnBatchPreviewsResume').addEventListener('click', resumeBatchPreviews);
   document.getElementById('batchPreviewCategory').addEventListener('change', refreshBatchPreviewStatus);
   document.getElementById('batchPreviewLimit').addEventListener('input', refreshBatchPreviewStatus);
