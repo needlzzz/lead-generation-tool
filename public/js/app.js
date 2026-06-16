@@ -83,6 +83,8 @@ async function loadData() {
     if (hasPreviewOnly) params.set('hasPreview', '1');
     const previewReady = document.getElementById('filterPreviewReady')?.checked;
     if (previewReady) params.set('previewReady', '1');
+    const poorDiscovered = document.getElementById('filterPoorDiscovered')?.checked;
+    if (poorDiscovered) params.set('poorDiscovered', '1');
     const searchQuery = document.getElementById('searchLeads')?.value?.trim();
     if (searchQuery) params.set('search', searchQuery);
 
@@ -232,14 +234,10 @@ async function renderStatsBar() {
 
     bar.innerHTML = `
       <span class="stat">${total.toLocaleString()} leads</span>
-      <span class="stat-sep">·</span>
-      <span class="stat">${reachedOut} reached out</span>
-      <span class="stat-sep">·</span>
-      <span class="stat">${replied} replied</span>
-      <span class="stat-sep">·</span>
-      <span class="stat">${won} won</span>
-      <span class="stat-sep">·</span>
-      <span class="stat">Quota: ${quotaRes.count}/${quotaRes.maxPerDay} today</span>
+      <span class="stat stat--reached">${reachedOut} reached out</span>
+      <span class="stat stat--replied">${replied} replied</span>
+      <span class="stat stat--won">${won} won</span>
+      <span class="stat stat--quota">Quota: ${quotaRes.count}/${quotaRes.maxPerDay} today</span>
     `;
   } catch (err) {
     bar.innerHTML = '';
@@ -990,6 +988,12 @@ function setupEventListeners() {
 
   // Preview-ready filter (has preview, not yet reached out)
   document.getElementById('filterPreviewReady').addEventListener('change', () => {
+    currentPage = 1;
+    loadData();
+  });
+
+  // Poor & Discovered filter
+  document.getElementById('filterPoorDiscovered').addEventListener('change', () => {
     currentPage = 1;
     loadData();
   });

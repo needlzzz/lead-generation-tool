@@ -119,6 +119,9 @@ router.get('/', (req, res) => {
     if (req.query.previewReady === '1') {
       leads = leads.filter(l => l.previewUrl && l.status !== 'Reached Out');
     }
+    if (req.query.poorDiscovered === '1') {
+      leads = leads.filter(l => l.websiteQuality === 'Poor' && l.status === 'Discovered');
+    }
     if (req.query.search) {
       const q = req.query.search.toLowerCase().trim();
       leads = leads.filter(l =>
