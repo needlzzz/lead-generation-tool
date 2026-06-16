@@ -21,7 +21,7 @@ function getSettings() {
 // POST /generate-previews (SSE stream)
 // ---------------------------------------------------------------------------
 router.post('/generate-previews', async (req, res) => {
-  const { leadIds, resume } = req.body || {};
+  const { leadIds, resume, category, limit } = req.body || {};
   const settings = getSettings();
 
   // SSE event sender
@@ -74,11 +74,13 @@ router.post('/generate-previews', async (req, res) => {
       }
     }
   } else {
-    // Auto-select eligible leads: have websiteAnalyzedAt set, no valid existing preview, up to 1000
+    // Auto-select eligible leads: have websiteAnalyzedAt set, no valid existing preview
+    const maxLeads = Math.min(limit || 1000, 1000);
     const allLeads = dataStore.getAll('leads');
     for (const lead of allLeads) {
-      if (validIds.length >= 1000) break;
-      if (lead.websiteAnalyzedAt) {
+      if (validIds.length >= maxLeads) break;
+      if (lead.websiteAnalyzedAt && !lead.previewUrl) {
+        if (category && lead.category !== category) continue;
         // Include leads that don't already have a valid preview
         // The batchPreviewGenerator will handle skip logic for existing valid previews
         validIds.push(lead.id);
@@ -108,6 +110,29 @@ router.post('/generate-previews', async (req, res) => {
   }
 
   res.end();
+});
+
+// ---------------------------------------------------------------------------
+// GET /preview-stats — pre-flight counts for batch preview generation
+// ---------------------------------------------------------------------------
+router.get('/preview-stats', (req, res) => {
+  const category = req.query.category || '';
+  const allLeads = dataStore.getAll('leads');
+
+  let eligible = allLeads.filter(l => l.websiteAnalyzedAt);
+  if (category) {
+    eligible = eligible.filter(l => l.category === category);
+  }
+
+  const withPreview = eligible.filter(l => l.previewUrl);
+  const withoutPreview = eligible.filter(l => !l.previewUrl);
+
+  res.json({
+    total: eligible.length,
+    withPreview: withPreview.length,
+    withoutPreview: withoutPreview.length,
+    category: category || 'all'
+  });
 });
 
 // ---------------------------------------------------------------------------

@@ -218,9 +218,15 @@
         </div>
         <div class="batch-section">
           <h3>Preview Generation</h3>
-          <p class="batch-desc">Build preview sites for all analyzed leads that don't have a preview yet.</p>
-          <div class="batch-actions">
-            <button class="btn btn-primary" id="btnBatchPreviews">Generate All Previews</button>
+          <p class="batch-desc">Build preview sites for analyzed leads that don't have a preview yet.</p>
+          <div class="batch-actions" style="flex-wrap: wrap; gap: 8px;">
+            <select id="batchPreviewCategory" class="category-filter" title="Filter by category">
+              <option value="">All Categories</option>
+            </select>
+            <label style="display:inline-flex; align-items:center; gap:4px; font-size:0.85rem; color:var(--color-text-secondary);">
+              Limit: <input type="number" id="batchPreviewLimit" min="1" max="1000" value="50" style="width:60px; padding:4px 6px; border:1px solid var(--color-border); border-radius:var(--radius-sm);">
+            </label>
+            <button class="btn btn-primary" id="btnBatchPreviews">Generate Previews</button>
             <button class="btn" id="btnBatchPreviewsResume" disabled>Resume</button>
             <button class="btn" id="btnDeployPreviews">Deploy Previews</button>
           </div>

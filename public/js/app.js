@@ -647,19 +647,35 @@ async function refreshBatchAnalyzeStatus() {
 async function refreshBatchPreviewStatus() {
   const container = document.getElementById('batchPreviewStatus');
   const btnResume = document.getElementById('btnBatchPreviewsResume');
+  const categorySelect = document.getElementById('batchPreviewCategory');
+
+  // Populate category dropdown (once)
+  if (categorySelect && categorySelect.options.length <= 1) {
+    try {
+      const cats = await API.get('/api/categories');
+      for (const cat of cats) {
+        const opt = document.createElement('option');
+        opt.value = cat.name;
+        opt.textContent = cat.name;
+        categorySelect.appendChild(opt);
+      }
+    } catch (e) {}
+  }
+
+  // Get preview stats for selected category
+  const selectedCategory = categorySelect ? categorySelect.value : '';
   try {
+    const stats = await API.get(`/api/batch/preview-stats?category=${encodeURIComponent(selectedCategory)}`);
     const data = await API.get('/api/batch/preview-status');
     const completed = data.completed ? data.completed.length : 0;
     const failed = data.failed ? data.failed.length : 0;
-    const queued = data.queue ? data.queue.length : 0;
     const statusClass = data.status === 'complete' ? 'complete' : data.status === 'running' ? 'running' : data.status === 'failed' ? 'failed' : '';
 
     container.innerHTML = `
-      <div class="batch-status-row"><span class="batch-status-label">Status:</span> <span class="batch-status-value ${statusClass}">${data.status || 'idle'}</span></div>
-      <div class="batch-status-row"><span class="batch-status-label">Queued:</span> <span class="batch-status-value">${queued}</span></div>
-      <div class="batch-status-row"><span class="batch-status-label">Completed:</span> <span class="batch-status-value">${completed}</span></div>
-      <div class="batch-status-row"><span class="batch-status-label">Failed:</span> <span class="batch-status-value">${failed}</span></div>
-      ${data.summary ? `<div class="batch-status-row"><span class="batch-status-label">Duration:</span> <span class="batch-status-value">${Math.round(data.summary.durationSeconds / 60)} min</span></div>` : ''}
+      <div class="batch-status-row"><span class="batch-status-label">Eligible (analyzed):</span> <span class="batch-status-value">${stats.total.toLocaleString()}</span></div>
+      <div class="batch-status-row"><span class="batch-status-label">Already have preview:</span> <span class="batch-status-value">${stats.withPreview.toLocaleString()}</span></div>
+      <div class="batch-status-row"><span class="batch-status-label">Need preview:</span> <span class="batch-status-value" style="font-weight:600; color:var(--color-primary)">${stats.withoutPreview.toLocaleString()}</span></div>
+      ${data.status !== 'idle' ? `<div class="batch-status-row" style="margin-top:4px; padding-top:4px; border-top:1px solid var(--color-border);"><span class="batch-status-label">Last run:</span> <span class="batch-status-value ${statusClass}">${data.status} (${completed} done, ${failed} failed)</span></div>` : ''}
     `;
 
     btnResume.disabled = !(data.status === 'running' || data.status === 'deploying');
@@ -870,16 +886,19 @@ async function startBatchReanalysis() {
 
 async function startBatchPreviews() {
   const btn = document.getElementById('btnBatchPreviews');
+  const category = document.getElementById('batchPreviewCategory')?.value || '';
+  const limit = parseInt(document.getElementById('batchPreviewLimit')?.value) || 50;
+
   btn.disabled = true;
   btn.textContent = '⏳ Running...';
 
-  appendBatchLog('Starting batch preview generation...', 'info');
+  appendBatchLog(`Starting batch preview generation (${category || 'all categories'}, limit: ${limit})...`, 'info');
 
   try {
     const response = await fetch('/api/batch/generate-previews', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({})
+      body: JSON.stringify({ category: category || undefined, limit })
     });
 
     if (!response.ok && !response.headers.get('content-type')?.includes('text/event-stream')) {
@@ -926,7 +945,8 @@ async function startBatchPreviews() {
     appendBatchLog(`❌ Error: ${err.message}`, 'error');
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Generate All Previews';
+    btn.textContent = 'Generate Previews';
+    await refreshBatchPreviewStatus();
   }
 }
 
@@ -1291,6 +1311,7 @@ function setupEventListeners() {
   document.getElementById('btnBatchReanalyze').addEventListener('click', startBatchReanalysis);
   document.getElementById('btnBatchPreviews').addEventListener('click', startBatchPreviews);
   document.getElementById('btnBatchPreviewsResume').addEventListener('click', resumeBatchPreviews);
+  document.getElementById('batchPreviewCategory').addEventListener('change', refreshBatchPreviewStatus);
   document.getElementById('btnBatchEmails').addEventListener('click', startBatchEmails);
   document.getElementById('btnBatchEmailsResume').addEventListener('click', resumeBatchEmails);
   document.getElementById('btnBatchEmailsStop').addEventListener('click', stopBatchEmails);
