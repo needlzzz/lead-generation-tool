@@ -441,6 +441,7 @@ function renderDiscoveryTab() {
   const empty = document.getElementById('emptyDiscovery');
   const noWebsiteOnly = document.getElementById('filterNoWebsite').checked;
   const hasEmailOnly = document.getElementById('filterHasEmail').checked;
+  const previewReady = document.getElementById('filterPreviewReady').checked;
   let leads = allLeads;
   if (currentCityFilter) {
     leads = leads.filter(l => {
@@ -452,7 +453,8 @@ function renderDiscoveryTab() {
   if (noWebsiteOnly) {
     leads = leads.filter(l => !l.websiteUrl || l.websiteQuality === 'None');
   }
-  if (hasEmailOnly) {
+  // "Preview ready" overrides "Has email" (same logic as server-side)
+  if (hasEmailOnly && !previewReady) {
     leads = leads.filter(l => l.email);
   }
 
