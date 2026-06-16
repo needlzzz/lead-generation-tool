@@ -69,15 +69,16 @@ beforeEach(() => {
 describe('GET /api/batch/preview-stats', () => {
   it('returns correct counts for all categories', async () => {
     dataStore._setLeads([
-      makeLead({ id: '1', previewUrl: null }),
-      makeLead({ id: '2', previewUrl: 'https://preview.kaelint.ch/x/' }),
-      makeLead({ id: '3', previewUrl: null }),
-      makeLead({ id: '4', websiteAnalyzedAt: null }), // not eligible (not analyzed)
+      makeLead({ id: '1', previewUrl: null, email: 'a@b.ch' }),
+      makeLead({ id: '2', previewUrl: 'https://preview.kaelint.ch/x/', email: 'b@c.ch' }),
+      makeLead({ id: '3', previewUrl: null, email: 'c@d.ch' }),
+      makeLead({ id: '4', websiteAnalyzedAt: null, email: 'd@e.ch' }), // not eligible (not analyzed)
+      makeLead({ id: '5', previewUrl: null, email: null }), // not eligible (no email)
     ]);
 
     const res = await request(app).get('/api/batch/preview-stats');
     expect(res.status).toBe(200);
-    expect(res.body.total).toBe(3); // only analyzed leads
+    expect(res.body.total).toBe(3); // only analyzed leads with email
     expect(res.body.withPreview).toBe(1);
     expect(res.body.withoutPreview).toBe(2);
     expect(res.body.category).toBe('all');
@@ -85,9 +86,9 @@ describe('GET /api/batch/preview-stats', () => {
 
   it('filters by category', async () => {
     dataStore._setLeads([
-      makeLead({ id: '1', category: 'Coiffeur', previewUrl: null }),
-      makeLead({ id: '2', category: 'Fitness', previewUrl: null }),
-      makeLead({ id: '3', category: 'Coiffeur', previewUrl: 'https://x/' }),
+      makeLead({ id: '1', category: 'Coiffeur', previewUrl: null, email: 'a@b.ch' }),
+      makeLead({ id: '2', category: 'Fitness', previewUrl: null, email: 'b@c.ch' }),
+      makeLead({ id: '3', category: 'Coiffeur', previewUrl: 'https://x/', email: 'c@d.ch' }),
     ]);
 
     const res = await request(app).get('/api/batch/preview-stats?category=Coiffeur');
@@ -99,7 +100,7 @@ describe('GET /api/batch/preview-stats', () => {
 
   it('returns zeros when no leads match', async () => {
     dataStore._setLeads([
-      makeLead({ id: '1', category: 'Fitness' }),
+      makeLead({ id: '1', category: 'Fitness', email: 'a@b.ch' }),
     ]);
 
     const res = await request(app).get('/api/batch/preview-stats?category=Handwerk');
@@ -110,9 +111,20 @@ describe('GET /api/batch/preview-stats', () => {
 
   it('excludes unanalyzed leads from eligibility', async () => {
     dataStore._setLeads([
-      makeLead({ id: '1', websiteAnalyzedAt: '2026-06-14T10:00:00.000Z' }),
-      makeLead({ id: '2', websiteAnalyzedAt: null }),
-      makeLead({ id: '3', websiteAnalyzedAt: '' }), // falsy
+      makeLead({ id: '1', websiteAnalyzedAt: '2026-06-14T10:00:00.000Z', email: 'a@b.ch' }),
+      makeLead({ id: '2', websiteAnalyzedAt: null, email: 'b@c.ch' }),
+      makeLead({ id: '3', websiteAnalyzedAt: '', email: 'c@d.ch' }), // falsy
+    ]);
+
+    const res = await request(app).get('/api/batch/preview-stats');
+    expect(res.body.total).toBe(1);
+  });
+
+  it('excludes leads without email from eligibility', async () => {
+    dataStore._setLeads([
+      makeLead({ id: '1', email: 'a@b.ch' }),
+      makeLead({ id: '2', email: null }),
+      makeLead({ id: '3', email: '' }),
     ]);
 
     const res = await request(app).get('/api/batch/preview-stats');

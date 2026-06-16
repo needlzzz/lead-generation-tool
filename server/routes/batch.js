@@ -79,10 +79,8 @@ router.post('/generate-previews', async (req, res) => {
     const allLeads = dataStore.getAll('leads');
     for (const lead of allLeads) {
       if (validIds.length >= maxLeads) break;
-      if (lead.websiteAnalyzedAt && !lead.previewUrl) {
+      if (lead.websiteAnalyzedAt && !lead.previewUrl && lead.email) {
         if (category && lead.category !== category) continue;
-        // Include leads that don't already have a valid preview
-        // The batchPreviewGenerator will handle skip logic for existing valid previews
         validIds.push(lead.id);
       }
     }
@@ -119,7 +117,7 @@ router.get('/preview-stats', (req, res) => {
   const category = req.query.category || '';
   const allLeads = dataStore.getAll('leads');
 
-  let eligible = allLeads.filter(l => l.websiteAnalyzedAt);
+  let eligible = allLeads.filter(l => l.websiteAnalyzedAt && l.email);
   if (category) {
     eligible = eligible.filter(l => l.category === category);
   }
