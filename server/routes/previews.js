@@ -119,7 +119,14 @@ router.post('/deploy', async (req, res) => {
       cwd: previewSiteRepoPath,
       timeout: 300000,
       stdio: ['pipe', 'pipe', 'pipe'],
-      env: { ...process.env, NODE_TLS_REJECT_UNAUTHORIZED: '0' }
+      env: {
+        ...process.env,
+        NODE_TLS_REJECT_UNAUTHORIZED: '0',
+        HTTP_PROXY: '',
+        HTTPS_PROXY: '',
+        http_proxy: '',
+        https_proxy: '',
+      }
     });
 
     // Update all "built" entries to "deployed"

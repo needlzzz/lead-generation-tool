@@ -396,7 +396,14 @@ async function deployAll(settings, sendEvent) {
       cwd: previewSiteRepoPath,
       timeout: 300000, // 5 minutes for deploy
       stdio: ['pipe', 'pipe', 'pipe'],
-      env: { ...process.env, NODE_TLS_REJECT_UNAUTHORIZED: '0' }
+      env: {
+        ...process.env,
+        NODE_TLS_REJECT_UNAUTHORIZED: '0',
+        HTTP_PROXY: '',
+        HTTPS_PROXY: '',
+        http_proxy: '',
+        https_proxy: '',
+      }
     });
 
     // Bulk-update all completed entries to "deployed" in registry

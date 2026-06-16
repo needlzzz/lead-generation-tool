@@ -252,6 +252,7 @@ async function renderPreviewsTab() {
   const tbody = document.querySelector('#tablePreviews tbody');
   const empty = document.getElementById('emptyPreviews');
   const countsEl = document.getElementById('previewCounts');
+  if (!tbody || !countsEl) return;
 
   try {
     const { previews, counts, total } = await API.get('/api/previews/list');
