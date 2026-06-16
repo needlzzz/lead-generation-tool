@@ -1217,3 +1217,21 @@ form {
   margin: 0 0 8px 0;
   font-size: 0.9rem;
 }
+
+/* Stats bar */
+.stats-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.stat {
+  white-space: nowrap;
+}
+
+.stat-sep {
+  color: var(--color-text-muted);
+}

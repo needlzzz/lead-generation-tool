@@ -110,6 +110,7 @@ async function loadData() {
     renderPagination();
     renderCurrentTab();
     renderDashboardAlerts(dueRes, repliesRes);
+    renderStatsBar();
   } catch (err) {
     showError(err.message);
   }
@@ -161,7 +162,6 @@ function setupTabs() {
 function renderCurrentTab() {
   switch (currentTab) {
     case 'discovery': renderDiscoveryTab(); break;
-    case 'previews': renderPreviewsTab(); break;
     case 'outreach': renderOutreachTab(); break;
     case 'replies': renderRepliesTab(); break;
     case 'clients': renderClientsTab(); break;
@@ -205,6 +205,43 @@ function renderPagination() {
 function goToPage(page) {
   currentPage = Math.max(1, Math.min(page, totalPages));
   loadData();
+}
+
+// ============================================================
+// STATS BAR
+// ============================================================
+
+async function renderStatsBar() {
+  const bar = document.getElementById('statsBar');
+  if (!bar) return;
+
+  try {
+    const [countsRes, quotaRes] = await Promise.all([
+      API.get('/api/leads/counts'),
+      API.get('/api/email/quota').catch(() => ({ count: 0, remaining: 20, maxPerDay: 20 }))
+    ]);
+
+    const counts = countsRes.counts || {};
+    const total = countsRes.total || 0;
+    const previews = allLeads.filter(l => l.previewUrl).length;
+    const reachedOut = counts['Reached Out'] || 0;
+    const replied = counts['Replied'] || 0;
+    const won = counts['Client Won'] || 0;
+
+    bar.innerHTML = `
+      <span class="stat">${total.toLocaleString()} leads</span>
+      <span class="stat-sep">·</span>
+      <span class="stat">${reachedOut} reached out</span>
+      <span class="stat-sep">·</span>
+      <span class="stat">${replied} replied</span>
+      <span class="stat-sep">·</span>
+      <span class="stat">${won} won</span>
+      <span class="stat-sep">·</span>
+      <span class="stat">Quota: ${quotaRes.count}/${quotaRes.maxPerDay} today</span>
+    `;
+  } catch (err) {
+    bar.innerHTML = '';
+  }
 }
 
 // ============================================================
@@ -431,13 +468,10 @@ function renderDiscoveryTab() {
       <td onclick="event.stopPropagation()"><input type="checkbox" class="lead-select" data-id="${l.id}" onchange="updateSelectionUI()"></td>
       <td>${esc(l.businessName)}</td>
       <td>${esc(l.category)}</td>
-      <td>${esc(l.address)}</td>
-      <td>${esc(l.phone)}</td>
       <td>${esc(l.email)}</td>
       <td>${l.websiteUrl ? `<a href="${esc(l.websiteUrl)}" target="_blank" onclick="event.stopPropagation()">🔗</a>` : '—'}</td>
       <td>${renderQualityBadge(l)}</td>
       <td><span class="status-pill ${statusClass(l.status)}">${statusLabel(l.status)}</span></td>
-      <td>${l.dateDiscovered || ''}</td>
       <td onclick="event.stopPropagation()">
         <div class="actions">
           <button class="btn btn-sm" onclick="startPreviewGeneration('${l.id}')" title="Generate Preview" ${l.websiteAnalyzedAt && !l.previewUrl && (l.status === 'Discovered' || l.status === 'Reached Out') ? '' : 'disabled'}>Preview</button>
@@ -485,8 +519,6 @@ async function renderOutreachTab() {
         <td><span class="status-pill ${statusClass(l.status)}">${statusLabel(l.status)}</span></td>
         <td>${l.dateEmail1Sent || '—'}</td>
         <td>${l.dateFollowUp1Sent || '—'}</td>
-        <td>${l.dateFollowUp2Sent || '—'}</td>
-        <td></td>
         <td onclick="event.stopPropagation()">
           <div class="actions">
             <button class="btn btn-sm" onclick="openReplyModal('${l.id}')" ${l.status === 'Reached Out' ? '' : 'disabled'}>📝 Reply</button>

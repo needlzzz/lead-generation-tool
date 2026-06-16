@@ -35,14 +35,13 @@
           <button id="btnSettings" class="btn-icon" title="Settings">⚙</button>
         </div>
       </div>
-      <!-- Status badges removed — counts visible via tabs -->
+      <div id="statsBar" class="stats-bar"></div>
     </header>
 
     <!-- Tabs -->
     <nav class="tabs" aria-label="Main navigation">
       <div role="tablist">
         <button class="tab active" role="tab" aria-selected="true" data-tab="discovery">Discovery</button>
-        <button class="tab" role="tab" aria-selected="false" data-tab="previews">Previews</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="outreach">Outreach Pipeline</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="replies">Replies &amp; Meetings</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="clients">Client Tracker</button>
@@ -105,13 +104,10 @@
               <th style="width:32px"><input type="checkbox" id="selectAllDiscovery" title="Select all"></th>
               <th>Business Name</th>
               <th style="cursor:pointer" onclick="toggleDiscoverySort('category')" title="Click to sort">Category ⇅</th>
-              <th>Address</th>
-              <th>Phone</th>
               <th>Email</th>
               <th>Website</th>
               <th style="cursor:pointer" onclick="toggleQualitySort()" title="Click to sort by quality" id="thQuality">Quality ⇅</th>
               <th style="cursor:pointer" onclick="toggleDiscoverySort('status')" title="Click to sort">Status ⇅</th>
-              <th style="cursor:pointer" onclick="toggleDiscoverySort('discovered')" title="Click to sort">Discovered ⇅</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -120,30 +116,6 @@
         <div id="emptyDiscovery" class="empty-state hidden">
           No leads discovered yet. Use "New Lead", "CSV Import", or "Auto-Discover" to get started.
         </div>
-      </div>
-    </section>
-
-    <section class="tab-panel" id="panel-previews">
-      <div class="panel-toolbar">
-        <span id="previewCounts" class="preview-counts"></span>
-        <button class="btn btn-primary" id="btnDeployPreviews">Deploy Previews</button>
-      </div>
-      <div class="table-wrap">
-        <table id="tablePreviews">
-          <thead>
-            <tr>
-              <th>Business Name</th>
-              <th>Category</th>
-              <th>City</th>
-              <th>Status</th>
-              <th>Preview URL</th>
-              <th>Created</th>
-              <th>Expires</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-        <div id="emptyPreviews" class="empty-state hidden">No previews generated yet.</div>
       </div>
     </section>
 
@@ -170,9 +142,7 @@
               <th>Email</th>
               <th>Status</th>
               <th>Email 1</th>
-              <th>Follow-Up 1</th>
-              <th>Follow-Up 2</th>
-              <th>Last Activity</th>
+              <th>Follow-Up</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -241,6 +211,7 @@
           <div class="batch-actions">
             <button class="btn btn-primary" id="btnBatchPreviews">Generate All Previews</button>
             <button class="btn" id="btnBatchPreviewsResume" disabled>Resume</button>
+            <button class="btn" id="btnDeployPreviews">Deploy Previews</button>
           </div>
           <div id="batchPreviewStatus" class="batch-status"></div>
         </div>
