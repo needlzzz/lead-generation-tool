@@ -791,6 +791,83 @@ async function startBatchAnalysis() {
   }
 }
 
+async function startBatchReanalysis() {
+  const btn = document.getElementById('btnBatchReanalyze');
+  const statusEl = document.getElementById('batchAnalyzeStatus');
+  const CUTOFF = '2026-06-11T00:00:00.000Z';
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Counting...';
+
+  try {
+    // Count leads analyzed before the cutoff via a quick client-side check
+    // We use the server endpoint with the reanalyzeBefore param
+    const msg = `Re-analyze all leads that were analyzed before June 11 (old method)?\n\nThis will re-run the website analysis with the new method.\nLeads analyzed after June 11 will not be touched.`;
+    if (!confirm(msg)) return;
+
+    btn.textContent = '⏳ Re-analyzing...';
+    appendBatchLog('Starting re-analysis of leads analyzed before June 11...', 'info');
+    statusEl.innerHTML = `<div class="batch-status-row"><span class="batch-status-label">Status:</span> <span class="batch-status-value running">Running (re-analysis)</span></div>`;
+
+    const response = await fetch('/api/scraper/analyze-websites', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reanalyzeBefore: CUTOFF })
+    });
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let analyzed = 0;
+    let total = 0;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          try {
+            const event = JSON.parse(line.slice(6));
+            if (event.type === 'start') {
+              total = event.total;
+              appendBatchLog(`Found ${total} leads to re-analyze.`, 'info');
+            } else if (event.type === 'progress') {
+              const pct = Math.round((event.current / total) * 100);
+              statusEl.innerHTML = `<div class="batch-status-row"><span class="batch-status-label">Status:</span> <span class="batch-status-value running">Re-analyzing (${pct}%)</span></div>
+                <div class="batch-status-row"><span class="batch-status-label">Progress:</span> <span class="batch-status-value">${event.current}/${total}</span></div>
+                <div class="batch-status-row"><span class="batch-status-label">Current:</span> <span class="batch-status-value">${event.businessName || ''}</span></div>`;
+            } else if (event.type === 'result') {
+              analyzed++;
+              if (analyzed % 10 === 0 || analyzed === total) {
+                appendBatchLog(`Re-analyzed ${analyzed}/${total} — ${event.businessName}: ${event.quality} (${event.score}/100)`, 'info');
+              }
+            } else if (event.type === 'done') {
+              appendBatchLog(`✅ Re-analysis complete: ${event.analyzed} websites re-analyzed`, 'success');
+              statusEl.innerHTML = `<div class="batch-status-row"><span class="batch-status-label">Status:</span> <span class="batch-status-value complete">Re-analysis complete</span></div>
+                <div class="batch-status-row"><span class="batch-status-label">Re-analyzed:</span> <span class="batch-status-value">${event.analyzed}</span></div>`;
+            } else if (event.type === 'error') {
+              appendBatchLog(`❌ Re-analysis error: ${event.error}`, 'error');
+            }
+          } catch (e) {}
+        }
+      }
+    }
+
+    await loadData();
+  } catch (err) {
+    appendBatchLog(`❌ Re-analysis error: ${err.message}`, 'error');
+    statusEl.innerHTML = `<div class="batch-status-row"><span class="batch-status-label">Status:</span> <span class="batch-status-value failed">Error</span></div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Re-analyze (old method)';
+  }
+}
+
 async function startBatchPreviews() {
   const btn = document.getElementById('btnBatchPreviews');
   btn.disabled = true;
@@ -1211,6 +1288,7 @@ function setupEventListeners() {
 
   // Batch operations
   document.getElementById('btnBatchAnalyze').addEventListener('click', startBatchAnalysis);
+  document.getElementById('btnBatchReanalyze').addEventListener('click', startBatchReanalysis);
   document.getElementById('btnBatchPreviews').addEventListener('click', startBatchPreviews);
   document.getElementById('btnBatchPreviewsResume').addEventListener('click', resumeBatchPreviews);
   document.getElementById('btnBatchEmails').addEventListener('click', startBatchEmails);

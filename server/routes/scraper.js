@@ -217,7 +217,7 @@ router.get('/analyze-stats', (req, res) => {
 
 // POST /api/scraper/analyze-websites (SSE — streams progress, parallel workers)
 router.post('/analyze-websites', async (req, res) => {
-  const { leadIds } = req.body;
+  const { leadIds, reanalyzeBefore } = req.body;
 
   // Configurable concurrency (4 workers by default — sweet spot for memory vs speed)
   const CONCURRENCY = 4;
@@ -237,10 +237,15 @@ router.post('/analyze-websites', async (req, res) => {
     }
   }
 
-  // Get leads to analyze — either specific IDs or all discovered leads with a website
+  // Get leads to analyze — either specific IDs, re-analyze by date, or all unanalyzed
   let leads;
   if (leadIds && leadIds.length > 0) {
     leads = leadIds.map(id => dataStore.get('leads', id)).filter(l => l && l.websiteUrl);
+  } else if (reanalyzeBefore) {
+    // Re-analyze leads that were analyzed before a given date (old method)
+    leads = dataStore.getAll('leads').filter(l =>
+      l.websiteUrl && l.websiteAnalyzedAt && l.websiteAnalyzedAt < reanalyzeBefore
+    );
   } else {
     leads = dataStore.getAll('leads').filter(l =>
       l.websiteUrl && !l.websiteAnalyzedAt && (l.status === 'Discovered' || l.status === 'Reached Out')
