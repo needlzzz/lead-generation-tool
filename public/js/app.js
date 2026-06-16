@@ -672,10 +672,19 @@ async function refreshBatchPreviewStatus() {
     const failed = data.failed ? data.failed.length : 0;
     const statusClass = data.status === 'complete' ? 'complete' : data.status === 'running' ? 'running' : data.status === 'failed' ? 'failed' : '';
 
+    // Duration estimate: ~30s per preview build (serialized via semaphore)
+    const limitVal = parseInt(document.getElementById('batchPreviewLimit')?.value) || 50;
+    const toBuild = Math.min(stats.withoutPreview, limitVal);
+    const estSeconds = toBuild * 30;
+    const estFormatted = estSeconds < 3600
+      ? `~${Math.ceil(estSeconds / 60)} min`
+      : `~${(estSeconds / 3600).toFixed(1)} h`;
+
     container.innerHTML = `
       <div class="batch-status-row"><span class="batch-status-label">Eligible (analyzed):</span> <span class="batch-status-value">${stats.total.toLocaleString()}</span></div>
       <div class="batch-status-row"><span class="batch-status-label">Already have preview:</span> <span class="batch-status-value">${stats.withPreview.toLocaleString()}</span></div>
       <div class="batch-status-row"><span class="batch-status-label">Need preview:</span> <span class="batch-status-value" style="font-weight:600; color:var(--color-primary)">${stats.withoutPreview.toLocaleString()}</span></div>
+      ${toBuild > 0 ? `<div class="batch-status-row"><span class="batch-status-label">Will build:</span> <span class="batch-status-value">${toBuild} (${estFormatted} estimated)</span></div>` : ''}
       ${data.status !== 'idle' ? `<div class="batch-status-row" style="margin-top:4px; padding-top:4px; border-top:1px solid var(--color-border);"><span class="batch-status-label">Last run:</span> <span class="batch-status-value ${statusClass}">${data.status} (${completed} done, ${failed} failed)</span></div>` : ''}
     `;
 
@@ -1313,6 +1322,7 @@ function setupEventListeners() {
   document.getElementById('btnBatchPreviews').addEventListener('click', startBatchPreviews);
   document.getElementById('btnBatchPreviewsResume').addEventListener('click', resumeBatchPreviews);
   document.getElementById('batchPreviewCategory').addEventListener('change', refreshBatchPreviewStatus);
+  document.getElementById('batchPreviewLimit').addEventListener('input', refreshBatchPreviewStatus);
   document.getElementById('btnBatchEmails').addEventListener('click', startBatchEmails);
   document.getElementById('btnBatchEmailsResume').addEventListener('click', resumeBatchEmails);
   document.getElementById('btnBatchEmailsStop').addEventListener('click', stopBatchEmails);
