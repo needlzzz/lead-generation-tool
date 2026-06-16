@@ -81,6 +81,8 @@ async function loadData() {
     if (hasEmailOnly) params.set('hasEmail', '1');
     const hasPreviewOnly = document.getElementById('filterHasPreview')?.checked;
     if (hasPreviewOnly) params.set('hasPreview', '1');
+    const previewReady = document.getElementById('filterPreviewReady')?.checked;
+    if (previewReady) params.set('previewReady', '1');
     const searchQuery = document.getElementById('searchLeads')?.value?.trim();
     if (searchQuery) params.set('search', searchQuery);
 
@@ -982,6 +984,12 @@ function setupEventListeners() {
 
   // Has-preview filter
   document.getElementById('filterHasPreview').addEventListener('change', () => {
+    currentPage = 1;
+    loadData();
+  });
+
+  // Preview-ready filter (has preview, not yet reached out)
+  document.getElementById('filterPreviewReady').addEventListener('change', () => {
     currentPage = 1;
     loadData();
   });
