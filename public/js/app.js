@@ -78,10 +78,11 @@ async function loadData() {
 
     // Server-side filters
     const hasEmailOnly = document.getElementById('filterHasEmail')?.checked;
-    if (hasEmailOnly) params.set('hasEmail', '1');
+    const previewReady = document.getElementById('filterPreviewReady')?.checked;
+    // "Preview ready" overrides "Has email" — shows all preview-ready leads regardless
+    if (hasEmailOnly && !previewReady) params.set('hasEmail', '1');
     const hasPreviewOnly = document.getElementById('filterHasPreview')?.checked;
     if (hasPreviewOnly) params.set('hasPreview', '1');
-    const previewReady = document.getElementById('filterPreviewReady')?.checked;
     if (previewReady) params.set('previewReady', '1');
     const poorDiscovered = document.getElementById('filterPoorDiscovered')?.checked;
     if (poorDiscovered) params.set('poorDiscovered', '1');
