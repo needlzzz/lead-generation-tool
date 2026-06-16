@@ -652,7 +652,8 @@ async function refreshBatchPreviewStatus() {
   // Populate category dropdown (once)
   if (categorySelect && categorySelect.options.length <= 1) {
     try {
-      const cats = await API.get('/api/categories');
+      const res = await API.get('/api/categories');
+      const cats = res.categories || res || [];
       for (const cat of cats) {
         const opt = document.createElement('option');
         opt.value = cat.name;
