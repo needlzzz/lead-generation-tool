@@ -624,8 +624,24 @@ let batchPreviewPolling = null;
 let batchEmailPolling = null;
 
 async function renderBatchTab() {
+  await refreshBatchAnalyzeStatus();
   await refreshBatchPreviewStatus();
   await refreshBatchEmailStatus();
+}
+
+async function refreshBatchAnalyzeStatus() {
+  const container = document.getElementById('batchAnalyzeStatus');
+  try {
+    const stats = await API.get('/api/scraper/analyze-stats');
+    container.innerHTML = `
+      <div class="batch-status-row"><span class="batch-status-label">To analyze:</span> <span class="batch-status-value">${stats.toAnalyze.toLocaleString()}</span></div>
+      <div class="batch-status-row"><span class="batch-status-label">Already analyzed:</span> <span class="batch-status-value">${stats.alreadyAnalyzed.toLocaleString()}</span></div>
+      <div class="batch-status-row"><span class="batch-status-label">No website:</span> <span class="batch-status-value">${stats.noWebsite.toLocaleString()}</span></div>
+      ${stats.toAnalyze > 0 ? `<div class="batch-status-row"><span class="batch-status-label">Estimate:</span> <span class="batch-status-value">${stats.estimate.formatted}</span></div>` : ''}
+    `;
+  } catch (err) {
+    container.innerHTML = `<span style="color:var(--color-text-muted)">Could not load analysis stats.</span>`;
+  }
 }
 
 async function refreshBatchPreviewStatus() {
@@ -692,6 +708,87 @@ function appendBatchLog(msg, type = 'info') {
   line.textContent = msg;
   container.appendChild(line);
   container.scrollTop = container.scrollHeight;
+}
+
+async function startBatchAnalysis() {
+  const btn = document.getElementById('btnBatchAnalyze');
+  const statusEl = document.getElementById('batchAnalyzeStatus');
+  btn.disabled = true;
+  btn.textContent = '⏳ Loading stats...';
+
+  try {
+    // Pre-flight: get stats
+    const stats = await API.get('/api/scraper/analyze-stats');
+    if (stats.toAnalyze === 0) {
+      appendBatchLog('No unanalyzed leads with websites found.', 'info');
+      statusEl.innerHTML = `<div class="batch-status-row"><span class="batch-status-label">Status:</span> <span class="batch-status-value">Nothing to analyze</span></div>`;
+      return;
+    }
+
+    const msg = `Analyze ${stats.toAnalyze.toLocaleString()} websites?\n\nAlready analyzed: ${stats.alreadyAnalyzed.toLocaleString()} (skipped)\nWithout website: ${stats.noWebsite.toLocaleString()} (skipped)\n\nEstimated duration: ${stats.estimate.formatted}\n(4 parallel workers, ~1.5s per lead)`;
+    if (!confirm(msg)) return;
+
+    btn.textContent = '⏳ Analyzing...';
+    appendBatchLog(`Starting batch website analysis: ${stats.toAnalyze} leads...`, 'info');
+    statusEl.innerHTML = `<div class="batch-status-row"><span class="batch-status-label">Status:</span> <span class="batch-status-value running">Running</span></div>
+      <div class="batch-status-row"><span class="batch-status-label">To analyze:</span> <span class="batch-status-value">${stats.toAnalyze}</span></div>`;
+
+    const response = await fetch('/api/scraper/analyze-websites', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let analyzed = 0;
+    let total = stats.toAnalyze;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          try {
+            const event = JSON.parse(line.slice(6));
+            if (event.type === 'start') {
+              total = event.total;
+            } else if (event.type === 'progress') {
+              const pct = Math.round((event.current / total) * 100);
+              statusEl.innerHTML = `<div class="batch-status-row"><span class="batch-status-label">Status:</span> <span class="batch-status-value running">Running (${pct}%)</span></div>
+                <div class="batch-status-row"><span class="batch-status-label">Progress:</span> <span class="batch-status-value">${event.current}/${total}</span></div>
+                <div class="batch-status-row"><span class="batch-status-label">Current:</span> <span class="batch-status-value">${event.businessName || ''}</span></div>`;
+            } else if (event.type === 'result') {
+              analyzed++;
+              if (analyzed % 10 === 0 || analyzed === total) {
+                appendBatchLog(`Analyzed ${analyzed}/${total} — ${event.businessName}: ${event.quality} (${event.score}/100)`, 'info');
+              }
+            } else if (event.type === 'done') {
+              appendBatchLog(`✅ Batch analysis complete: ${event.analyzed} websites analyzed`, 'success');
+              statusEl.innerHTML = `<div class="batch-status-row"><span class="batch-status-label">Status:</span> <span class="batch-status-value complete">Complete</span></div>
+                <div class="batch-status-row"><span class="batch-status-label">Analyzed:</span> <span class="batch-status-value">${event.analyzed}</span></div>`;
+            } else if (event.type === 'error') {
+              appendBatchLog(`❌ Analysis error: ${event.error}`, 'error');
+            }
+          } catch (e) {}
+        }
+      }
+    }
+
+    await loadData();
+  } catch (err) {
+    appendBatchLog(`❌ Batch analysis error: ${err.message}`, 'error');
+    statusEl.innerHTML = `<div class="batch-status-row"><span class="batch-status-label">Status:</span> <span class="batch-status-value failed">Error</span></div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Analyze All Websites';
+  }
 }
 
 async function startBatchPreviews() {
@@ -1113,6 +1210,7 @@ function setupEventListeners() {
   });
 
   // Batch operations
+  document.getElementById('btnBatchAnalyze').addEventListener('click', startBatchAnalysis);
   document.getElementById('btnBatchPreviews').addEventListener('click', startBatchPreviews);
   document.getElementById('btnBatchPreviewsResume').addEventListener('click', resumeBatchPreviews);
   document.getElementById('btnBatchEmails').addEventListener('click', startBatchEmails);

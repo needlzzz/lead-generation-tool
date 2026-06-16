@@ -208,6 +208,14 @@
     <section class="tab-panel" id="panel-batch">
       <div class="batch-panel">
         <div class="batch-section">
+          <h3>Website Analysis</h3>
+          <p class="batch-desc">Analyze all leads with a website that haven't been analyzed yet. Runs 4 parallel workers.</p>
+          <div class="batch-actions">
+            <button class="btn btn-primary" id="btnBatchAnalyze">Analyze All Websites</button>
+          </div>
+          <div id="batchAnalyzeStatus" class="batch-status"></div>
+        </div>
+        <div class="batch-section">
           <h3>Preview Generation</h3>
           <p class="batch-desc">Build preview sites for all analyzed leads that don't have a preview yet.</p>
           <div class="batch-actions">
