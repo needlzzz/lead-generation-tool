@@ -218,14 +218,14 @@ describe('GET /api/leads — Filters', () => {
   });
 
   describe('filter combinations', () => {
-    it('hasEmail + previewReady: previewReady takes precedence (returns leads without email)', async () => {
-      // This validates the key bug fix: when both are active server-side,
-      // previewReady should NOT be restricted by hasEmail
+    it('hasEmail + previewReady: both filters apply independently', async () => {
+      // hasEmail filters to leads with email, previewReady filters to preview+not-reached-out
+      // Result is the intersection: has email AND has preview AND not reached out
       const res = await request(app).get('/api/leads?hasEmail=1&previewReady=1');
-      // Server applies both independently — hasEmail=1 filters email, previewReady filters preview+status
-      // The result is the intersection: has email AND has preview AND not reached out
       // IDs: 2 (email+preview+Discovered), 7 (email+preview+Replied)
       expect(res.body.pagination.total).toBe(2);
+      expect(res.body.leads.every(l => l.email)).toBe(true);
+      expect(res.body.leads.every(l => l.previewUrl)).toBe(true);
     });
 
     it('poorDiscovered + hasEmail returns only poor+discovered leads with email', async () => {
