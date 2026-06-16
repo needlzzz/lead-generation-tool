@@ -8,42 +8,29 @@ const router = express.Router();
 // Default templates (same as in settings route)
 const DEFAULT_TEMPLATES = {
   email1: {
-    subject: 'Idee für [Business Name]',
+    subject: 'Eure Website, [Business Name]',
     body: `Sali [Business Name],
 
-ich bin Marc Kaelin von Kaelint Webdesign und ich habe mir eure Webseite näher angeschaut. Dabei sind mir folgende Punkte aufgefallen:
+mir ist aufgefallen, dass eure Website ein paar Schwachstellen hat — z.B. [Website-Probleme-Kurz]. Das heisst: Leute, die euch googeln, springen evtl. wieder ab, bevor sie anfragen.
 
-[Website-Probleme]
-
-Das sind Punkte, die bei eurer Kundschaft evtl. Verunsicherung auslösen könnten.
-
-Ich hab mal einen Entwurf erstellt, wie eure Webseite moderner aussehen könnte:
+Ich hab kurz skizziert, wie das besser aussehen könnte:
 👉 [Preview-Link]
 
-[Preview-Disclaimer]
-
-Falls Ihr euch für ein Re-Design interessiert, meldet euch gerne bei mir.
-
-Für mehr Informationen zum Angebot, besuche meine Webseite:
-👉 https://kaelint.ch
+Schaut's euch mal an — wenn's interessiert, antwortet einfach auf diese Mail.
 
 Marc Kaelin
-Kaelint Webdesign`
+kaelint.ch`
   },
   email2: {
-    subject: 'Re: Idee für [Business Name]',
+    subject: 'Re: Eure Website, [Business Name]',
     body: `Sali [Business Name],
 
-wollte nur sichergehen, dass meine Nachricht nicht untergegangen ist. Die Vorschau ist noch online:
+kurzes Follow-up — die Vorschau ist noch online:
 👉 [Preview-Link]
 
-Kein Druck — nur falls es doch passt.
+Kein Stress, nur falls es passt.
 
-Für mehr Informationen zum Angebot, besuche meine Webseite:
-👉 https://kaelint.ch
-
-Marc Kaelin
-Kaelint Webdesign`
+Marc`
   }
 };
 
