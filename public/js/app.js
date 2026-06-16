@@ -368,17 +368,13 @@ function renderDashboardAlerts(dueData, repliesData) {
   const alertsContainer = document.getElementById('outreachAlerts');
   const fuSection = document.getElementById('followUpsDue');
   const fuList = document.getElementById('followUpsList');
-  const replySection = document.getElementById('checkReplies');
-  const replyList = document.getElementById('repliesList');
 
   if (!alertsContainer) return;
 
   const hasFU = dueData.followUp1Due.length + dueData.followUp2Due.length + dueData.markColdDue.length > 0;
-  const hasReplies = repliesData.leads.length > 0;
 
-  alertsContainer.classList.toggle('hidden', !hasFU && !hasReplies);
+  alertsContainer.classList.toggle('hidden', !hasFU);
   fuSection.classList.toggle('hidden', !hasFU);
-  replySection.classList.toggle('hidden', !hasReplies);
 
   // Follow-ups
   let fuHtml = '';
@@ -396,14 +392,18 @@ function renderDashboardAlerts(dueData, repliesData) {
   });
   fuList.innerHTML = fuHtml;
 
-  // Reply reminders
-  let replyHtml = '';
-  repliesData.leads.forEach(l => {
-    replyHtml += `<div class="alert-item"><span class="alert-info"><strong>${esc(l.businessName)}</strong></span>
-      <span class="alert-email">${esc(l.email)}</span>
-      <button class="btn btn-sm" onclick="openReplyModal('${l.id}')">📝 Log Reply</button></div>`;
-  });
-  replyList.innerHTML = replyHtml;
+  // Summary bar (replaces the noisy notification list)
+  const summary = document.getElementById('outreachSummary');
+  if (summary) {
+    const reachedCount = repliesData.leads.length;
+    const fuCount = dueData.followUp1Due.length + dueData.followUp2Due.length;
+    const coldCount = dueData.markColdDue.length;
+    const parts = [];
+    if (reachedCount > 0) parts.push(`<span class="stat stat--reached">${reachedCount} awaiting reply</span>`);
+    if (fuCount > 0) parts.push(`<span class="stat stat--replied">${fuCount} follow-ups due</span>`);
+    if (coldCount > 0) parts.push(`<span class="stat stat--quota">${coldCount} mark cold</span>`);
+    summary.innerHTML = parts.join('');
+  }
 }
 
 // ============================================================
@@ -512,9 +512,17 @@ async function renderOutreachTab() {
     }
     empty.classList.add('hidden');
 
-    tbody.innerHTML = allOutreach.map(l => `
+    tbody.innerHTML = allOutreach.map(l => {
+      const daysSinceSent = l.dateEmail1Sent
+        ? Math.floor((Date.now() - new Date(l.dateEmail1Sent).getTime()) / 86400000)
+        : null;
+      const waitingBadge = l.status === 'Reached Out' && daysSinceSent !== null
+        ? `<span class="days-badge${daysSinceSent >= 7 ? ' days-badge--overdue' : daysSinceSent >= 3 ? ' days-badge--due' : ''}">${daysSinceSent}d</span>`
+        : '';
+
+      return `
       <tr class="clickable" onclick="showActivityLog('${l.id}')">
-        <td>${esc(l.businessName)}</td>
+        <td>${esc(l.businessName)} ${waitingBadge}</td>
         <td>${esc(l.category)}</td>
         <td>${esc(l.email)}</td>
         <td><span class="status-pill ${statusClass(l.status)}">${statusLabel(l.status)}</span></td>
@@ -522,11 +530,13 @@ async function renderOutreachTab() {
         <td>${l.dateFollowUp1Sent || '—'}</td>
         <td onclick="event.stopPropagation()">
           <div class="actions">
-            <button class="btn btn-sm" onclick="openReplyModal('${l.id}')" ${l.status === 'Reached Out' ? '' : 'disabled'}>📝 Reply</button>
+            ${l.status === 'Reached Out' ? `<button class="btn btn-sm btn-primary" onclick="openReplyModal('${l.id}')">📝 Reply</button>` : ''}
+            ${l.status === 'Reached Out' ? `<button class="btn btn-sm" onclick="doTransition('${l.id}','mark-no-response')">❄️</button>` : ''}
           </div>
         </td>
       </tr>
-    `).join('');
+    `;
+    }).join('');
   } catch (err) {
     tbody.innerHTML = '';
     empty.classList.remove('hidden');
