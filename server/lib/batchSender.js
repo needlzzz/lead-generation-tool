@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const nodemailer = require('nodemailer');
 const quotaTracker = require('./quotaTracker');
-const { renderTemplate } = require('./emailService');
+const { renderTemplate, resolveTemplatesForLead } = require('./emailService');
 const dataStore = require('./dataStore');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
@@ -136,7 +136,6 @@ function isTransientError(err) {
 async function processQueue(settings) {
   const brevoConfig = settings.smtp && settings.smtp.brevo;
   const { sendDelayMin, sendDelayMax } = settings.batch;
-  const templates = settings.templates || {};
 
   for (let i = 0; i < state.queue.length; i++) {
     // (a) Check stop flag
@@ -179,7 +178,12 @@ async function processQueue(settings) {
       continue;
     }
 
-    // (d) Render email template from global settings
+    // (d) Render email template — prefer the lead's category template (per-category
+    // campaigns), falling back to the global settings template.
+    const category = lead.category
+      ? dataStore.getAll('categories').find((c) => c.name === lead.category)
+      : null;
+    const templates = resolveTemplatesForLead(settings, category || null);
     const template = templates[item.emailType];
     if (!template) {
       state.failed.push({

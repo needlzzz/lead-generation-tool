@@ -22,11 +22,16 @@ jest.mock('../server/lib/quotaTracker', () => ({
 
 jest.mock('../server/lib/dataStore', () => ({
   get: jest.fn(),
+  getAll: jest.fn(() => []),
   save: jest.fn()
 }));
 
 jest.mock('../server/lib/emailService', () => ({
-  renderTemplate: jest.fn()
+  renderTemplate: jest.fn(),
+  resolveTemplatesForLead: jest.fn(() => ({
+    email1: { subject: 'Test Subject', body: 'Test Body' },
+    email2: { subject: 'Test Subject', body: 'Test Body' }
+  }))
 }));
 
 jest.mock('fs', () => {
@@ -45,7 +50,7 @@ const fs = require('fs');
 const nodemailer = require('nodemailer');
 const quotaTracker = require('../server/lib/quotaTracker');
 const dataStore = require('../server/lib/dataStore');
-const { renderTemplate } = require('../server/lib/emailService');
+const { renderTemplate, resolveTemplatesForLead } = require('../server/lib/emailService');
 const batchSender = require('../server/lib/batchSender');
 
 // Default test settings
@@ -108,6 +113,11 @@ beforeEach(() => {
   quotaTracker.increment.mockReturnValue({ count: 1, remaining: 249, date: '2026-06-11' });
   quotaTracker.getCount.mockReturnValue({ count: 0, remaining: 250, date: '2026-06-11' });
   renderTemplate.mockReturnValue({ subject: 'Test Subject', body: 'Test Body' });
+  resolveTemplatesForLead.mockReturnValue({
+    email1: { subject: 'Test Subject', body: 'Test Body' },
+    email2: { subject: 'Test Subject', body: 'Test Body' }
+  });
+  dataStore.getAll.mockReturnValue([]);
 
   // fs mocks defaults
   fs.existsSync.mockReturnValue(true);

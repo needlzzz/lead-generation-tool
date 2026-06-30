@@ -2662,7 +2662,7 @@ function renderCategoriesList() {
           <button class="btn btn-sm btn-danger" onclick="deleteCategory('${c.id}')">Del</button>
         </div>
       </div>
-      <div class="category-card-meta">Search term: ${esc(c.searchTerm)}</div>
+      <div class="category-card-meta">Search term: ${esc(c.searchTerm)}${c.templates ? ' · 📧 custom template' : ''}</div>
     </div>
   `).join('') || '<p style="padding:20px;color:#999">No categories found.</p>';
 }
@@ -2673,6 +2673,11 @@ function editCategory(id) {
   document.getElementById('catEditId').value = cat.id;
   document.getElementById('catName').value = cat.name;
   document.getElementById('catSearchTerm').value = cat.searchTerm;
+  const t = cat.templates || {};
+  document.getElementById('catE1Subject').value = (t.email1 && t.email1.subject) || '';
+  document.getElementById('catE1Body').value = (t.email1 && t.email1.body) || '';
+  document.getElementById('catE2Subject').value = (t.email2 && t.email2.subject) || '';
+  document.getElementById('catE2Body').value = (t.email2 && t.email2.body) || '';
   document.getElementById('modalCategoryTitle').textContent = 'Edit Category';
   openModal('modalCategory');
 }
@@ -2683,6 +2688,17 @@ async function saveCategory() {
     name: document.getElementById('catName').value,
     searchTerm: document.getElementById('catSearchTerm').value
   };
+
+  // Per-category email templates (optional). Only include an email block when at
+  // least one of its fields is filled, so empty categories fall back to globals.
+  const e1Subject = document.getElementById('catE1Subject').value.trim();
+  const e1Body = document.getElementById('catE1Body').value.trim();
+  const e2Subject = document.getElementById('catE2Subject').value.trim();
+  const e2Body = document.getElementById('catE2Body').value.trim();
+  const templates = {};
+  if (e1Subject || e1Body) templates.email1 = { subject: e1Subject, body: e1Body };
+  if (e2Subject || e2Body) templates.email2 = { subject: e2Subject, body: e2Body };
+  data.templates = Object.keys(templates).length > 0 ? templates : null;
 
   try {
     if (id) {

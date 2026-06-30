@@ -12,6 +12,7 @@ const DEFAULT_CATEGORIES = [
 
   // DIENSTLEISTUNGEN
   { id: uuidv4(), name: 'Fahrschule', searchTerm: 'Fahrschule' },
+  { id: uuidv4(), name: 'Fahrlehrer', searchTerm: 'Fahrlehrer' },
 
   // BEAUTY / WELLNESS
   { id: uuidv4(), name: 'Kosmetikstudio', searchTerm: 'Kosmetikstudio' },

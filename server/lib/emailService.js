@@ -1,6 +1,77 @@
 const nodemailer = require('nodemailer');
 
 /**
+ * Canonical fallback templates (website-sales campaign).
+ * Used when neither the lead's category nor the global settings define a template.
+ */
+const DEFAULT_TEMPLATES = {
+  email1: {
+    subject: 'Eure Website, [Business Name]',
+    body: `Sali [Business Name],
+
+mir ist aufgefallen, dass eure Website ein paar Schwachstellen hat — z.B. [Website-Probleme-Kurz]. Das heisst: Leute, die euch googeln, springen evtl. wieder ab, bevor sie anfragen.
+
+Ich hab kurz skizziert, wie das besser aussehen könnte:
+👉 [Preview-Link]
+
+Schaut's euch mal an — wenn's interessiert, antwortet einfach auf diese Mail.
+
+Marc Kaelin
+kaelint.ch`
+  },
+  email2: {
+    subject: 'Re: Eure Website, [Business Name]',
+    body: `Sali [Business Name],
+
+kurzes Follow-up — die Vorschau ist noch online:
+👉 [Preview-Link]
+
+Kein Stress, nur falls es passt.
+
+Marc`
+  }
+};
+
+/**
+ * Resolve the email templates to use for a given lead.
+ *
+ * Precedence (per email type, per field): category template → global settings
+ * template → built-in DEFAULT_TEMPLATES. This lets a single category (e.g.
+ * "Fahrlehrer") run a completely different campaign without affecting other leads.
+ *
+ * Pure function: the caller is responsible for looking up the lead's category
+ * (by name) and passing it in, so this stays decoupled from the data store.
+ *
+ * @param {object} settings - App settings (may contain a global `templates` object)
+ * @param {object|null} category - The lead's category object (may contain `templates`)
+ * @returns {{ email1: {subject,body}, email2: {subject,body} }}
+ */
+function resolveTemplatesForLead(settings, category) {
+  const settingsTemplates = (settings && settings.templates) || {};
+
+  const resolved = {
+    email1: { ...DEFAULT_TEMPLATES.email1, ...(settingsTemplates.email1 || {}) },
+    email2: { ...DEFAULT_TEMPLATES.email2, ...(settingsTemplates.email2 || {}) }
+  };
+
+  const categoryTemplates = category && category.templates;
+  if (categoryTemplates) {
+    // Only non-empty fields override the fallback, so a category that customises
+    // just the body still inherits the global/default subject.
+    const pickFilled = (obj) =>
+      Object.fromEntries(Object.entries(obj || {}).filter(([, v]) => v != null && v !== ''));
+    if (categoryTemplates.email1) {
+      resolved.email1 = { ...resolved.email1, ...pickFilled(categoryTemplates.email1) };
+    }
+    if (categoryTemplates.email2) {
+      resolved.email2 = { ...resolved.email2, ...pickFilled(categoryTemplates.email2) };
+    }
+  }
+
+  return resolved;
+}
+
+/**
  * Format an ISO date string as a German date (e.g., "15. Juli 2026").
  * Returns empty string for invalid/null dates.
  */
@@ -171,4 +242,12 @@ async function testConnection(smtpConfig) {
   return true;
 }
 
-module.exports = { renderTemplate, sendEmail, testConnection, createTransport, formatGermanDate };
+module.exports = {
+  renderTemplate,
+  sendEmail,
+  testConnection,
+  createTransport,
+  formatGermanDate,
+  resolveTemplatesForLead,
+  DEFAULT_TEMPLATES
+};
