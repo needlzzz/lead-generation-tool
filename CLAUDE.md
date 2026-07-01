@@ -175,6 +175,11 @@ Calendar days, no weekend logic.
 - Same unified template for all 45 categories
 - Edit button in email preview modal (edit body before sending, backend accepts customBody/customSubject)
 
+### Per-Category Campaigns
+- A category can carry its own `templates` object (`email1`/`email2`, each with `subject` + `body`). `resolveTemplatesForLead()` prefers the category template over the global settings template over the built-in default, so one category can run a completely different campaign without affecting other leads.
+- **Fahrschule / Fahrlehrer → CrashCode co-branding pitch**: these two default categories ship a dedicated campaign (`CRASHCODE_FAHRSCHULE_TEMPLATES` in `defaultCategories.js`) that offers driving schools the free, co-brandable CrashCode accident-help app for their students — not a website redesign. It uses only identity/CTA placeholders (`[Business Name]`, `[Dein Name]`, `[CALENDLY-LINK]`), no website/preview placeholders.
+- **Backfill:** `ensureDefaults()` in `routes/categories.js` additively applies a shipped campaign template to an already-seeded same-named category only when that category has no `templates` of its own — existing user-defined templates are never overwritten.
+
 ## SMTP Configuration
 
 - Configurable host, port, username, password, from address
