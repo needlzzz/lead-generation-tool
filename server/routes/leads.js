@@ -457,6 +457,18 @@ router.post('/:id/transition', (req, res) => {
       lead.activityLog.push({ date: now, action: 'Reverted to Discovered', details: 'Undid Lost — back in discovery pool' });
       break;
 
+    case 'reset-to-discovered':
+      lead.status = result.nextStatus;
+      lead.dateEmail1Sent = null;
+      lead.dateFollowUp1Sent = null;
+      lead.dateFollowUp2Sent = null;
+      lead.calendlySent = false;
+      lead.replyDate = null;
+      lead.replySentiment = null;
+      lead.meetingDate = null;
+      lead.activityLog.push({ date: now, action: 'Reset to Discovered', details: 'Outreach dates cleared — back in discovery pool' });
+      break;
+
     default:
       return res.status(400).json({ error: `Unknown action: ${action}` });
   }

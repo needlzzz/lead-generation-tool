@@ -533,6 +533,7 @@ async function renderOutreachTab() {
             ${l.status === 'Reached Out' ? `<button class="btn btn-sm btn-primary" onclick="openReplyModal('${l.id}')">📝 Reply</button>` : ''}
             ${l.status === 'Reached Out' ? `<button class="btn btn-sm" onclick="doTransition('${l.id}','mark-no-response')">❄️</button>` : ''}
             ${l.status === 'No Response' ? `<button class="btn btn-sm" onclick="doTransition('${l.id}','revert-to-reached-out')">↩ Undo</button>` : ''}
+            <button class="btn btn-sm" onclick="doTransition('${l.id}','reset-to-discovered')" title="Reset to Discovered (clears outreach dates)">🔄 Reset</button>
           </div>
         </td>
       </tr>

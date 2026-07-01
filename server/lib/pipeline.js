@@ -8,7 +8,8 @@ const TRANSITIONS = {
     'send-followup-1': 'Reached Out',
     'send-followup-2': 'Reached Out',
     'mark-no-response': 'No Response',
-    'log-reply': 'Replied'
+    'log-reply': 'Replied',
+    'reset-to-discovered': 'Discovered'
   },
   'Replied': {
     'schedule-meeting': 'Meeting Scheduled'
@@ -19,7 +20,8 @@ const TRANSITIONS = {
   },
   // Terminal statuses — allow revert
   'No Response': {
-    'revert-to-reached-out': 'Reached Out'
+    'revert-to-reached-out': 'Reached Out',
+    'reset-to-discovered': 'Discovered'
   },
   'Client Won': {},
   'Lost': {
