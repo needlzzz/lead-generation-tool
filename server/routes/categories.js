@@ -7,7 +7,10 @@ const router = express.Router();
 
 // Seed defaults if categories.json is empty; otherwise add any newly-introduced
 // default categories that are missing by name (e.g. "Fahrlehrer"). Existing
-// categories are never overwritten, so user edits are preserved.
+// categories are never overwritten, so user edits are preserved. As an additive
+// exception, a default that ships a campaign template (e.g. the CrashCode pitch
+// for "Fahrschule"/"Fahrlehrer") is backfilled onto the matching existing
+// category only when that category has no templates of its own yet.
 function ensureDefaults() {
   const existing = dataStore.getAll('categories');
   if (existing.length === 0) {
@@ -16,10 +19,18 @@ function ensureDefaults() {
     }
     return;
   }
-  const existingNames = new Set(existing.map((c) => c.name));
+  const existingByName = new Map(existing.map((c) => [c.name, c]));
   for (const cat of DEFAULT_CATEGORIES) {
-    if (!existingNames.has(cat.name)) {
+    const current = existingByName.get(cat.name);
+    if (!current) {
       dataStore.save('categories', { ...cat, id: uuidv4() });
+      continue;
+    }
+    // Backfill a shipped campaign template without touching user-defined ones.
+    if (cat.templates && !current.templates) {
+      current.templates = cat.templates;
+      if (current.tone === undefined && cat.tone !== undefined) current.tone = cat.tone;
+      dataStore.save('categories', current);
     }
   }
 }
