@@ -15,41 +15,54 @@ const { v4: uuidv4 } = require('uuid');
  */
 const CRASHCODE_FAHRSCHULE_TEMPLATES = {
   email1: {
-    subject: 'Eine Unfall-App für eure Fahrschüler:innen – mit [Business Name] drauf',
+    subject: 'Partnerschaft-Idee für [Business Name]: Lehrmittel + Unfall-App für eure Schüler:innen',
     body: `Sali [Business Name],
 
-kurze Idee, die perfekt zu einer Fahrschule passt.
+ich hätte eine Partnerschaft-Idee, die perfekt zu einer Fahrschule passt – und für euch komplett kostenlos ist.
 
-Ich habe CrashCode entwickelt – eine kostenlose App, die bei einem Autounfall hilft. Statt im Stress Papierformulare auszufüllen, tauschen beide Beteiligten ihre Fahrzeug- und Versicherungsdaten in Sekunden per QR-Code aus. Alles bleibt auf dem Handy: kein Server, kein Datensammeln.
+Ich habe CrashCode entwickelt: eine App, die zeigt, was bei einem Autounfall Schritt für Schritt zu tun ist. Die Beteiligten tauschen ihre Fahrzeug- und Versicherungsdaten in Sekunden per QR-Code aus und werden durch ein vollständiges Unfallprotokoll geführt (nach dem Europäischen Unfallbericht). Alles bleibt auf dem Handy – kein Server, kein Datensammeln.
 
-Genau euer Publikum: Fahranfänger:innen sind statistisch häufiger in Unfälle verwickelt – und meist überfordert, wenn es passiert. CrashCode nimmt ihnen genau diese Unsicherheit.
+Für euch sehe ich zwei konkrete Vorteile:
 
-Das Beste für euch: Ihr könnt die App mit eurem Namen «co-branden». Eure Schüler:innen scannen einmalig euren QR-Code und sehen danach bei jedem Öffnen «Bereitgestellt von [Business Name]». So bleibt ihr präsent – lange nach der letzten Fahrstunde.
+1) Als Lehrmittel im Unterricht
+«Was tue ich bei einem Unfall?» ist Prüfungsstoff – aber trocken zu erklären. Mit CrashCode üben eure Schüler:innen den Ablauf praktisch am eigenen Handy: Unfallstelle sichern, Daten austauschen, Protokoll ausfüllen, Fotos und Skizze erstellen. Gerade Fahranfänger:innen sind statistisch häufiger in Unfälle verwickelt und im Ernstfall überfordert – hier nehmt ihr ihnen die Unsicherheit.
 
-Für euch heisst das:
+2) Als Partnerschaft mit eurem Branding
+Ihr könnt die App mit eurem Namen «co-branden». Eure Schüler:innen scannen einmalig euren QR-Code und sehen danach bei jedem Öffnen «Bereitgestellt von [Business Name]». So bleibt ihr auf dem Handy präsent – lange nach der letzten Fahrstunde, inklusive Weiterempfehlungen an Kolleg:innen und Familie.
+
+Was das für euch heisst:
+• Ein praktisches Lehrmittel, das euch im Unterricht Arbeit abnimmt
 • Ein echtes Sicherheits-Geschenk für jede:n Schüler:in
-• Ihr positioniert euch als moderne, verantwortungsvolle Fahrschule
+• Sichtbarkeit und Empfehlungen über die ganze Ausbildung hinaus
 • Kostenlos und ohne Aufwand – euren QR-Code erstellt ihr in 2 Minuten selbst, kein technisches Setup
 
-Hat das Potenzial für euch? Ich zeige es euch gern in 10 Minuten:
-👉 [CALENDLY-LINK]
+Hat das Potenzial für euch? Ich zeige euch gerne in 10 Minuten wie die App funktioniert.
 
-Freundliche Grüsse
-[Dein Name]
-kaelint.ch`
+📱 Die App gibt es bereits fürs iPhone: https://apps.apple.com/ch/app/crashcode/id6783841118 – die Android-Version folgt in Kürze.
+
+Marc Kälin | Entwickler von CrashCode
+📞 +41 76 526 43 67
+✉️ business@kaelint.ch
+🌐 https://crashcode.kaelint.ch
+💼 LinkedIn: https://ch.linkedin.com/in/marc-kaelin-76b474127`
   },
   email2: {
-    subject: 'Re: Eine Unfall-App für eure Fahrschüler:innen',
+    subject: 'Re: Partnerschaft-Idee für [Business Name]',
     body: `Sali [Business Name],
 
-kurzes Follow-up zu meiner Idee mit CrashCode – der Unfall-App, die ihr gratis und mit eurem Namen an eure Fahrschüler:innen weitergeben könnt.
+kurzes Follow-up zu meiner Idee mit CrashCode – der Unfall-App, die eure Schüler:innen als Lehrmittel nutzen und die ihr gratis mit eurem Namen weitergeben könnt.
 
-Ich weiss, der Alltag als Fahrlehrer:in ist voll. Darum ganz unkompliziert: Wenn es euch interessiert, antwortet einfach kurz auf diese Mail – oder schnappt euch direkt einen Termin:
-👉 [CALENDLY-LINK]
+Ich weiss, der Alltag als Fahrlehrer:in ist voll. Darum ganz unkompliziert: Wenn es euch interessiert, antwortet einfach kurz auf diese Mail – oder meldet euch bei mir, dann zeige ich euch die App in 10 Minuten.
 
 Kein Stress, nur falls es passt.
 
-[Dein Name]`
+📱 Die App gibt es bereits fürs iPhone: https://apps.apple.com/ch/app/crashcode/id6783841118 – die Android-Version folgt in Kürze.
+
+Marc Kälin | Entwickler von CrashCode
+📞 +41 76 526 43 67
+✉️ business@kaelint.ch
+🌐 https://crashcode.kaelint.ch
+💼 LinkedIn: https://ch.linkedin.com/in/marc-kaelin-76b474127`
   }
 };
 
