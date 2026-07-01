@@ -11,6 +11,9 @@ let currentEmailContext = null; // { leadId, emailType }
 let qualitySortOrder = 'asc'; // default: Poor first (best prospects)
 let discoverySortField = null; // null, 'category', 'status', 'discovered'
 let discoverySortOrder = null; // null, 'asc', 'desc'
+let outreachSortField = null; // null, 'businessName', 'category', 'email', 'status', 'email1', 'followup'
+let outreachSortOrder = null; // null, 'asc', 'desc'
+let outreachLeadsCache = []; // last fetched outreach leads (for client-side sorting)
 let currentPage = 1;
 let totalPages = 1;
 let totalLeads = 0;
@@ -510,46 +513,110 @@ async function renderOutreachTab() {
   try {
     const { leads } = await API.get('/api/leads?status=Reached+Out&limit=200&page=1');
     const { leads: noResponseLeads } = await API.get('/api/leads?status=No+Response&limit=200&page=1');
-    const allOutreach = [...leads, ...noResponseLeads];
-
-    if (allOutreach.length === 0) {
-      tbody.innerHTML = '';
-      empty.classList.remove('hidden');
-      return;
-    }
-    empty.classList.add('hidden');
-
-    tbody.innerHTML = allOutreach.map(l => {
-      const daysSinceSent = l.dateEmail1Sent
-        ? Math.floor((Date.now() - new Date(l.dateEmail1Sent).getTime()) / 86400000)
-        : null;
-      const waitingBadge = l.status === 'Reached Out' && daysSinceSent !== null
-        ? `<span class="days-badge${daysSinceSent >= 7 ? ' days-badge--overdue' : daysSinceSent >= 3 ? ' days-badge--due' : ''}">${daysSinceSent}d</span>`
-        : '';
-
-      return `
-      <tr class="clickable" onclick="showActivityLog('${l.id}')">
-        <td>${esc(l.businessName)} ${waitingBadge}</td>
-        <td>${esc(l.category)}</td>
-        <td>${esc(l.email)}</td>
-        <td><span class="status-pill ${statusClass(l.status)}">${statusLabel(l.status)}</span></td>
-        <td>${l.dateEmail1Sent || '—'}</td>
-        <td>${l.dateFollowUp1Sent || '—'}</td>
-        <td onclick="event.stopPropagation()">
-          <div class="actions">
-            ${l.status === 'Reached Out' ? `<button class="btn btn-sm btn-primary" onclick="openReplyModal('${l.id}')">📝 Reply</button>` : ''}
-            ${l.status === 'Reached Out' ? `<button class="btn btn-sm" onclick="doTransition('${l.id}','mark-no-response')">❄️</button>` : ''}
-            ${l.status === 'No Response' ? `<button class="btn btn-sm" onclick="doTransition('${l.id}','revert-to-reached-out')">↩ Undo</button>` : ''}
-            <button class="btn btn-sm" onclick="doTransition('${l.id}','reset-to-discovered')" title="Reset to Discovered (clears outreach dates)">🔄 Reset</button>
-          </div>
-        </td>
-      </tr>
-    `;
-    }).join('');
+    outreachLeadsCache = [...leads, ...noResponseLeads];
+    paintOutreachTable();
   } catch (err) {
     tbody.innerHTML = '';
     empty.classList.remove('hidden');
   }
+}
+
+const OUTREACH_SORT_LABELS = {
+  businessName: 'Business Name',
+  category: 'Category',
+  email: 'Email',
+  status: 'Status',
+  email1: 'Email 1',
+  followup: 'Follow-Up'
+};
+
+function outreachSortValue(lead, field) {
+  switch (field) {
+    case 'businessName': return (lead.businessName || '').toLowerCase();
+    case 'category': return (lead.category || '').toLowerCase();
+    case 'email': return (lead.email || '').toLowerCase();
+    case 'status': return statusLabel(lead.status).toLowerCase();
+    case 'email1': return lead.dateEmail1Sent || '';
+    case 'followup': return lead.dateFollowUp1Sent || '';
+    default: return '';
+  }
+}
+
+function toggleOutreachSort(field) {
+  if (outreachSortField === field) {
+    if (outreachSortOrder === 'asc') outreachSortOrder = 'desc';
+    else if (outreachSortOrder === 'desc') { outreachSortField = null; outreachSortOrder = null; }
+  } else {
+    outreachSortField = field;
+    outreachSortOrder = 'asc';
+  }
+  paintOutreachTable();
+}
+
+function paintOutreachTable() {
+  const tbody = document.querySelector('#tableOutreach tbody');
+  const empty = document.getElementById('emptyOutreach');
+
+  // Update header sort indicators
+  Object.keys(OUTREACH_SORT_LABELS).forEach(field => {
+    const th = document.getElementById('thOut' + field);
+    if (!th) return;
+    const arrow = outreachSortField === field
+      ? (outreachSortOrder === 'asc' ? '▲' : '▼')
+      : '⇅';
+    th.textContent = OUTREACH_SORT_LABELS[field] + ' ' + arrow;
+  });
+
+  const allOutreach = [...outreachLeadsCache];
+
+  if (allOutreach.length === 0) {
+    tbody.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  if (outreachSortField && outreachSortOrder) {
+    const dir = outreachSortOrder === 'asc' ? 1 : -1;
+    allOutreach.sort((a, b) => {
+      const va = outreachSortValue(a, outreachSortField);
+      const vb = outreachSortValue(b, outreachSortField);
+      // Push empty values to the end regardless of direction
+      if (va === '' && vb !== '') return 1;
+      if (vb === '' && va !== '') return -1;
+      if (va < vb) return -1 * dir;
+      if (va > vb) return 1 * dir;
+      return 0;
+    });
+  }
+
+  tbody.innerHTML = allOutreach.map(l => {
+    const daysSinceSent = l.dateEmail1Sent
+      ? Math.floor((Date.now() - new Date(l.dateEmail1Sent).getTime()) / 86400000)
+      : null;
+    const waitingBadge = l.status === 'Reached Out' && daysSinceSent !== null
+      ? `<span class="days-badge${daysSinceSent >= 7 ? ' days-badge--overdue' : daysSinceSent >= 3 ? ' days-badge--due' : ''}">${daysSinceSent}d</span>`
+      : '';
+
+    return `
+    <tr class="clickable" onclick="showActivityLog('${l.id}')">
+      <td>${esc(l.businessName)} ${waitingBadge}</td>
+      <td>${esc(l.category)}</td>
+      <td>${esc(l.email)}</td>
+      <td><span class="status-pill ${statusClass(l.status)}">${statusLabel(l.status)}</span></td>
+      <td>${l.dateEmail1Sent || '—'}</td>
+      <td>${l.dateFollowUp1Sent || '—'}</td>
+      <td onclick="event.stopPropagation()">
+        <div class="actions">
+          ${l.status === 'Reached Out' ? `<button class="btn btn-sm btn-primary" onclick="openReplyModal('${l.id}')">📝 Reply</button>` : ''}
+          ${l.status === 'Reached Out' ? `<button class="btn btn-sm" onclick="doTransition('${l.id}','mark-no-response')">❄️</button>` : ''}
+          ${l.status === 'No Response' ? `<button class="btn btn-sm" onclick="doTransition('${l.id}','revert-to-reached-out')">↩ Undo</button>` : ''}
+          <button class="btn btn-sm" onclick="doTransition('${l.id}','reset-to-discovered')" title="Reset to Discovered (clears outreach dates)">🔄 Reset</button>
+        </div>
+      </td>
+    </tr>
+  `;
+  }).join('');
 }
 
 // ============================================================
