@@ -1427,6 +1427,9 @@ async function previewEmail(leadId, emailType) {
     const result = await API.post('/api/email/preview', { leadId, emailType });
     document.getElementById('emailTo').textContent = result.to;
     document.getElementById('emailSubject').textContent = result.subject;
+    document.getElementById('emailSubjectEdit').value = result.subject;
+    document.getElementById('emailSubjectEdit').classList.add('hidden');
+    document.getElementById('emailSubject').classList.remove('hidden');
     document.getElementById('emailBody').textContent = result.body;
     document.getElementById('emailBodyEdit').value = result.body;
     document.getElementById('emailBodyEdit').classList.add('hidden');
@@ -1444,12 +1447,17 @@ async function previewEmail(leadId, emailType) {
 function toggleEmailEdit() {
   const pre = document.getElementById('emailBody');
   const textarea = document.getElementById('emailBodyEdit');
+  const subjectSpan = document.getElementById('emailSubject');
+  const subjectInput = document.getElementById('emailSubjectEdit');
   const btn = document.getElementById('btnEditEmail');
   if (textarea.classList.contains('hidden')) {
     // Switch to edit mode
     textarea.value = pre.textContent;
     pre.classList.add('hidden');
     textarea.classList.remove('hidden');
+    subjectInput.value = subjectSpan.textContent;
+    subjectSpan.classList.add('hidden');
+    subjectInput.classList.remove('hidden');
     textarea.focus();
     btn.textContent = 'Preview';
   } else {
@@ -1457,6 +1465,9 @@ function toggleEmailEdit() {
     pre.textContent = textarea.value;
     textarea.classList.add('hidden');
     pre.classList.remove('hidden');
+    subjectSpan.textContent = subjectInput.value;
+    subjectInput.classList.add('hidden');
+    subjectSpan.classList.remove('hidden');
     btn.textContent = 'Edit';
   }
 }
