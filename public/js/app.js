@@ -392,6 +392,13 @@ function renderDashboardAlerts(dueData, repliesData) {
   });
   fuList.innerHTML = fuHtml;
 
+  // Count badge in the collapsible summary
+  const fuCountBadge = document.getElementById('followUpsCount');
+  if (fuCountBadge) {
+    const total = dueData.followUp1Due.length + dueData.followUp2Due.length + dueData.markColdDue.length;
+    fuCountBadge.textContent = total > 0 ? `(${total})` : '';
+  }
+
   // Summary bar (replaces the noisy notification list)
   const summary = document.getElementById('outreachSummary');
   if (summary) {
@@ -1482,10 +1489,16 @@ async function sendCurrentEmail() {
     const pre = document.getElementById('emailBody');
     const body = customBody || pre.textContent;
 
+    // Use edited subject if the input was active
+    const subjectInput = document.getElementById('emailSubjectEdit');
+    const subject = !subjectInput.classList.contains('hidden')
+      ? subjectInput.value
+      : document.getElementById('emailSubject').textContent;
+
     await API.post('/api/email/send', {
       ...currentEmailContext,
       customBody: body,
-      customSubject: document.getElementById('emailSubject').textContent
+      customSubject: subject
     });
     closeModal('modalEmail');
     currentEmailContext = null;

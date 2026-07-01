@@ -179,6 +179,28 @@ body {
   margin-bottom: 0.5rem;
 }
 
+.alert-section-summary {
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.4rem 0;
+  user-select: none;
+  list-style-position: inside;
+}
+
+.alert-section-summary:hover {
+  color: var(--color-accent, var(--color-text));
+}
+
+.alert-section[open] .alert-section-summary {
+  margin-bottom: 0.5rem;
+}
+
+.fu-count {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
 .alert-item {
   display: flex;
   justify-content: space-between;
