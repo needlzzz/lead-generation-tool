@@ -2056,14 +2056,110 @@ async function emailSelectedLeads() {
 
   const willSend = Math.min(eligible.length, quota.remaining);
   const willSkipQuota = eligible.length - willSend;
+  const toSend = eligible.slice(0, willSend);
 
-  let msg = `Send Email 1 to ${willSend} lead(s)?`;
-  if (noEmail > 0) msg += `\n${noEmail} skipped (no email or wrong status)`;
-  if (willSkipQuota > 0) msg += `\n${willSkipQuota} won't be sent (daily limit: ${quota.maxPerDay})`;
-  msg += `\n\nPersonal quota: ${quota.count}/${quota.maxPerDay} used today`;
+  // Build a verification view so the user can confirm which template each lead
+  // gets (per-category campaign, e.g. Fahrschule, vs the global template).
+  await showBulkVerify(toSend, { noEmail, willSkipQuota, quota });
+}
 
-  if (!confirm(msg)) return;
+/**
+ * Return true when a category carries its own non-empty campaign template
+ * (so leads in it receive the category-specific email, not the global one).
+ */
+function categoryHasCampaign(category) {
+  const t = category && category.templates && category.templates.email1;
+  return !!(t && ((t.body && t.body.trim()) || (t.subject && t.subject.trim())));
+}
 
+/**
+ * Populate and open the bulk-send verification modal. Groups the leads by the
+ * template they will actually receive and shows a rendered preview per group.
+ */
+async function showBulkVerify(toSend, { noEmail, willSkipQuota, quota }) {
+  // Group leads by the campaign/template they will receive.
+  const groups = new Map(); // key -> { label, isCampaign, leads: [] }
+  for (const lead of toSend) {
+    const category = lead.category ? allCategories.find(c => c.name === lead.category) : null;
+    const isCampaign = categoryHasCampaign(category);
+    const key = isCampaign ? `cat:${category.name}` : 'global';
+    const label = isCampaign
+      ? `${category.name} campaign (category-specific template)`
+      : 'Global template (Settings)';
+    if (!groups.has(key)) groups.set(key, { label, isCampaign, leads: [] });
+    groups.get(key).leads.push(lead);
+  }
+
+  const summary = document.getElementById('bulkVerifySummary');
+  let summaryText = `About to send Email 1 to ${toSend.length} lead(s).`;
+  if (noEmail > 0) summaryText += ` ${noEmail} skipped (no email or wrong status).`;
+  if (willSkipQuota > 0) summaryText += ` ${willSkipQuota} won't fit today's quota.`;
+  summaryText += ` Personal quota: ${quota.count}/${quota.maxPerDay} used today.`;
+  summary.textContent = summaryText;
+
+  const container = document.getElementById('bulkVerifyGroups');
+  container.innerHTML = '';
+
+  for (const group of groups.values()) {
+    const block = document.createElement('div');
+    block.style.cssText = 'border:1px solid var(--color-border,#ddd);border-radius:6px;padding:0.75rem;margin-bottom:0.75rem;';
+
+    const heading = document.createElement('div');
+    heading.style.cssText = 'font-weight:600;margin-bottom:0.35rem;';
+    heading.textContent = `${group.label} — ${group.leads.length} lead(s)`;
+    block.appendChild(heading);
+
+    // Fetch a representative preview (subject + body) for the first lead.
+    const sample = group.leads[0];
+    let subjectText = '(preview unavailable)';
+    let bodyText = '';
+    try {
+      const result = await API.post('/api/email/preview', { leadId: sample.id, emailType: 'email1' });
+      subjectText = result.subject;
+      bodyText = result.body;
+    } catch (e) {
+      bodyText = '';
+    }
+
+    const subj = document.createElement('div');
+    subj.style.cssText = 'font-size:0.85rem;margin-bottom:0.35rem;';
+    subj.innerHTML = `<strong>Subject:</strong> `;
+    subj.appendChild(document.createTextNode(subjectText));
+    block.appendChild(subj);
+
+    if (bodyText) {
+      const snippet = document.createElement('pre');
+      snippet.className = 'email-body';
+      snippet.style.cssText = 'max-height:140px;overflow:auto;font-size:0.8rem;margin:0;';
+      snippet.textContent = bodyText;
+      block.appendChild(snippet);
+    }
+
+    const names = document.createElement('div');
+    names.style.cssText = 'font-size:0.75rem;color:var(--color-text-muted,#777);margin-top:0.35rem;';
+    names.textContent = 'Recipients: ' + group.leads.map(l => l.businessName).join(', ');
+    block.appendChild(names);
+
+    container.appendChild(block);
+  }
+
+  const confirmBtn = document.getElementById('btnConfirmBulkSend');
+  // Replace the button to clear any prior click handler.
+  const freshBtn = confirmBtn.cloneNode(true);
+  confirmBtn.parentNode.replaceChild(freshBtn, confirmBtn);
+  freshBtn.addEventListener('click', () => {
+    closeModal('modalBulkVerify');
+    executeBulkSend(toSend);
+  });
+
+  openModal('modalBulkVerify');
+}
+
+/**
+ * Actually send Email 1 to each lead, one by one, honoring the same per-lead
+ * template resolution the backend applies.
+ */
+async function executeBulkSend(toSend) {
   const btn = document.getElementById('btnEmailSelected');
   btn.disabled = true;
   btn.textContent = '⏳ Sending...';
@@ -2072,8 +2168,8 @@ async function emailSelectedLeads() {
   let failed = 0;
   let lastError = '';
 
-  for (let i = 0; i < willSend; i++) {
-    const lead = eligible[i];
+  for (let i = 0; i < toSend.length; i++) {
+    const lead = toSend[i];
     try {
       await API.post('/api/email/send', { leadId: lead.id, emailType: 'email1' });
       sent++;

@@ -170,6 +170,8 @@ Kaelint Webdesign
 - Tracked in: `server/data/personal-send-quota.json`
 - Headers: Reply-To set, X-Mailer suppressed (looks like personal email)
 - **Important:** Trim credentials on save (trailing spaces cause auth failure)
+- **Per-lead template resolution:** every send path (single send, "Email Selected", batch send) resolves the template via `getTemplatesForLead()` / `resolveTemplatesForLead()`, which prefers the lead's category-specific campaign (e.g. the Fahrschule/Fahrlehrer CrashCode pitch) over the global settings template. So a Fahrschule lead always gets the Fahrschule template — never the global one.
+- **Bulk-send verification:** "Email Selected" opens a verification modal (`#modalBulkVerify`) before sending. It groups the selected leads by the template they will actually receive (category campaign vs global), shows a rendered subject + body preview per group via `/api/email/preview`, lists recipients, then sends only on "Send now".
 
 ### Brevo SMTP (for batch sends)
 - Used by: Batch Operations → Start Batch Send

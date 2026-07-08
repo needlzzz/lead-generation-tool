@@ -16,9 +16,9 @@ const { v4: uuidv4 } = require('uuid');
 const CRASHCODE_FAHRSCHULE_TEMPLATES = {
   email1: {
     subject: 'Partnerschaft-Idee für [Business Name]: Lehrmittel + Unfall-App für eure Schüler:innen',
-    body: `Sali [Business Name],
+    body: `Sali zäme!
 
-ich hätte eine Partnerschaft-Idee, die perfekt zu einer Fahrschule passt – und für euch komplett kostenlos ist.
+Ich hätte eine Partnerschaft-Idee, die perfekt zu einer Fahrschule passt – und für euch komplett kostenlos ist.
 
 Ich habe CrashCode entwickelt: eine App, die zeigt, was bei einem Autounfall Schritt für Schritt zu tun ist. Die Beteiligten tauschen ihre Fahrzeug- und Versicherungsdaten in Sekunden per QR-Code aus und werden durch ein vollständiges Unfallprotokoll geführt (nach dem Europäischen Unfallbericht). Alles bleibt auf dem Handy – kein Server, kein Datensammeln.
 
@@ -38,7 +38,7 @@ Was das für euch heisst:
 
 Hat das Potenzial für euch? Ich zeige euch gerne in 10 Minuten wie die App funktioniert.
 
-📱 Die App gibt es bereits fürs iPhone: https://apps.apple.com/ch/app/crashcode/id6783841118 – die Android-Version folgt in Kürze.
+📱 Die App gibt es bereits fürs iPhone: https://apps.apple.com/ch/app/crashcode/id6783841118 – die Android-Version befindet sich aktuell in der Test-Phase. Du kannst mir aber deine E-Mailadresse (verknüpft mit deinem Google Konto) angeben und ich lade dich gerne als Tester ein.
 
 Marc Kälin | Entwickler von CrashCode
 📞 +41 76 526 43 67
@@ -48,15 +48,15 @@ Marc Kälin | Entwickler von CrashCode
   },
   email2: {
     subject: 'Re: Partnerschaft-Idee für [Business Name]',
-    body: `Sali [Business Name],
+    body: `Sali zäme!
 
-kurzes Follow-up zu meiner Idee mit CrashCode – der Unfall-App, die eure Schüler:innen als Lehrmittel nutzen und die ihr gratis mit eurem Namen weitergeben könnt.
+Kurzes Follow-up zu meiner Idee mit CrashCode – der Unfall-App, die eure Schüler:innen als Lehrmittel nutzen und die ihr gratis mit eurem Namen weitergeben könnt.
 
 Ich weiss, der Alltag als Fahrlehrer:in ist voll. Darum ganz unkompliziert: Wenn es euch interessiert, antwortet einfach kurz auf diese Mail – oder meldet euch bei mir, dann zeige ich euch die App in 10 Minuten.
 
 Kein Stress, nur falls es passt.
 
-📱 Die App gibt es bereits fürs iPhone: https://apps.apple.com/ch/app/crashcode/id6783841118 – die Android-Version folgt in Kürze.
+📱 Die App gibt es bereits fürs iPhone: https://apps.apple.com/ch/app/crashcode/id6783841118 – die Android-Version befindet sich aktuell in der Test-Phase. Du kannst mir aber deine E-Mailadresse (verknüpft mit deinem Google Konto) angeben und ich lade dich gerne als Tester ein.
 
 Marc Kälin | Entwickler von CrashCode
 📞 +41 76 526 43 67
