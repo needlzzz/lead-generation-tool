@@ -47,6 +47,7 @@
         <button class="tab" role="tab" aria-selected="false" data-tab="clients">Client Tracker</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="batch">Batch Operations</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="scrapelog">Scrape Log</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="test">Test Mail</button>
       </div>
     </nav>
 
@@ -255,6 +256,53 @@
       <div id="emptyScrapeLog" class="empty-state hidden">No scrape history yet.</div>
     </section>
 
+    <section class="tab-panel" id="panel-test">
+      <div class="panel-toolbar">
+        <span class="outreach-summary">Send a test email to yourself to preview templates before real outreach. Test sends do not touch the pipeline or daily quota.</span>
+      </div>
+      <div style="max-width:840px;padding:16px;display:flex;flex-direction:column;gap:14px;">
+        <div class="form-row">
+          <label for="testRecipient">Recipient email</label>
+          <div style="display:flex;gap:8px;">
+            <input type="email" id="testRecipient" placeholder="your@email.com" style="flex:1;">
+            <button type="button" class="btn" id="btnSaveTestRecipient">Save</button>
+          </div>
+        </div>
+        <div class="form-row">
+          <label for="testTemplate">Template</label>
+          <select id="testTemplate">
+            <option value="email1">Email 1 — Cold Outreach</option>
+            <option value="email2">Email 2 — Follow-Up</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="testLead">Render with data from</label>
+          <select id="testLead">
+            <option value="">Sample data (Muster Garage)</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="testProvider">Send via</label>
+          <select id="testProvider"></select>
+        </div>
+        <div class="form-actions" style="justify-content:flex-start;">
+          <button type="button" class="btn" id="btnTestPreview">↻ Refresh preview</button>
+        </div>
+        <div class="form-row">
+          <label for="testSubject">Subject</label>
+          <input type="text" id="testSubject">
+        </div>
+        <div class="form-row">
+          <label for="testBody">Body</label>
+          <textarea id="testBody" rows="14"></textarea>
+        </div>
+        <div class="form-actions" style="justify-content:flex-start;">
+          <button type="button" class="btn btn-primary" id="btnSendTest">📨 Send Test Email</button>
+        </div>
+        <div id="testSendResult" class="smtp-test-result hidden"></div>
+      </div>
+    </section>
+
     <!-- Modals -->
     <!-- Add/Edit Lead Modal -->
     <div class="modal-overlay hidden" id="modalLead">
@@ -342,6 +390,7 @@
         </div>
         <div class="email-preview">
           <p id="bulkVerifySummary" style="margin:0 0 0.75rem;"></p>
+          <div id="bulkVerifyProvider" style="margin:0 0 0.75rem;"></div>
           <div id="bulkVerifyGroups"></div>
         </div>
         <div class="form-actions">

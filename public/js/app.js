@@ -174,6 +174,7 @@ function renderCurrentTab() {
     case 'clients': renderClientsTab(); break;
     case 'batch': renderBatchTab(); break;
     case 'scrapelog': renderScrapeLogTab(); break;
+    case 'test': renderTestTab(); break;
   }
 }
 
@@ -2041,26 +2042,24 @@ async function emailSelectedLeads() {
     return;
   }
 
-  // Check personal quota
-  let quota;
+  // Discover which SMTP senders are configured (with per-sender quota).
+  let providers = [];
   try {
-    quota = await API.get('/api/email/quota');
+    const resp = await API.get('/api/email/providers');
+    providers = resp.providers || [];
   } catch (e) {
-    quota = { count: 0, remaining: 20, maxPerDay: 20 };
+    providers = [];
   }
 
-  if (quota.remaining === 0) {
-    showError(`Daily personal email limit reached (${quota.count}/${quota.maxPerDay}). Try again tomorrow or use Batch Send.`);
+  if (providers.length === 0) {
+    showError('No SMTP server configured. Please configure one in Settings.');
     return;
   }
 
-  const willSend = Math.min(eligible.length, quota.remaining);
-  const willSkipQuota = eligible.length - willSend;
-  const toSend = eligible.slice(0, willSend);
-
   // Build a verification view so the user can confirm which template each lead
-  // gets (per-category campaign, e.g. Fahrschule, vs the global template).
-  await showBulkVerify(toSend, { noEmail, willSkipQuota, quota });
+  // gets (per-category campaign, e.g. Fahrschule, vs the global template) and,
+  // when more than one SMTP server is configured, which sender to use.
+  await showBulkVerify(eligible, { noEmail, providers });
 }
 
 /**
@@ -2075,11 +2074,12 @@ function categoryHasCampaign(category) {
 /**
  * Populate and open the bulk-send verification modal. Groups the leads by the
  * template they will actually receive and shows a rendered preview per group.
+ * When more than one SMTP sender is configured, prompts the user to pick one.
  */
-async function showBulkVerify(toSend, { noEmail, willSkipQuota, quota }) {
+async function showBulkVerify(eligible, { noEmail, providers }) {
   // Group leads by the campaign/template they will receive.
   const groups = new Map(); // key -> { label, isCampaign, leads: [] }
-  for (const lead of toSend) {
+  for (const lead of eligible) {
     const category = lead.category ? allCategories.find(c => c.name === lead.category) : null;
     const isCampaign = categoryHasCampaign(category);
     const key = isCampaign ? `cat:${category.name}` : 'global';
@@ -2090,12 +2090,48 @@ async function showBulkVerify(toSend, { noEmail, willSkipQuota, quota }) {
     groups.get(key).leads.push(lead);
   }
 
+  // Sender selection — only prompt when more than one SMTP is configured.
+  let selectedProviderId = providers[0].id;
+  const currentProvider = () => providers.find(p => p.id === selectedProviderId) || providers[0];
+
+  const providerHost = document.getElementById('bulkVerifyProvider');
+  providerHost.innerHTML = '';
+  if (providers.length > 1) {
+    const label = document.createElement('label');
+    label.style.cssText = 'display:flex;align-items:center;gap:0.5rem;font-size:0.9rem;font-weight:600;';
+    label.appendChild(document.createTextNode('Send via:'));
+    const sel = document.createElement('select');
+    sel.style.cssText = 'flex:1;padding:0.35rem;';
+    for (const p of providers) {
+      const opt = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = `${p.label} — ${p.fromAddress} (${p.remaining}/${p.maxPerDay} left today)`;
+      sel.appendChild(opt);
+    }
+    sel.value = selectedProviderId;
+    sel.addEventListener('change', () => {
+      selectedProviderId = sel.value;
+      updateSummary();
+    });
+    label.appendChild(sel);
+    providerHost.appendChild(label);
+  } else {
+    const p = providers[0];
+    providerHost.textContent = `Sending via ${p.label} — ${p.fromAddress} (${p.remaining}/${p.maxPerDay} left today).`;
+  }
+
   const summary = document.getElementById('bulkVerifySummary');
-  let summaryText = `About to send Email 1 to ${toSend.length} lead(s).`;
-  if (noEmail > 0) summaryText += ` ${noEmail} skipped (no email or wrong status).`;
-  if (willSkipQuota > 0) summaryText += ` ${willSkipQuota} won't fit today's quota.`;
-  summaryText += ` Personal quota: ${quota.count}/${quota.maxPerDay} used today.`;
-  summary.textContent = summaryText;
+  function updateSummary() {
+    const p = currentProvider();
+    const willSend = Math.min(eligible.length, p.remaining);
+    const willSkipQuota = eligible.length - willSend;
+    let summaryText = `About to send Email 1 to ${willSend} lead(s) via ${p.label}.`;
+    if (noEmail > 0) summaryText += ` ${noEmail} skipped (no email or wrong status).`;
+    if (willSkipQuota > 0) summaryText += ` ${willSkipQuota} won't fit today's quota.`;
+    summaryText += ` Quota: ${p.count}/${p.maxPerDay} used today.`;
+    summary.textContent = summaryText;
+  }
+  updateSummary();
 
   const container = document.getElementById('bulkVerifyGroups');
   container.innerHTML = '';
@@ -2148,8 +2184,15 @@ async function showBulkVerify(toSend, { noEmail, willSkipQuota, quota }) {
   const freshBtn = confirmBtn.cloneNode(true);
   confirmBtn.parentNode.replaceChild(freshBtn, confirmBtn);
   freshBtn.addEventListener('click', () => {
+    const p = currentProvider();
+    const willSend = Math.min(eligible.length, p.remaining);
+    const toSend = eligible.slice(0, willSend);
     closeModal('modalBulkVerify');
-    executeBulkSend(toSend);
+    if (toSend.length === 0) {
+      showError(`Daily quota exhausted for ${p.label}. Pick another sender or try again tomorrow.`);
+      return;
+    }
+    executeBulkSend(toSend, p.id);
   });
 
   openModal('modalBulkVerify');
@@ -2159,7 +2202,7 @@ async function showBulkVerify(toSend, { noEmail, willSkipQuota, quota }) {
  * Actually send Email 1 to each lead, one by one, honoring the same per-lead
  * template resolution the backend applies.
  */
-async function executeBulkSend(toSend) {
+async function executeBulkSend(toSend, provider) {
   const btn = document.getElementById('btnEmailSelected');
   btn.disabled = true;
   btn.textContent = '⏳ Sending...';
@@ -2171,7 +2214,7 @@ async function executeBulkSend(toSend) {
   for (let i = 0; i < toSend.length; i++) {
     const lead = toSend[i];
     try {
-      await API.post('/api/email/send', { leadId: lead.id, emailType: 'email1' });
+      await API.post('/api/email/send', { leadId: lead.id, emailType: 'email1', provider });
       sent++;
     } catch (err) {
       failed++;
@@ -2788,6 +2831,128 @@ async function sendTestEmail() {
       }
     });
     const result = await API.post('/api/settings/send-test-email', { to: recipient });
+    resultEl.classList.remove('smtp-pending');
+    resultEl.classList.add('smtp-success');
+    resultEl.textContent = `✅ ${result.message}`;
+  } catch (err) {
+    resultEl.classList.remove('smtp-pending');
+    resultEl.classList.add('smtp-error');
+    resultEl.textContent = `❌ ${err.message}`;
+  }
+}
+
+// ============================================================
+// TEST MAIL TAB
+// ============================================================
+
+let testTabInitialized = false;
+
+function initTestTabListeners() {
+  if (testTabInitialized) return;
+  testTabInitialized = true;
+  document.getElementById('btnSaveTestRecipient').addEventListener('click', saveTestRecipient);
+  document.getElementById('btnTestPreview').addEventListener('click', refreshTestPreview);
+  document.getElementById('btnSendTest').addEventListener('click', sendTestMail);
+  document.getElementById('testTemplate').addEventListener('change', refreshTestPreview);
+  document.getElementById('testLead').addEventListener('change', refreshTestPreview);
+}
+
+async function renderTestTab() {
+  initTestTabListeners();
+
+  // Populate the sender (SMTP provider) dropdown from configured providers.
+  const provSel = document.getElementById('testProvider');
+  try {
+    const { providers } = await API.get('/api/email/providers');
+    provSel.innerHTML = '';
+    if (!providers || providers.length === 0) {
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = 'No SMTP configured — set one up in Settings';
+      provSel.appendChild(opt);
+    } else {
+      for (const p of providers) {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = `${p.label} — ${p.fromAddress}`;
+        provSel.appendChild(opt);
+      }
+    }
+  } catch (e) { /* ignore — leave whatever is there */ }
+
+  // Populate the "render with" lead dropdown (sample data + real leads).
+  const leadSel = document.getElementById('testLead');
+  const prevLead = leadSel.value;
+  leadSel.innerHTML = '<option value="">Sample data (Muster Garage)</option>';
+  for (const l of allLeads) {
+    const opt = document.createElement('option');
+    opt.value = l.id;
+    opt.textContent = l.businessName + (l.email ? ` (${l.email})` : '');
+    leadSel.appendChild(opt);
+  }
+  leadSel.value = prevLead;
+
+  // Load the saved recipient (only if the field is empty, so edits survive).
+  try {
+    const { settings } = await API.get('/api/settings');
+    const rcpt = document.getElementById('testRecipient');
+    if (!rcpt.value) rcpt.value = settings.testRecipient || '';
+  } catch (e) { /* ignore */ }
+
+  await refreshTestPreview();
+}
+
+async function refreshTestPreview() {
+  const emailType = document.getElementById('testTemplate').value;
+  const leadId = document.getElementById('testLead').value;
+  try {
+    const result = await API.post('/api/email/test-preview', {
+      emailType,
+      leadId: leadId || undefined
+    });
+    document.getElementById('testSubject').value = result.subject;
+    document.getElementById('testBody').value = result.body;
+  } catch (err) {
+    showError(err.message);
+  }
+}
+
+async function saveTestRecipient() {
+  const to = document.getElementById('testRecipient').value.trim();
+  try {
+    await API.put('/api/settings', { testRecipient: to });
+    showToast('success', 'Test recipient saved.');
+  } catch (err) {
+    showError(err.message);
+  }
+}
+
+async function sendTestMail() {
+  const to = document.getElementById('testRecipient').value.trim();
+  if (!to) {
+    showError('Enter a recipient email address.');
+    return;
+  }
+  const provider = document.getElementById('testProvider').value;
+  const emailType = document.getElementById('testTemplate').value;
+  const customSubject = document.getElementById('testSubject').value;
+  const customBody = document.getElementById('testBody').value;
+
+  const resultEl = document.getElementById('testSendResult');
+  resultEl.classList.remove('hidden', 'smtp-success', 'smtp-error');
+  resultEl.classList.add('smtp-pending');
+  resultEl.textContent = '⏳ Sending test email...';
+
+  try {
+    // Persist the recipient so it's remembered next time.
+    await API.put('/api/settings', { testRecipient: to });
+    const result = await API.post('/api/email/test-send', {
+      to,
+      emailType,
+      provider,
+      customSubject,
+      customBody
+    });
     resultEl.classList.remove('smtp-pending');
     resultEl.classList.add('smtp-success');
     resultEl.textContent = `✅ ${result.message}`;

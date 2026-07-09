@@ -98,6 +98,7 @@ const DEFAULT_SETTINGS = {
   userName: '',
   calendlyLink: '',
   previewSiteRepoPath: '/Users/tabkamac/private/dev/git/kaelint-website-business',
+  testRecipient: '',
   templates: DEFAULT_TEMPLATES,
   smtp: {
     host: '',
@@ -165,7 +166,7 @@ router.get('/', (req, res) => {
 
 // PUT /api/settings
 router.put('/', (req, res) => {
-  const { userName, calendlyLink, previewSiteRepoPath, templates, smtp, batch } = req.body;
+  const { userName, calendlyLink, previewSiteRepoPath, testRecipient, templates, smtp, batch } = req.body;
 
   // Validate batch settings if provided
   if (batch && typeof batch === 'object') {
@@ -188,6 +189,7 @@ router.put('/', (req, res) => {
     userName: userName !== undefined ? userName : existing.userName,
     calendlyLink: calendlyLink !== undefined ? calendlyLink : existing.calendlyLink,
     previewSiteRepoPath: previewSiteRepoPath !== undefined ? previewSiteRepoPath : (existing.previewSiteRepoPath || DEFAULT_SETTINGS.previewSiteRepoPath),
+    testRecipient: testRecipient !== undefined ? testRecipient : (existing.testRecipient || ''),
     templates: {
       email1: templates && templates.email1 ? { ...existingTemplates.email1, ...templates.email1 } : existingTemplates.email1,
       email2: templates && templates.email2 ? { ...existingTemplates.email2, ...templates.email2 } : existingTemplates.email2

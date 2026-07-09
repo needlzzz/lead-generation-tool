@@ -105,7 +105,12 @@ function makeLead(overrides = {}) {
 }
 
 beforeEach(() => {
-  jest.useFakeTimers();
+  // Pin the fake clock to a fixed instant WITHIN the 08:00–17:00 Europe/Zurich
+  // send window (10:00 UTC = 12:00 CEST). Several tests exercise the real
+  // send loop without mocking isWithinSendWindow(), so without a pinned clock
+  // they pass or fail depending on the wall-clock time of day (green during the
+  // day, red after 17:00). A fixed in-window instant makes them deterministic.
+  jest.useFakeTimers({ now: new Date('2026-06-11T10:00:00Z') });
   jest.clearAllMocks();
 
   // Reset mocks to sensible defaults
