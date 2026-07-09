@@ -258,3 +258,14 @@ Calendar days, no weekend logic.
 - Status badges removed from header
 - Content spans full viewport width (no max-width constraint)
 - Emojis removed from most buttons (text labels), kept for: 🔍 Discover, ✖ (Not a Fit), ✏️ (Edit)
+
+## Git & Networking
+
+- Git is configured to route through the corporate proxy (`aproxy.corproot.net:8080`). That proxy only resolves while the corporate VPN is connected.
+- **When the VPN is not active, do NOT use the proxy** — it fails with `Could not resolve proxy: aproxy.corproot.net`. Push/pull/fetch with the proxy disabled for that command:
+  ```bash
+  git -c http.proxy= -c https.proxy= push
+  ```
+  (Use the same `-c http.proxy= -c https.proxy=` prefix for `pull`/`fetch`/`clone`.) This is per-command and does not change the global git config.
+- When the VPN IS connected, a plain `git push` works through the proxy.
+- This is independent of the app's own SMTP proxy setting (`smtp.useProxy`) — that only affects Nodemailer email sends, not git.
