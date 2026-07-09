@@ -2854,6 +2854,7 @@ function initTestTabListeners() {
   document.getElementById('btnTestPreview').addEventListener('click', refreshTestPreview);
   document.getElementById('btnSendTest').addEventListener('click', sendTestMail);
   document.getElementById('testTemplate').addEventListener('change', refreshTestPreview);
+  document.getElementById('testCampaign').addEventListener('change', refreshTestPreview);
   document.getElementById('testLead').addEventListener('change', refreshTestPreview);
 }
 
@@ -2880,6 +2881,22 @@ async function renderTestTab() {
     }
   } catch (e) { /* ignore — leave whatever is there */ }
 
+  // Populate the campaign dropdown with categories that carry their own
+  // template (e.g. Fahrschule/Fahrlehrer), so their campaign can be tested
+  // independently of the rendered lead's own category.
+  const campaignSel = document.getElementById('testCampaign');
+  const prevCampaign = campaignSel.value;
+  campaignSel.innerHTML = '<option value="">Global template (Settings)</option>';
+  for (const c of allCategories) {
+    if (categoryHasCampaign(c)) {
+      const opt = document.createElement('option');
+      opt.value = c.name;
+      opt.textContent = `${c.name} campaign`;
+      campaignSel.appendChild(opt);
+    }
+  }
+  campaignSel.value = prevCampaign;
+
   // Populate the "render with" lead dropdown (sample data + real leads).
   const leadSel = document.getElementById('testLead');
   const prevLead = leadSel.value;
@@ -2905,10 +2922,12 @@ async function renderTestTab() {
 async function refreshTestPreview() {
   const emailType = document.getElementById('testTemplate').value;
   const leadId = document.getElementById('testLead').value;
+  const categoryName = document.getElementById('testCampaign').value;
   try {
     const result = await API.post('/api/email/test-preview', {
       emailType,
-      leadId: leadId || undefined
+      leadId: leadId || undefined,
+      categoryName: categoryName || undefined
     });
     document.getElementById('testSubject').value = result.subject;
     document.getElementById('testBody').value = result.body;
@@ -2935,6 +2954,7 @@ async function sendTestMail() {
   }
   const provider = document.getElementById('testProvider').value;
   const emailType = document.getElementById('testTemplate').value;
+  const categoryName = document.getElementById('testCampaign').value;
   const customSubject = document.getElementById('testSubject').value;
   const customBody = document.getElementById('testBody').value;
 
@@ -2951,7 +2971,8 @@ async function sendTestMail() {
       emailType,
       provider,
       customSubject,
-      customBody
+      customBody,
+      categoryName: categoryName || undefined
     });
     resultEl.classList.remove('smtp-pending');
     resultEl.classList.add('smtp-success');

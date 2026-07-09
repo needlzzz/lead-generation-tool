@@ -17,6 +17,20 @@ function getTemplatesForLead(settings, lead) {
   return resolveTemplatesForLead(settings, category || null);
 }
 
+/**
+ * Resolve templates for the Test tab. When an explicit campaign category name is
+ * given (e.g. "Fahrschule"), its category-specific templates win regardless of
+ * the rendered lead's own category; otherwise fall back to the lead's category
+ * (or the global template).
+ */
+function getTemplatesForTest(settings, lead, categoryName) {
+  if (categoryName) {
+    const category = dataStore.getAll('categories').find((c) => c.name === categoryName);
+    return resolveTemplatesForLead(settings, category || null);
+  }
+  return getTemplatesForLead(settings, lead);
+}
+
 /** True when the personal SMTP server is fully configured. */
 function isPersonalConfigured(settings) {
   const s = (settings && settings.smtp) || {};
@@ -231,7 +245,7 @@ function buildSampleLead() {
 
 // POST /api/email/test-preview — render a template with a real or sample lead.
 router.post('/test-preview', (req, res) => {
-  const { emailType, leadId } = req.body;
+  const { emailType, leadId, categoryName } = req.body;
   if (!['email1', 'email2'].includes(emailType)) {
     return res.status(400).json({ error: 'emailType must be email1 or email2' });
   }
@@ -243,7 +257,7 @@ router.post('/test-preview', (req, res) => {
     if (found) lead = found;
   }
 
-  const templates = getTemplatesForLead(settings, lead);
+  const templates = getTemplatesForTest(settings, lead, categoryName);
   const template = templates[emailType];
   if (!template) {
     return res.status(404).json({ error: `Template ${emailType} not configured` });
@@ -256,7 +270,7 @@ router.post('/test-preview', (req, res) => {
 // POST /api/email/test-send — send a test email to a chosen recipient.
 // Does NOT touch the pipeline or consume any daily quota (it is a test).
 router.post('/test-send', async (req, res) => {
-  const { to, emailType, provider, customSubject, customBody, leadId } = req.body;
+  const { to, emailType, provider, customSubject, customBody, leadId, categoryName } = req.body;
   if (!to) {
     return res.status(400).json({ error: 'Recipient address is required' });
   }
@@ -296,7 +310,7 @@ router.post('/test-send', async (req, res) => {
       const found = dataStore.get('leads', leadId);
       if (found) lead = found;
     }
-    const templates = getTemplatesForLead(settings, lead);
+    const templates = getTemplatesForTest(settings, lead, categoryName);
     const template = templates[emailType];
     if (!template) {
       return res.status(404).json({ error: `Template ${emailType} not configured` });
