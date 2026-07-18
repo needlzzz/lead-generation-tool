@@ -1,20 +1,42 @@
 const express = require('express');
 const dataStore = require('../lib/dataStore');
-const { renderTemplate, sendEmail, resolveTemplatesForLead } = require('../lib/emailService');
+const {
+  renderTemplate,
+  sendEmail,
+  resolveTemplatesForLead,
+  guessLeadLanguage,
+  normalizeCampaignLanguage
+} = require('../lib/emailService');
 const personalQuota = require('../lib/personalQuotaTracker');
 const quotaTracker = require('../lib/quotaTracker');
 
 const router = express.Router();
 
 /**
- * Resolve the email templates for a lead, preferring its category's own
- * templates (per-category campaigns) over the global settings template.
+ * Resolve the effective campaign language for a lead. An explicit request wins;
+ * otherwise, for a lead in a multi-language campaign category, auto-detect the
+ * language the recipient speaks from its city/address. Non-campaign leads always
+ * resolve to German (the default), so their behaviour is unchanged.
  */
-function getTemplatesForLead(settings, lead) {
+function resolveLangForLead(lead, category, requestedLang) {
+  const normalized = normalizeCampaignLanguage(requestedLang);
+  if (normalized) return normalized;
+  if (category && category.campaign) return guessLeadLanguage(lead);
+  return undefined;
+}
+
+/**
+ * Resolve the email templates for a lead, preferring its category's own
+ * templates (per-category campaigns) over the global settings template. When the
+ * category runs a multi-language campaign, the language variant matching the
+ * recipient (explicit `lang`, else auto-detected) is applied.
+ */
+function getTemplatesForLead(settings, lead, lang) {
   const category = lead && lead.category
     ? dataStore.getAll('categories').find((c) => c.name === lead.category)
     : null;
-  return resolveTemplatesForLead(settings, category || null);
+  const effectiveLang = resolveLangForLead(lead, category, lang);
+  return { templates: resolveTemplatesForLead(settings, category || null, effectiveLang), lang: effectiveLang };
 }
 
 /**
@@ -23,12 +45,13 @@ function getTemplatesForLead(settings, lead) {
  * the rendered lead's own category; otherwise fall back to the lead's category
  * (or the global template).
  */
-function getTemplatesForTest(settings, lead, categoryName) {
+function getTemplatesForTest(settings, lead, categoryName, lang) {
   if (categoryName) {
     const category = dataStore.getAll('categories').find((c) => c.name === categoryName);
-    return resolveTemplatesForLead(settings, category || null);
+    const effectiveLang = resolveLangForLead(lead, category, lang);
+    return resolveTemplatesForLead(settings, category || null, effectiveLang);
   }
-  return getTemplatesForLead(settings, lead);
+  return getTemplatesForLead(settings, lead, lang).templates;
 }
 
 /** True when the personal SMTP server is fully configured. */
@@ -87,7 +110,7 @@ router.get('/providers', (req, res) => {
 
 // POST /api/email/preview
 router.post('/preview', (req, res) => {
-  const { leadId, emailType } = req.body;
+  const { leadId, emailType, lang } = req.body;
   if (!leadId || !emailType) {
     return res.status(400).json({ error: 'leadId and emailType are required' });
   }
@@ -100,7 +123,7 @@ router.post('/preview', (req, res) => {
   if (!lead.email) return res.status(400).json({ error: 'Lead has no email address' });
 
   const settings = dataStore.readSingleton('settings') || {};
-  const templates = getTemplatesForLead(settings, lead);
+  const { templates, lang: effectiveLang } = getTemplatesForLead(settings, lead, lang);
   if (!templates[emailType]) {
     return res.status(404).json({ error: `Template ${emailType} not configured in settings` });
   }
@@ -111,13 +134,14 @@ router.post('/preview', (req, res) => {
   res.json({
     subject: rendered.subject,
     body: rendered.body,
-    to: lead.email
+    to: lead.email,
+    lang: effectiveLang || null
   });
 });
 
 // POST /api/email/send
 router.post('/send', async (req, res) => {
-  const { leadId, emailType, customBody, customSubject, provider } = req.body;
+  const { leadId, emailType, customBody, customSubject, provider, lang } = req.body;
   if (!leadId || !emailType) {
     return res.status(400).json({ error: 'leadId and emailType are required' });
   }
@@ -165,7 +189,7 @@ router.post('/send', async (req, res) => {
   if (!lead) return res.status(404).json({ error: 'Lead not found' });
   if (!lead.email) return res.status(400).json({ error: 'Lead has no email address' });
 
-  const templates = getTemplatesForLead(settings, lead);
+  const { templates } = getTemplatesForLead(settings, lead, lang);
   if (!templates[emailType]) {
     return res.status(404).json({ error: `Template ${emailType} not configured in settings` });
   }

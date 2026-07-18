@@ -10,8 +10,15 @@
 
 const {
   resolveTemplatesForLead,
+  guessLanguageFromText,
+  guessLeadLanguage,
+  normalizeCampaignLanguage,
   DEFAULT_TEMPLATES
 } = require('../server/lib/emailService');
+const {
+  CRASHCODE_FAHRSCHULE_CAMPAIGN,
+  CRASHCODE_FAHRSCHULE_TEMPLATES_BY_LANG
+} = require('../server/lib/defaultCategories');
 
 describe('resolveTemplatesForLead', () => {
   test('falls back to DEFAULT_TEMPLATES when no settings and no category', () => {
@@ -119,5 +126,85 @@ describe('resolveTemplatesForLead', () => {
       expect(typeof result[key].subject).toBe('string');
       expect(typeof result[key].body).toBe('string');
     }
+  });
+});
+
+describe('multi-language campaign resolution', () => {
+  const fahrschule = {
+    name: 'Fahrschule',
+    campaign: CRASHCODE_FAHRSCHULE_CAMPAIGN,
+    templates: CRASHCODE_FAHRSCHULE_TEMPLATES_BY_LANG.de
+  };
+
+  test('German (default) is used when no language is requested', () => {
+    const result = resolveTemplatesForLead({}, fahrschule);
+    expect(result.email1.body).toBe(CRASHCODE_FAHRSCHULE_TEMPLATES_BY_LANG.de.email1.body);
+    expect(result.email1.body).toContain('Sali zäme');
+  });
+
+  test('French variant is applied when lang="fr"', () => {
+    const result = resolveTemplatesForLead({}, fahrschule, 'fr');
+    expect(result.email1.subject).toBe(CRASHCODE_FAHRSCHULE_TEMPLATES_BY_LANG.fr.email1.subject);
+    expect(result.email1.body).toContain('auto-école');
+    expect(result.email2.body).toContain('CrashCode');
+  });
+
+  test('Italian variant is applied when lang="it"', () => {
+    const result = resolveTemplatesForLead({}, fahrschule, 'it');
+    expect(result.email1.subject).toBe(CRASHCODE_FAHRSCHULE_TEMPLATES_BY_LANG.it.email1.subject);
+    expect(result.email1.body).toContain('scuola guida');
+  });
+
+  test('all three variants keep the [Business Name] placeholder', () => {
+    for (const lang of ['de', 'fr', 'it']) {
+      const result = resolveTemplatesForLead({}, fahrschule, lang);
+      expect(result.email1.body).toContain('[Business Name]');
+    }
+  });
+
+  test('language is ignored for a non-campaign category', () => {
+    const plain = { name: 'Coiffeur' };
+    const withLang = resolveTemplatesForLead({}, plain, 'fr');
+    const withoutLang = resolveTemplatesForLead({}, plain);
+    expect(withLang).toEqual(withoutLang);
+    expect(withLang.email1).toEqual(DEFAULT_TEMPLATES.email1);
+  });
+
+  test('unsupported language falls back to the base (German) template', () => {
+    const result = resolveTemplatesForLead({}, fahrschule, 'es');
+    expect(result.email1.body).toBe(CRASHCODE_FAHRSCHULE_TEMPLATES_BY_LANG.de.email1.body);
+  });
+});
+
+describe('recipient language detection', () => {
+  test('normalizeCampaignLanguage accepts only de/fr/it', () => {
+    expect(normalizeCampaignLanguage('de')).toBe('de');
+    expect(normalizeCampaignLanguage('fr')).toBe('fr');
+    expect(normalizeCampaignLanguage('it')).toBe('it');
+    expect(normalizeCampaignLanguage('es')).toBeNull();
+    expect(normalizeCampaignLanguage(undefined)).toBeNull();
+  });
+
+  test('French cities detect fr', () => {
+    expect(guessLanguageFromText('Lausanne')).toBe('fr');
+    expect(guessLanguageFromText('Rue du Rhône 12, Genève')).toBe('fr');
+  });
+
+  test('Italian cities detect it', () => {
+    expect(guessLanguageFromText('Via Nassa, Lugano')).toBe('it');
+    expect(guessLanguageFromText('Bellinzona')).toBe('it');
+  });
+
+  test('German-speaking / unknown locations default to de', () => {
+    expect(guessLanguageFromText('Zürich')).toBe('de');
+    expect(guessLanguageFromText('')).toBe('de');
+    expect(guessLanguageFromText(undefined)).toBe('de');
+  });
+
+  test('guessLeadLanguage reads city and address', () => {
+    expect(guessLeadLanguage({ city: 'Genf' })).toBe('fr');
+    expect(guessLeadLanguage({ address: 'Via Cantonale, Lugano' })).toBe('it');
+    expect(guessLeadLanguage({ city: 'Bern' })).toBe('de');
+    expect(guessLeadLanguage(null)).toBe('de');
   });
 });

@@ -1,4 +1,59 @@
 const nodemailer = require('nodemailer');
+const { CAMPAIGN_TEMPLATES } = require('./defaultCategories');
+
+/**
+ * Supported campaign languages, in priority order for detection.
+ * German is the default/base; French + Italian are the localized variants.
+ */
+const CAMPAIGN_LANGUAGES = ['de', 'fr', 'it'];
+
+/**
+ * Location keywords that indicate the language a recipient most likely speaks.
+ * Used to auto-pick the campaign language variant from a lead's city/address.
+ * Kept intentionally small (Swiss French/Italian regions); anything unmatched
+ * falls back to German. Mirrored client-side in public/js/app.js —
+ * keep the two lists in sync.
+ */
+const LANGUAGE_LOCATION_HINTS = {
+  fr: [
+    'lausanne', 'genf', 'genève', 'geneve', 'geneva', 'genève', 'neuchâtel', 'neuchatel',
+    'fribourg', 'sion', 'montreux', 'vevey', 'yverdon', 'nyon', 'morges', 'bulle',
+    'delémont', 'delemont', 'martigny', 'renens', 'carouge', 'meyrin', 'vernier',
+    'gland', 'rolle', 'monthey', 'sierre', 'la chaux-de-fonds', 'le locle', 'jura',
+    'valais', 'vaud', 'romandie'
+  ],
+  it: [
+    'lugano', 'bellinzona', 'locarno', 'mendrisio', 'chiasso', 'ticino', 'tessin',
+    'biasca', 'losone', 'minusio', 'giubiasco', 'ascona', 'paradiso', 'massagno'
+  ]
+};
+
+/**
+ * Guess the language a recipient speaks from a free-text location string
+ * (city + address). Returns 'de' | 'fr' | 'it'. Defaults to German.
+ */
+function guessLanguageFromText(text) {
+  const hay = (text || '').toLowerCase();
+  if (!hay) return 'de';
+  if (LANGUAGE_LOCATION_HINTS.it.some((h) => hay.includes(h))) return 'it';
+  if (LANGUAGE_LOCATION_HINTS.fr.some((h) => hay.includes(h))) return 'fr';
+  return 'de';
+}
+
+/**
+ * Guess the language a lead speaks from its city/address fields.
+ */
+function guessLeadLanguage(lead) {
+  if (!lead) return 'de';
+  return guessLanguageFromText(`${lead.city || ''} ${lead.address || ''}`);
+}
+
+/**
+ * Normalize a requested language to a supported campaign language.
+ */
+function normalizeCampaignLanguage(lang) {
+  return CAMPAIGN_LANGUAGES.includes(lang) ? lang : null;
+}
 
 /**
  * Canonical fallback templates (website-sales campaign).
@@ -44,9 +99,12 @@ Marc`
  *
  * @param {object} settings - App settings (may contain a global `templates` object)
  * @param {object|null} category - The lead's category object (may contain `templates`)
+ * @param {string} [lang] - Optional campaign language ('de'|'fr'|'it'). When the
+ *   category runs a multi-language campaign (see `campaign`/`CAMPAIGN_TEMPLATES`),
+ *   the matching language variant overrides the base template. Ignored otherwise.
  * @returns {{ email1: {subject,body}, email2: {subject,body} }}
  */
-function resolveTemplatesForLead(settings, category) {
+function resolveTemplatesForLead(settings, category, lang) {
   const settingsTemplates = (settings && settings.templates) || {};
 
   const resolved = {
@@ -54,17 +112,31 @@ function resolveTemplatesForLead(settings, category) {
     email2: { ...DEFAULT_TEMPLATES.email2, ...(settingsTemplates.email2 || {}) }
   };
 
+  const pickFilled = (obj) =>
+    Object.fromEntries(Object.entries(obj || {}).filter(([, v]) => v != null && v !== ''));
+
   const categoryTemplates = category && category.templates;
   if (categoryTemplates) {
     // Only non-empty fields override the fallback, so a category that customises
     // just the body still inherits the global/default subject.
-    const pickFilled = (obj) =>
-      Object.fromEntries(Object.entries(obj || {}).filter(([, v]) => v != null && v !== ''));
     if (categoryTemplates.email1) {
       resolved.email1 = { ...resolved.email1, ...pickFilled(categoryTemplates.email1) };
     }
     if (categoryTemplates.email2) {
       resolved.email2 = { ...resolved.email2, ...pickFilled(categoryTemplates.email2) };
+    }
+  }
+
+  // Campaign language variant — when the category runs a multi-language campaign
+  // and a supported language is requested, the localized variant wins so the
+  // recipient gets the email in the language they speak.
+  const campaign = category && category.campaign;
+  const requestedLang = normalizeCampaignLanguage(lang);
+  if (campaign && requestedLang && CAMPAIGN_TEMPLATES[campaign]) {
+    const variant = CAMPAIGN_TEMPLATES[campaign][requestedLang];
+    if (variant) {
+      if (variant.email1) resolved.email1 = { ...resolved.email1, ...pickFilled(variant.email1) };
+      if (variant.email2) resolved.email2 = { ...resolved.email2, ...pickFilled(variant.email2) };
     }
   }
 
@@ -249,5 +321,9 @@ module.exports = {
   createTransport,
   formatGermanDate,
   resolveTemplatesForLead,
+  guessLanguageFromText,
+  guessLeadLanguage,
+  normalizeCampaignLanguage,
+  CAMPAIGN_LANGUAGES,
   DEFAULT_TEMPLATES
 };

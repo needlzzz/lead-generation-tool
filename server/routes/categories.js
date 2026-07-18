@@ -27,9 +27,21 @@ function ensureDefaults() {
       continue;
     }
     // Backfill a shipped campaign template without touching user-defined ones.
+    let dirty = false;
     if (cat.templates && !current.templates) {
       current.templates = cat.templates;
       if (current.tone === undefined && cat.tone !== undefined) current.tone = cat.tone;
+      dirty = true;
+    }
+    // Backfill the campaign id so multi-language campaigns (e.g. the CrashCode
+    // driving-school pitch) can pick the fr/it variant for a lead — even on
+    // categories seeded before the campaign field existed. Never overwrites a
+    // user's own templates; only tags the category for language resolution.
+    if (cat.campaign && current.campaign !== cat.campaign) {
+      current.campaign = cat.campaign;
+      dirty = true;
+    }
+    if (dirty) {
       dataStore.save('categories', current);
     }
   }

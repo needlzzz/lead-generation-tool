@@ -31,7 +31,8 @@ jest.mock('../server/lib/emailService', () => ({
   resolveTemplatesForLead: jest.fn(() => ({
     email1: { subject: 'Test Subject', body: 'Test Body' },
     email2: { subject: 'Test Subject', body: 'Test Body' }
-  }))
+  })),
+  guessLeadLanguage: jest.fn(() => 'de')
 }));
 
 jest.mock('fs', () => {

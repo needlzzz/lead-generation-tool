@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const nodemailer = require('nodemailer');
 const quotaTracker = require('./quotaTracker');
-const { renderTemplate, resolveTemplatesForLead } = require('./emailService');
+const { renderTemplate, resolveTemplatesForLead, guessLeadLanguage } = require('./emailService');
 const dataStore = require('./dataStore');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
@@ -179,11 +179,13 @@ async function processQueue(settings) {
     }
 
     // (d) Render email template — prefer the lead's category template (per-category
-    // campaigns), falling back to the global settings template.
+    // campaigns), falling back to the global settings template. For a multi-language
+    // campaign, auto-pick the variant matching the language the recipient speaks.
     const category = lead.category
       ? dataStore.getAll('categories').find((c) => c.name === lead.category)
       : null;
-    const templates = resolveTemplatesForLead(settings, category || null);
+    const lang = category && category.campaign ? guessLeadLanguage(lead) : undefined;
+    const templates = resolveTemplatesForLead(settings, category || null, lang);
     const template = templates[item.emailType];
     if (!template) {
       state.failed.push({

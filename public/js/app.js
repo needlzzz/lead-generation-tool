@@ -2071,23 +2071,75 @@ function categoryHasCampaign(category) {
   return !!(t && ((t.body && t.body.trim()) || (t.subject && t.subject.trim())));
 }
 
+// Multi-language campaigns: campaign id → available language codes. Mirrors the
+// server registry (CAMPAIGN_TEMPLATES in server/lib/defaultCategories.js).
+const CAMPAIGN_LANGUAGES = { 'crashcode-fahrschule': ['de', 'fr', 'it'] };
+const LANGUAGE_LABELS = { de: 'Deutsch', fr: 'Français', it: 'Italiano' };
+
+/**
+ * Language keyword hints, mirroring LANGUAGE_LOCATION_HINTS in
+ * server/lib/emailService.js — keep the two lists in sync.
+ */
+const LANGUAGE_LOCATION_HINTS = {
+  fr: ['lausanne', 'genf', 'genève', 'geneve', 'geneva', 'neuchâtel', 'neuchatel', 'fribourg', 'sion', 'montreux', 'vevey', 'yverdon', 'nyon', 'morges', 'bulle', 'delémont', 'delemont', 'martigny', 'renens', 'carouge', 'meyrin', 'vernier', 'gland', 'rolle', 'monthey', 'sierre', 'la chaux-de-fonds', 'le locle', 'jura', 'valais', 'vaud', 'romandie'],
+  it: ['lugano', 'bellinzona', 'locarno', 'mendrisio', 'chiasso', 'ticino', 'tessin', 'biasca', 'losone', 'minusio', 'giubiasco', 'ascona', 'paradiso', 'massagno']
+};
+
+/**
+ * Return the campaign's available languages if the category runs a
+ * multi-language campaign, otherwise null.
+ */
+function campaignLangsForCategory(category) {
+  if (category && category.campaign && CAMPAIGN_LANGUAGES[category.campaign]) {
+    return CAMPAIGN_LANGUAGES[category.campaign];
+  }
+  return null;
+}
+
+/**
+ * Guess the language a lead speaks from its city/address. Returns 'de'|'fr'|'it'.
+ * Mirrors guessLeadLanguage in server/lib/emailService.js.
+ */
+function guessLeadLanguage(lead) {
+  const hay = `${(lead && lead.city) || ''} ${(lead && lead.address) || ''}`.toLowerCase();
+  if (!hay.trim()) return 'de';
+  if (LANGUAGE_LOCATION_HINTS.it.some(h => hay.includes(h))) return 'it';
+  if (LANGUAGE_LOCATION_HINTS.fr.some(h => hay.includes(h))) return 'fr';
+  return 'de';
+}
+
 /**
  * Populate and open the bulk-send verification modal. Groups the leads by the
- * template they will actually receive and shows a rendered preview per group.
- * When more than one SMTP sender is configured, prompts the user to pick one.
+ * template they will actually receive — and, for a multi-language campaign, by
+ * the language the recipient speaks (auto-detected, overridable per group) — and
+ * shows a rendered preview per group. When more than one SMTP sender is
+ * configured, prompts the user to pick one.
  */
 async function showBulkVerify(eligible, { noEmail, providers }) {
-  // Group leads by the campaign/template they will receive.
-  const groups = new Map(); // key -> { label, isCampaign, leads: [] }
+  // Per-lead campaign language, sent to the backend so each recipient gets the
+  // email in the language they speak. Undefined for non-campaign (global) leads.
+  const langByLead = new Map();
+
+  // Group leads by the campaign/template + language they will receive.
+  const groups = new Map(); // key -> { label, isCampaign, lang, langs, category, leads: [] }
   for (const lead of eligible) {
     const category = lead.category ? allCategories.find(c => c.name === lead.category) : null;
-    const isCampaign = categoryHasCampaign(category);
-    const key = isCampaign ? `cat:${category.name}` : 'global';
-    const label = isCampaign
-      ? `${category.name} campaign (category-specific template)`
-      : 'Global template (Settings)';
-    if (!groups.has(key)) groups.set(key, { label, isCampaign, leads: [] });
-    groups.get(key).leads.push(lead);
+    const langs = campaignLangsForCategory(category);
+    if (langs && langs.length > 0) {
+      const lang = langs.includes(guessLeadLanguage(lead)) ? guessLeadLanguage(lead) : langs[0];
+      langByLead.set(lead.id, lang);
+      const key = `cat:${category.name}:${lang}`;
+      if (!groups.has(key)) {
+        groups.set(key, { isCampaign: true, category, langs, lang, leads: [] });
+      }
+      groups.get(key).leads.push(lead);
+    } else {
+      const key = 'global';
+      if (!groups.has(key)) {
+        groups.set(key, { isCampaign: false, label: 'Global template (Settings)', leads: [] });
+      }
+      groups.get(key).leads.push(lead);
+    }
   }
 
   // Sender selection — only prompt when more than one SMTP is configured.
@@ -2136,40 +2188,67 @@ async function showBulkVerify(eligible, { noEmail, providers }) {
   const container = document.getElementById('bulkVerifyGroups');
   container.innerHTML = '';
 
+  // Fetch and fill the subject + body preview for a block in the given language.
+  async function refreshPreview(subjEl, bodyEl, sampleLeadId, lang) {
+    subjEl.innerHTML = '<strong>Subject:</strong> ';
+    subjEl.appendChild(document.createTextNode('(loading…)'));
+    bodyEl.textContent = '';
+    try {
+      const result = await API.post('/api/email/preview', { leadId: sampleLeadId, emailType: 'email1', lang });
+      subjEl.innerHTML = '<strong>Subject:</strong> ';
+      subjEl.appendChild(document.createTextNode(result.subject));
+      bodyEl.textContent = result.body || '';
+    } catch (e) {
+      subjEl.innerHTML = '<strong>Subject:</strong> ';
+      subjEl.appendChild(document.createTextNode('(preview unavailable)'));
+      bodyEl.textContent = '';
+    }
+  }
+
   for (const group of groups.values()) {
     const block = document.createElement('div');
     block.style.cssText = 'border:1px solid var(--color-border,#ddd);border-radius:6px;padding:0.75rem;margin-bottom:0.75rem;';
 
     const heading = document.createElement('div');
     heading.style.cssText = 'font-weight:600;margin-bottom:0.35rem;';
-    heading.textContent = `${group.label} — ${group.leads.length} lead(s)`;
+    const headingText = () => group.isCampaign
+      ? `${group.category.name} campaign — ${LANGUAGE_LABELS[group.lang] || group.lang} — ${group.leads.length} lead(s)`
+      : `${group.label} — ${group.leads.length} lead(s)`;
+    heading.textContent = headingText();
     block.appendChild(heading);
-
-    // Fetch a representative preview (subject + body) for the first lead.
-    const sample = group.leads[0];
-    let subjectText = '(preview unavailable)';
-    let bodyText = '';
-    try {
-      const result = await API.post('/api/email/preview', { leadId: sample.id, emailType: 'email1' });
-      subjectText = result.subject;
-      bodyText = result.body;
-    } catch (e) {
-      bodyText = '';
-    }
 
     const subj = document.createElement('div');
     subj.style.cssText = 'font-size:0.85rem;margin-bottom:0.35rem;';
-    subj.innerHTML = `<strong>Subject:</strong> `;
-    subj.appendChild(document.createTextNode(subjectText));
-    block.appendChild(subj);
+    const snippet = document.createElement('pre');
+    snippet.className = 'email-body';
+    snippet.style.cssText = 'max-height:140px;overflow:auto;font-size:0.8rem;margin:0;';
 
-    if (bodyText) {
-      const snippet = document.createElement('pre');
-      snippet.className = 'email-body';
-      snippet.style.cssText = 'max-height:140px;overflow:auto;font-size:0.8rem;margin:0;';
-      snippet.textContent = bodyText;
-      block.appendChild(snippet);
+    // Language selector for multi-language campaign groups.
+    if (group.isCampaign && group.langs.length > 1) {
+      const langLabel = document.createElement('label');
+      langLabel.style.cssText = 'display:flex;align-items:center;gap:0.5rem;font-size:0.8rem;margin-bottom:0.4rem;';
+      langLabel.appendChild(document.createTextNode('Language:'));
+      const langSel = document.createElement('select');
+      langSel.style.cssText = 'padding:0.25rem;';
+      for (const lc of group.langs) {
+        const opt = document.createElement('option');
+        opt.value = lc;
+        opt.textContent = LANGUAGE_LABELS[lc] || lc;
+        langSel.appendChild(opt);
+      }
+      langSel.value = group.lang;
+      langSel.addEventListener('change', () => {
+        group.lang = langSel.value;
+        for (const l of group.leads) langByLead.set(l.id, group.lang);
+        heading.textContent = headingText();
+        refreshPreview(subj, snippet, group.leads[0].id, group.lang);
+      });
+      langLabel.appendChild(langSel);
+      block.appendChild(langLabel);
     }
+
+    block.appendChild(subj);
+    block.appendChild(snippet);
 
     const names = document.createElement('div');
     names.style.cssText = 'font-size:0.75rem;color:var(--color-text-muted,#777);margin-top:0.35rem;';
@@ -2177,6 +2256,9 @@ async function showBulkVerify(eligible, { noEmail, providers }) {
     block.appendChild(names);
 
     container.appendChild(block);
+
+    // Initial preview (in the group's language for campaigns).
+    refreshPreview(subj, snippet, group.leads[0].id, group.isCampaign ? group.lang : undefined);
   }
 
   const confirmBtn = document.getElementById('btnConfirmBulkSend');
@@ -2192,7 +2274,7 @@ async function showBulkVerify(eligible, { noEmail, providers }) {
       showError(`Daily quota exhausted for ${p.label}. Pick another sender or try again tomorrow.`);
       return;
     }
-    executeBulkSend(toSend, p.id);
+    executeBulkSend(toSend, p.id, langByLead);
   });
 
   openModal('modalBulkVerify');
@@ -2200,9 +2282,10 @@ async function showBulkVerify(eligible, { noEmail, providers }) {
 
 /**
  * Actually send Email 1 to each lead, one by one, honoring the same per-lead
- * template resolution the backend applies.
+ * template resolution the backend applies. The per-lead campaign language
+ * (langByLead) is passed so each recipient gets the email in their language.
  */
-async function executeBulkSend(toSend, provider) {
+async function executeBulkSend(toSend, provider, langByLead) {
   const btn = document.getElementById('btnEmailSelected');
   btn.disabled = true;
   btn.textContent = '⏳ Sending...';
@@ -2214,7 +2297,8 @@ async function executeBulkSend(toSend, provider) {
   for (let i = 0; i < toSend.length; i++) {
     const lead = toSend[i];
     try {
-      await API.post('/api/email/send', { leadId: lead.id, emailType: 'email1', provider });
+      const lang = langByLead ? langByLead.get(lead.id) : undefined;
+      await API.post('/api/email/send', { leadId: lead.id, emailType: 'email1', provider, lang });
       sent++;
     } catch (err) {
       failed++;
